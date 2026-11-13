@@ -34,6 +34,18 @@ The confirmation page shows an order summary that the customer can print or save
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
 
+## Publishing with GitHub Pages (free)
+This repo is public, so GitHub can host the checkout for free:
+1. On GitHub, go to the repo's **Settings → Pages**.
+2. Under **Build and deployment**, set Source to **Deploy from a branch**, pick the branch (for example `main` once this is merged) and folder **/ (root)**, then **Save**.
+3. After about a minute it's live at **https://hamstari.github.io/adcheckout/**.
+
+To update rates, edit `rates.csv` / `sold.csv` on GitHub (open the file → pencil icon, or Add file → Upload files), then **Commit changes**. The site updates within about a minute.
+
+**Optional: your own address.** In Settings → Pages → Custom domain, enter `ads.bestdealsnetworks.com`. Then in Wix go to Domains → your domain → Manage DNS records, add a **CNAME** with host `ads` pointing to `hamstari.github.io`, and tick **Enforce HTTPS** in GitHub once it's available.
+
+**On Wix:** link to the page from a button or menu item (simplest). Or use Add Elements → Embed Code → **Embed a Site**, paste the URL, and make the box tall (about 3,500px on desktop). Wix embeds have a fixed height, so the auto-resizing in `embed.html` doesn't work there.
+
 ## Publishing on your site
 The checkout is three plain files with no build step: `index.html`, `rates.csv` and `sold.csv`.
 
