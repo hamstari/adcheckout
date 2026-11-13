@@ -39,10 +39,18 @@
   .eyebrow { color: var(--teal); letter-spacing: .24em; font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
   header h1 { font-size: clamp(30px, 5.5vw, 46px); margin: 10px 0 14px; line-height: 1.15; }
   header p { max-width: 640px; color: #d4d4d4; font-size: 16.5px; margin: 0 0 26px; }
-  @media (max-width: 560px) { header { padding-top: 32px; padding-bottom: 88px; } header p { font-size: 15px; } }
+  @media (max-width: 560px) {
+    header { padding-top: 32px; padding-bottom: 88px; } header p { font-size: 15px; }
+  }
+  @media (max-width: 360px) { .steps .xs-hide { display: none; } }
   .steps { display: flex; gap: 8px; flex-wrap: wrap; }
   .steps span { border: 1px solid #3a3a3a; color: #bdbdbd; padding: 7px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; }
   .steps span.on { background: var(--teal); border-color: var(--teal); color: var(--black); font-weight: 700; }
+  @media (max-width: 560px) {
+    /* the three step pills stay on one row */
+    .steps { flex-wrap: nowrap; gap: 6px; }
+    .steps span { flex: 1 1 auto; text-align: center; white-space: nowrap; padding: 7px 6px; font-size: clamp(10.5px, 3.1vw, 12.5px); }
+  }
 
   /* Layout */
   main { margin-top: -64px; padding: 0 var(--gutter) 64px; position: relative; z-index: 1; }
@@ -179,7 +187,7 @@
     <h1>Best Deals Ads</h1>
     <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and months, then check out. Printing and mailing included.</p>
     <div class="steps" id="steps">
-      <span class="on">1 · Build your ad</span>
+      <span class="on">1 · Build<i class="xs-hide" style="font-style:normal"> your ad</i></span>
       <span>2 · Checkout</span>
       <span>3 · Confirmation</span>
     </div>
