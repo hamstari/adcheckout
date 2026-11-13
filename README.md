@@ -7,7 +7,9 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
 ## Pricing
-Each zone has its own rate for each ad size (`CONFIG.rates`, zone → size → price per issue). Zone cards show the price for the selected size, and size cards show the lowest zone price ("From $X"). Ad design is included at no charge. On top of that, booking both magazines saves 10% and the volume discount applies.
+Each magazine has its own rate table (`CONFIG.rates.bdb` and `CONFIG.rates.ehi`): zone → ad size → price per issue. Set a zone to `null` if that magazine doesn't mail there. That zone then shows as unavailable, and it's removed from the order if the customer switches magazines.
+
+"Both magazines" adds the two rates for each zone and then takes 10% off. It's only offered in zones both magazines mail. Zone cards show the price for the selected size and magazine, and size cards show the lowest zone price ("From $X"). Ad design is included at no charge. The volume discount applies on top.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).

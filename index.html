@@ -167,6 +167,7 @@
           </div>
           <p class="sub" id="zoneSub">Choose the zones you want to reach. Each zone is its own mailing.</p>
           <div class="opts" id="zoneOpts"></div>
+          <div class="note hidden" id="zoneNote"></div>
         </div>
 
         <div class="panel">
@@ -285,9 +286,9 @@ const CONFIG = {
   salesEmail: "advertise@bestdealsbook.com",
   salesPhone: "844-600-8846",
   publications: [
-    { id: "bdb",  name: "Best Deals Book", desc: "Coupons and offers from trusted local home service pros", mult: 1 },
-    { id: "ehi",  name: "Exclusively Home Improvements", desc: "Home improvement magazine for affluent homeowners", mult: 1 },
-    { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, discount: 0.10, tag: "Save 10%" },
+    { id: "bdb",  name: "Best Deals Book", desc: "Coupons and offers from trusted local home service pros", mult: 1, includes: ["bdb"] },
+    { id: "ehi",  name: "Exclusively Home Improvements", desc: "Home improvement magazine for affluent homeowners", mult: 1, includes: ["ehi"] },
+    { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, includes: ["bdb", "ehi"], discount: 0.10, tag: "Save 10%" },
   ],
   sizes: [
     { id: "bc",  name: "Back Cover",          trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
@@ -298,15 +299,28 @@ const CONFIG = {
     { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
   ],
   // homes = approx. households mailed per issue (placeholder)
-  // Price per issue for each zone and ad size, per magazine. Zones can each have their own rates.
+  // Price per issue for each magazine → zone → ad size.
+  // Set a zone to null if that magazine doesn't mail there.
+  // "Both magazines" = the two rates added together, then the 10% bundle discount.
   rates: {
-    Z1: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
-    Z2: { bc: 1345, ifc: 1075, ibc:  985, fp:  805, hp:  470, qp:  285 },
-    Z3: { bc: 1720, ifc: 1375, ibc: 1260, fp: 1030, hp:  605, qp:  360 },
-    Z4: { bc: 1195, ifc:  955, ibc:  875, fp:  715, hp:  420, qp:  250 },
-    Z5: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
-    Z6: { bc: 1645, ifc: 1315, ibc: 1205, fp:  985, hp:  580, qp:  345 },
-    Z7: { bc: 1270, ifc: 1015, ibc:  930, fp:  760, hp:  445, qp:  270 },
+    bdb: {
+      Z1: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
+      Z2: { bc: 1345, ifc: 1075, ibc:  985, fp:  805, hp:  470, qp:  285 },
+      Z3: { bc: 1720, ifc: 1375, ibc: 1260, fp: 1030, hp:  605, qp:  360 },
+      Z4: { bc: 1195, ifc:  955, ibc:  875, fp:  715, hp:  420, qp:  250 },
+      Z5: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
+      Z6: { bc: 1645, ifc: 1315, ibc: 1205, fp:  985, hp:  580, qp:  345 },
+      Z7: { bc: 1270, ifc: 1015, ibc:  930, fp:  760, hp:  445, qp:  270 },
+    },
+    ehi: {
+      Z1: { bc: 1195, ifc:  955, ibc:  875, fp:  715, hp:  420, qp:  250 },
+      Z2: { bc: 1120, ifc:  895, ibc:  820, fp:  670, hp:  395, qp:  235 },
+      Z3: { bc: 1345, ifc: 1075, ibc:  985, fp:  805, hp:  470, qp:  285 },
+      Z4: null, // not mailed in this zone
+      Z5: { bc: 1045, ifc:  835, ibc:  765, fp:  625, hp:  370, qp:  220 },
+      Z6: null, // not mailed in this zone
+      Z7: null, // not mailed in this zone
+    },
   },
   zones: [
     { id: "Z1", name: "Zone 1", homes: 20000 },
@@ -364,7 +378,7 @@ const MONTHS = (() => {
   return out;
 })();
 const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
-const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", step: 1, notice: "" };
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", step: 1, notice: "", zoneNotice: "" };
 
 // Zones where this size is already sold for this month, in the chosen magazine(s).
 function takenZones(monthKey) {
@@ -412,8 +426,25 @@ function optButton({ pressed, html, onClick, label }) {
   return b;
 }
 
-const rate = (zoneId, sizeId) => CONFIG.rates[zoneId][sizeId];
-const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)));
+// Per-issue price for a zone in the chosen magazine(s); null if not offered there.
+const rate = (zoneId, sizeId, pubId = state.pub) => {
+  const pubs = CONFIG.publications.find(p => p.id === pubId).includes;
+  const parts = pubs.map(p => CONFIG.rates[p][zoneId] && CONFIG.rates[p][zoneId][sizeId]);
+  return parts.some(v => v == null) ? null : parts.reduce((a, v) => a + v, 0);
+};
+const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)).filter(v => v != null));
+const pubShort = { bdb: "Best Deals Book", ehi: "Exclusively Home Improvements" };
+// Which of the chosen magazines don't mail this zone.
+const missingIn = (zoneId) => CONFIG.publications.find(p => p.id === state.pub).includes.filter(p => !CONFIG.rates[p][zoneId]);
+
+// Drop zones the chosen magazine(s) don't mail.
+function pruneZones() {
+  const dropped = [...state.zones].filter(z => missingIn(z).length);
+  dropped.forEach(z => state.zones.delete(z));
+  state.zoneNotice = dropped.length
+    ? `Removed ${dropped.join(", ")}: ${pubShort[missingIn(dropped[0])[0]]} doesn't mail ${dropped.length > 1 ? "those zones" : "that zone"}.`
+    : "";
+}
 
 function calc() {
   const pub = CONFIG.publications.find(p => p.id === state.pub);
@@ -423,7 +454,7 @@ function calc() {
   const art = CONFIG.artwork.find(a => a.id === state.art);
   const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
   const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
-  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0) * pub.mult;
+  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0);
   const gross = perIssue * issues;
   const bundleOff = gross * (pub.discount || 0);
   const termOff = (gross - bundleOff) * discount;
@@ -443,7 +474,7 @@ function render() {
   CONFIG.publications.forEach(p => pubEl.append(optButton({
     pressed: state.pub === p.id,
     html: `<b>${p.name}</b><small>${p.desc}</small>${p.tag ? `<span class="tag">${p.tag}</span>` : ""}`,
-    onClick: () => { state.pub = p.id; pruneMonths(); render(); },
+    onClick: () => { state.pub = p.id; pruneZones(); pruneMonths(); render(); },
   })));
 
   // sizes
@@ -457,13 +488,22 @@ function render() {
 
   // zones
   const zoneEl = $("#zoneOpts"); zoneEl.innerHTML = "";
-  CONFIG.zones.forEach(z => zoneEl.append(optButton({
-    pressed: state.zones.has(z.id),
-    html: `<b>${z.name}</b><small>About ${z.homes.toLocaleString()} homes</small><div class="price">${money(rate(z.id, state.size) * c.pub.mult)} / issue</div>`,
-    onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); pruneMonths(); render(); },
-  })));
+  CONFIG.zones.forEach(z => {
+    const missing = missingIn(z.id);
+    const b = optButton({
+      pressed: state.zones.has(z.id),
+      html: missing.length
+        ? `<b>${z.name}</b><small>${pubShort[missing[0]]} doesn't mail here</small>`
+        : `<b>${z.name}</b><small>About ${(z.homes * c.pub.mult).toLocaleString()} homes</small><div class="price">${money(rate(z.id, state.size))} / issue</div>`,
+      onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); state.zoneNotice = ""; pruneMonths(); render(); },
+    });
+    if (missing.length) b.disabled = true;
+    zoneEl.append(b);
+  });
+  $("#zoneNote").classList.toggle("hidden", !state.zoneNotice);
+  $("#zoneNote").textContent = state.zoneNotice || "";
   $("#zoneSub").textContent = `Choose the zones you want to reach. Each zone is its own mailing. Prices shown are for a ${c.size.name}${c.pub.mult > 1 ? " in both magazines" : ""}.`;
-  $("#allZones").textContent = state.zones.size === CONFIG.zones.length ? "Clear all" : "Select all";
+  $("#allZones").textContent = CONFIG.zones.filter(z => !missingIn(z.id).length).every(z => state.zones.has(z.id)) ? "Clear all" : "Select all";
 
   // issues
   const quick = $("#quickPicks"); quick.innerHTML = "";
@@ -536,8 +576,10 @@ function render() {
 $("#clearMonths").onclick = () => { state.months.clear(); state.notice = ""; render(); };
 
 $("#allZones").onclick = () => {
-  if (state.zones.size === CONFIG.zones.length) state.zones.clear();
-  else CONFIG.zones.forEach(z => state.zones.add(z.id));
+  const open = CONFIG.zones.filter(z => !missingIn(z.id).length);
+  if (open.every(z => state.zones.has(z.id))) state.zones.clear();
+  else open.forEach(z => state.zones.add(z.id));
+  state.zoneNotice = "";
   pruneMonths(); render();
 };
 
@@ -563,7 +605,7 @@ function buildOrder(form) {
         bothMagazineSavings: Math.round(c.bundleOff),
         volumeSavings: Math.round(c.termOff),
         volumeDiscountPct: Math.round(c.discount * 100),
-        zonePricesPerIssue: Object.fromEntries(c.zonePrices.map(z => [z.id, z.price * c.pub.mult])),
+        zonePricesPerIssue: Object.fromEntries(c.zonePrices.map(z => [z.id, z.price])),
         total: Math.round(c.total),
       },
       customer,
@@ -577,7 +619,7 @@ function receiptRows(c, order) {
     ["Business", order.customer.business],
     ["Magazine", c.pub.name],
     ["Ad size", `${c.size.name} (${c.size.trim})`],
-    ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price * c.pub.mult)}`).join(", ")],
+    ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
     ["Artwork", c.art.name],
     ["Per issue", money(c.perIssue)],
