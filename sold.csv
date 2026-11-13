@@ -1,6 +1,6 @@
-Magazine,Ad size,Zone,Month,Advertiser
-BDB,Back Cover,Z1,Jan 2027,Example Roofing
-BDB,Back Cover,Z1,Feb 2027,Example Roofing
-BDB,Back Cover,Z3,Mar 2027,Example AC
-BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
-EHI,Back Cover,Z1,Apr 2027,Example Windows
+Magazine,Ad size,Zone,Month,Advertiser,Notes
+BDB,Back Cover,Z1,Jan 2027,Example Roofing,"PLACEHOLDER - example booking, delete"
+BDB,Back Cover,Z1,Feb 2027,Example Roofing,"PLACEHOLDER - example booking, delete"
+BDB,Back Cover,Z3,Mar 2027,Example AC,"PLACEHOLDER - example booking, delete"
+BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers,"PLACEHOLDER - example booking, delete"
+EHI,Back Cover,Z1,Apr 2027,Example Windows,"PLACEHOLDER - example booking, delete"

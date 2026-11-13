@@ -27,6 +27,7 @@ One row per magazine and zone. Prices are **per issue**.
 - **A magazine doesn't mail a zone:** delete that row.
 - **A size isn't sold in a zone:** leave that cell empty.
 - **Magazine:** `BDB` (Best Deals Book) or `EHI` (Exclusively Home Improvements).
+- **Notes:** for your team only. The checkout ignores it. Each row says *PLACEHOLDER* now; clear that note as you put in the real rate.
 
 ## sold.csv
 One row per booked cover. The cover then shows as **Taken** for that zone and month, so nobody else can book it.
@@ -37,7 +38,7 @@ One row per booked cover. The cover then shows as **Taken** for that zone and mo
 
 - **Ad size:** `Back Cover`, `Inside Front Cover` or `Inside Back Cover`.
 - **Month:** `Jan 2027` works. So does Excel changing it to `Jan-27` or `1/1/2027`.
-- **Advertiser:** for your team only. Customers never see it.
+- **Advertiser** and **Notes:** for your team only. Customers never see them.
 - **Booking cancelled:** delete the row.
 
 ## Don't
@@ -45,4 +46,21 @@ One row per booked cover. The cover then shows as **Taken** for that zone and mo
 - Rename the files.
 - Save as `.xlsx`. It has to be `.csv`.
 
-The demo rates and sold covers in these files now are examples. Replace them with real ones before going live.
+## Placeholder rates (currently in rates.csv)
+These are made-up demo numbers so the checkout works. Replace every one before going live. Exclusively Home Improvements has no rows for Z4, Z6 and Z7, which means it shows as not mailing those zones.
+
+| Magazine | Zone | Zone name | Homes | Back Cover | Inside Front Cover | Inside Back Cover | Full Page | Half Page | Quarter Page |
+|---|---|---|---|---|---|---|---|---|---|
+| BDB | Z1 | Zone 1 | 20000 | 1495 | 1195 | 1095 | 895 | 525 | 315 |
+| BDB | Z2 | Zone 2 | 20000 | 1345 | 1075 | 985 | 805 | 470 | 285 |
+| BDB | Z3 | Zone 3 | 20000 | 1720 | 1375 | 1260 | 1030 | 605 | 360 |
+| BDB | Z4 | Zone 4 | 20000 | 1195 | 955 | 875 | 715 | 420 | 250 |
+| BDB | Z5 | Zone 5 | 20000 | 1495 | 1195 | 1095 | 895 | 525 | 315 |
+| BDB | Z6 | Zone 6 | 20000 | 1645 | 1315 | 1205 | 985 | 580 | 345 |
+| BDB | Z7 | Zone 7 | 20000 | 1270 | 1015 | 930 | 760 | 445 | 270 |
+| EHI | Z1 | Zone 1 | 18000 | 1195 | 955 | 875 | 715 | 420 | 250 |
+| EHI | Z2 | Zone 2 | 18000 | 1120 | 895 | 820 | 670 | 395 | 235 |
+| EHI | Z3 | Zone 3 | 18000 | 1345 | 1075 | 985 | 805 | 470 | 285 |
+| EHI | Z5 | Zone 5 | 18000 | 1045 | 835 | 765 | 625 | 370 | 220 |
+
+`sold.csv` also has 5 example bookings (BDB back covers in Z1 for Jan and Feb 2027 and Z3 for Mar 2027, a BDB inside front cover in Z2 for Jan 2027, and an EHI back cover in Z1 for Apr 2027). Delete them before going live.
