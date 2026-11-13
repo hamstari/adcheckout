@@ -23,11 +23,11 @@ The key can change files in this repo, so only give it to trusted staff. Set an 
 Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
 
 ## Premium placement
-Step 5 of the checkout offers Standard placement (included), **Right-hand read**, **Front of magazine** and **Centerfold**. Each premium position adds a percentage to the ad price per issue (`CONFIG.placements` in `index.html`; the 10% / 15% / 25% there are placeholders). Covers can't take a placement upgrade, and Centerfold is Full Page only.
+Step 5 of the checkout offers Standard placement (included), **Right-hand read**, **Front of magazine** and **Centerfold** (`CONFIG.placements` in `index.html`). No price is shown or added to the total for these: each says "Upgrade charge TBD on invoice", and staff set the charge when invoicing. Covers can't take a placement upgrade, and Centerfold is Full Page only.
 
-**Additional placement request** is a free-text add-on. It adds no charge by itself; the order is marked "to be quoted" and staff confirm availability and any cost before invoicing.
+**Additional placement request** is a free-text add-on, also marked "Charge TBD on invoice".
 
-Premium positions aren't tracked as sold the way covers are, so staff confirm them for each issue.
+When either is chosen, the summary, confirmation and order show the total "plus placement charge TBD", and the order data has `placementChargeTBD: true`. Premium positions aren't tracked as sold the way covers are, so staff confirm them for each issue.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
