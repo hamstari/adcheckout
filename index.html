@@ -39,10 +39,18 @@
   .eyebrow { color: var(--teal); letter-spacing: .24em; font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
   header h1 { font-size: clamp(30px, 5.5vw, 46px); margin: 10px 0 14px; line-height: 1.15; }
   header p { max-width: 640px; color: #d4d4d4; font-size: 16.5px; margin: 0 0 26px; }
-  @media (max-width: 560px) { header { padding-top: 32px; padding-bottom: 88px; } header p { font-size: 15px; } }
+  @media (max-width: 560px) {
+    header { padding-top: 32px; padding-bottom: 88px; } header p { font-size: 15px; }
+  }
+  @media (max-width: 360px) { .steps .xs-hide { display: none; } }
   .steps { display: flex; gap: 8px; flex-wrap: wrap; }
   .steps span { border: 1px solid #3a3a3a; color: #bdbdbd; padding: 7px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; }
   .steps span.on { background: var(--teal); border-color: var(--teal); color: var(--black); font-weight: 700; }
+  @media (max-width: 560px) {
+    /* the three step pills stay on one row */
+    .steps { flex-wrap: nowrap; gap: 6px; }
+    .steps span { flex: 1 1 auto; text-align: center; white-space: nowrap; padding: 7px 6px; font-size: clamp(10.5px, 3.1vw, 12.5px); }
+  }
 
   /* Layout */
   main { margin-top: -64px; padding: 0 var(--gutter) 64px; position: relative; z-index: 1; }
@@ -121,23 +129,46 @@
   .chip:hover { border-color: var(--teal); }
   .tiers { font-size: 13.5px; color: var(--muted); margin-top: 14px; }
   .tiers b { color: var(--teal-d); }
-  .demo-bar { background: #e9b14c; color: #2a1d00; text-align: center; font-size: 13.5px; font-weight: 600; padding: 8px var(--gutter); }
   .hidden { display: none !important; }
-  .confirm { text-align: center; padding: 48px clamp(22px, 4vw, 40px); }
-  .confirm .big { width: 64px; height: 64px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 30px; margin: 0 auto 16px; }
-  .confirm h2 { font-size: 28px; margin-bottom: 8px; }
-  .ref { font-weight: 700; letter-spacing: .08em; }
-  .receipt { text-align: left; max-width: 520px; margin: 24px auto 8px; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
-  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 0; font-size: 14px; }
+  /* Confirmation */
+  .grid.done { grid-template-columns: 1fr; max-width: 760px; }
+  .confirm { padding: 0; overflow: hidden; }
+  .confirm-top { background: var(--black); color: #fff; text-align: center; padding: 44px clamp(22px, 5vw, 48px) 40px; position: relative; }
+  .confirm-top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg, #87cbe4 0 20%, #2f5a82 20% 40%, #347142 40% 60%, #e9b14c 60% 80%, #c83536 80% 100%); }
+  .confirm .big { width: 60px; height: 60px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 28px; font-weight: 700; margin: 0 auto 18px; }
+  .confirm-top .eyebrow { margin-bottom: 8px; }
+  .confirm h2 { font-size: clamp(24px, 4vw, 30px); color: #fff; margin-bottom: 18px; line-height: 1.2; }
+  .refchip { display: inline-flex; gap: 10px; align-items: baseline; border: 1px solid #3a3a3a; border-radius: 999px; padding: 8px 18px; font-size: 13px; color: #bdbdbd; }
+  .ref { font-weight: 700; letter-spacing: .1em; color: #fff; font-size: 15px; }
+  .confirm-top p { color: #d4d4d4; max-width: 520px; margin: 18px auto 0; font-size: 15px; }
+  .confirm-body { padding: clamp(24px, 4vw, 40px); }
+  .confirm-body h3 { font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--teal-d); font-weight: 700; margin: 0 0 14px; }
+  .next { list-style: none; margin: 0 0 32px; padding: 0; display: grid; gap: 14px; }
+  .next li { display: flex; gap: 14px; align-items: flex-start; }
+  .next .n { width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--black); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+  .next b { display: block; font-weight: 600; }
+  .next span { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+  .receipt { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; font-size: 14px; }
+  .receipt dt, .receipt dd { margin: 0; padding: 10px 18px; border-bottom: 1px solid var(--line); }
   .receipt dt { color: var(--muted); }
-  .receipt dd { margin: 0; text-align: right; padding-left: 16px; }
-  .receipt .tot { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; font-weight: 700; }
+  .receipt dd { text-align: right; font-weight: 500; overflow-wrap: anywhere; }
+  .receipt .tot { background: var(--black); color: #fff; border: 0; font-weight: 700; padding-top: 14px; padding-bottom: 14px; }
+  .receipt dd.tot { font-size: 20px; }
+  .receipt dd.tot small { display: block; font-size: 12px; font-weight: 500; color: #bdbdbd; }
+  .demo-note { text-align: center; color: var(--muted); font-size: 12.5px; margin: 16px 0 0; }
   .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
   .actions .btn { width: auto; min-width: 220px; margin-top: 0; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   @media print {
     body { background: #fff; }
-    header .steps, header p, aside, footer, .actions, #step1, #step2, .mbar, .demo-bar { display: none !important; }
+    header .steps, header p, aside, footer, .actions, #step1, #step2, .mbar, .demo-note { display: none !important; }
+    .confirm-top, .receipt .tot { background: #fff !important; color: var(--ink) !important; }
+    .confirm-top::after { display: none; }
+    .confirm h2, .ref { color: var(--ink) !important; }
+    .confirm-top p, .refchip, .receipt dd.tot small { color: var(--muted) !important; }
+    .receipt .tot { border-top: 2px solid var(--ink); }
     header { padding: 20px 0; background: #fff; color: var(--ink); }
     header::after { display: none; }
     main { margin-top: 0; padding: 0; }
@@ -150,14 +181,13 @@
 </head>
 <body>
 
-<div class="demo-bar hidden" id="demoBar">Demo: prices and availability are examples, and nothing you enter is sent or saved.</div>
 <header>
   <div class="wrap">
     <div class="eyebrow">Best Deals Networks</div>
     <h1>Best Deals Ads</h1>
     <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and months, then check out. Printing and mailing included.</p>
     <div class="steps" id="steps">
-      <span class="on">1 · Build your ad</span>
+      <span class="on">1 · Build<i class="xs-hide" style="font-style:normal"> your ad</i></span>
       <span>2 · Checkout</span>
       <span>3 · Confirmation</span>
     </div>
@@ -205,7 +235,18 @@
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">5</div><h2>Artwork</h2></div>
+          <div class="panel-h"><div class="num">5</div><h2>Placement</h2></div>
+          <p class="sub">Standard placement is included. Upgrade to a premium position for more attention.</p>
+          <div class="opts" id="placeOpts"></div>
+          <div class="note hidden" id="placeNote"></div>
+          <div class="opts wide" style="margin-top:12px" id="reqOpt"></div>
+          <label id="reqWrap" class="hidden" style="margin-top:12px">Describe the placement you'd like
+            <textarea id="reqText" rows="2" maxlength="300" placeholder="For example: near the roofing section, opposite editorial, first half of the book…"></textarea>
+          </label>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h"><div class="num">6</div><h2>Artwork</h2></div>
           <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
           <div class="opts" id="artOpts"></div>
         </div>
@@ -263,14 +304,23 @@
       <!-- STEP 3 -->
       <section id="step3" class="hidden">
         <div class="panel confirm">
-          <div class="big">✓</div>
-          <h2>Your ad space is requested</h2>
-          <p>Reference <span class="ref" id="refNo"></span></p>
-          <p class="sub" id="confirmText"></p>
-          <div class="receipt"><dl id="receipt"></dl></div>
-          <div class="actions">
-            <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
-            <button class="btn" id="newOrder" type="button">Book another ad</button>
+          <div class="confirm-top">
+            <div class="big">✓</div>
+            <div class="eyebrow">Thank you</div>
+            <h2>Your ad space is requested</h2>
+            <div class="refchip">Reference <span class="ref" id="refNo"></span></div>
+            <p id="confirmText"></p>
+          </div>
+          <div class="confirm-body">
+            <h3>What happens next</h3>
+            <ol class="next" id="nextSteps"></ol>
+            <h3>Your order</h3>
+            <div class="receipt"><dl id="receipt"></dl></div>
+            <div class="actions">
+              <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
+              <button class="btn" id="newOrder" type="button">Book another ad</button>
+            </div>
+            <p class="demo-note hidden" id="demoNote">This is a demo. No request was sent.</p>
           </div>
         </div>
       </section>
@@ -343,6 +393,16 @@ const CONFIG = {
   ],
   // Filled from the "Sold covers" sheet: magazine → size → zone → ["YYYY-MM", ...].
   soldOut: {},
+  // PREMIUM PLACEMENT. No price is shown or added to the total: the upgrade charge is set on the invoice.
+  // sizes = which ad sizes can book it. Covers are already fixed positions, so they're left out.
+  placements: [
+    { id: "std",    name: "Standard placement", desc: "We place your ad for the best fit in the issue", premium: false },
+    { id: "rhr",    name: "Right-hand read",    desc: "On a right-hand page, where readers look first", premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "front",  name: "Front of magazine",  desc: "In the opening pages of the issue",               premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "center", name: "Centerfold",         desc: "The center spread, where the magazine falls open", premium: true, sizes: ["fp"], limit: "One per zone" },
+  ],
+  // Free-text placement request add-on. No automatic charge: staff confirm it and set any charge on the invoice.
+  placementRequest: { name: "Additional placement request", desc: "Ask for a specific spot or neighbor. We'll confirm availability before you're invoiced." },
   artwork: [
     { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
     { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
@@ -353,6 +413,7 @@ const CONFIG = {
    State + helpers
    =========================================================== */
 const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
 const MONTHS = (() => {
   const out = [], d = new Date();
@@ -370,7 +431,7 @@ const MONTHS = (() => {
   return out;
 })();
 const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
-const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", step: 1, notice: "", zoneNotice: "" };
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", place: "std", req: false, reqText: "", step: 1, notice: "", zoneNotice: "" };
 
 // Zones where this size is already sold for this month, in the chosen magazine(s).
 function takenZones(monthKey) {
@@ -569,6 +630,12 @@ function pruneZones() {
   state.zoneNotice = dropped.length ? `Removed ${dropped.join(", ")}: not available with this magazine and ad size.` : "";
 }
 
+const placeOk = (pl, sizeId) => !pl.sizes || pl.sizes.includes(sizeId);
+// Reset the placement if the chosen ad size can't book it.
+function prunePlace() {
+  if (!placeOk(CONFIG.placements.find(x => x.id === state.place), state.size)) state.place = "std";
+}
+
 function calc() {
   const pub = CONFIG.publications.find(p => p.id === state.pub);
   const size = CONFIG.sizes.find(s => s.id === state.size);
@@ -577,13 +644,17 @@ function calc() {
   const art = CONFIG.artwork.find(a => a.id === state.art);
   const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
   const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
-  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0);
+  const baseIssue = zonePrices.reduce((a, z) => a + z.price, 0);
+  const place = CONFIG.placements.find(x => x.id === state.place);
+  const placeFee = 0;                       // upgrade charge is TBD on the invoice
+  const tbd = place.premium || state.req;   // order has a charge still to be set
+  const perIssue = baseIssue;
   const gross = perIssue * issues;
   const bundleOff = gross * (pub.discount || 0);
   const termOff = (gross - bundleOff) * discount;
   const total = gross - bundleOff - termOff;
   const homes = zones.reduce((s, z) => s + zoneHomes(z.id), 0);
-  return { pub, size, issues, discount, art, zones, zonePrices, perIssue, gross, bundleOff, termOff, total, homes };
+  return { pub, size, issues, discount, art, zones, zonePrices, place, placeFee, tbd, baseIssue, perIssue, gross, bundleOff, termOff, total, homes };
 }
 
 /* ===========================================================
@@ -605,7 +676,7 @@ function render() {
   CONFIG.sizes.forEach(s => sizeEl.append(optButton({
     pressed: state.size === s.id,
     html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">${isFinite(sizeFrom(s.id)) ? `From ${money(sizeFrom(s.id))} / zone / issue` : "Not available"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
-    onClick: () => { state.size = s.id; pruneZones(); pruneMonths(); render(); },
+    onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
   })));
   $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
 
@@ -660,6 +731,33 @@ function render() {
   $("#tierNote").innerHTML = (c.discount ? `<b>${Math.round(c.discount * 100)}% off</b> for ${c.issues} issues. ` : "") +
     (next ? `Add ${next.min - c.issues} more issue${next.min - c.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
 
+  // placement
+  const plEl = $("#placeOpts"); plEl.innerHTML = "";
+  CONFIG.placements.forEach(pl => {
+    const ok = placeOk(pl, state.size);
+    const b = optButton({
+      pressed: state.place === pl.id,
+      html: `<b>${pl.name}</b><small>${ok ? pl.desc : (pl.sizes.length === 1 ? "Full Page ads only" : "Not available for cover positions")}</small>` +
+        (ok ? `<div class="price">${pl.premium ? "Upgrade charge TBD on invoice" : "Included"}</div>` : "") +
+        (ok && pl.limit ? `<span class="tag">${pl.limit}</span>` : ""),
+      onClick: () => { state.place = pl.id; render(); },
+    });
+    if (!ok) b.disabled = true;
+    plEl.append(b);
+  });
+  const pNote = $("#placeNote");
+  pNote.classList.toggle("hidden", !(c.size.premium || c.place.premium));
+  pNote.textContent = c.size.premium
+    ? `${c.size.name} is already a premium position, so placement upgrades don't apply.`
+    : "Premium positions are limited. We'll confirm yours for every issue, and the upgrade charge will be on your invoice.";
+  const rq = $("#reqOpt"); rq.innerHTML = "";
+  rq.append(optButton({
+    pressed: state.req,
+    html: `<b>${state.req ? "✓ " : "+ "}${CONFIG.placementRequest.name}</b><small>${CONFIG.placementRequest.desc}</small><div class="price">Charge TBD on invoice</div>`,
+    onClick: () => { state.req = !state.req; render(); if (state.req) $("#reqText").focus(); },
+  }));
+  $("#reqWrap").classList.toggle("hidden", !state.req);
+
   // artwork
   const artEl = $("#artOpts"); artEl.innerHTML = "";
   CONFIG.artwork.forEach(a => artEl.append(optButton({
@@ -675,18 +773,22 @@ function render() {
     ["Zones", c.zones.length ? c.zones.map(z => z.id).join(", ") : "None yet"],
     ["Homes / issue", c.homes ? "~" + c.homes.toLocaleString() : "—"],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
-    ["Per issue", money(c.perIssue)],
+    ["Placement", c.place.name],
   ];
+  if (c.place.premium) rows.push(["Placement upgrade", "TBD on invoice"]);
+  if (state.req) rows.push(["Placement request", "TBD on invoice"]);
+  rows.push(["Per issue", money(c.perIssue)]);
   if (c.bundleOff) rows.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
   if (c.termOff) rows.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("#sumTotal").textContent = money(c.total);
-  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money(c.total / c.issues)} per issue after savings` : "";
+  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money(c.total / c.issues)} per issue after savings${c.tbd ? ". Placement charge TBD on invoice." : ""}` : "";
 
   // step chrome
   ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
   [...$("#steps").children].forEach((el, i) => el.classList.toggle("on", state.step === i + 1));
   $("#summary").classList.toggle("hidden", state.step === 3);
+  document.querySelector(".grid").classList.toggle("done", state.step === 3);
   $("#backBtn").classList.toggle("hidden", state.step !== 2);
   if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
   $("#nextBtn").disabled = c.zones.length === 0 || c.issues === 0;
@@ -696,6 +798,7 @@ function render() {
 /* ===========================================================
    Events
    =========================================================== */
+$("#reqText").oninput = (e) => { state.reqText = e.target.value; };
 $("#clearMonths").onclick = () => { state.months.clear(); state.notice = ""; render(); };
 
 $("#allZones").onclick = () => {
@@ -721,10 +824,14 @@ function buildOrder(form) {
       zones: c.zones.map(z => z.id),
       months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key),
       issues: c.issues,
+      placement: c.place.name,
+      placementRequest: state.req ? (state.reqText.trim() || "(requested, no details given)") : null,
       artwork: c.art.name,
       pricing: {
         perIssue: Math.round(c.perIssue),
         subtotal: Math.round(c.gross),
+        adSpacePerIssue: Math.round(c.baseIssue),
+        placementChargeTBD: c.tbd,
         bothMagazineSavings: Math.round(c.bundleOff),
         volumeSavings: Math.round(c.termOff),
         volumeDiscountPct: Math.round(c.discount * 100),
@@ -744,6 +851,8 @@ function receiptRows(c, order) {
     ["Ad size", `${c.size.name} (${c.size.trim})`],
     ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
+    ["Placement", c.place.name + (c.place.premium ? " (upgrade charge TBD on invoice)" : "")],
+    ...(order.placementRequest ? [["Placement request", `${order.placementRequest} (charge TBD on invoice)`]] : []),
     ["Artwork", c.art.name],
     ["Per issue", money(c.perIssue)],
   ];
@@ -757,7 +866,7 @@ function orderText(c, order) {
   const cu = order.customer;
   return [
     "New ad space request", "",
-    ...lines, `Total: ${money(c.total)}`, "",
+    ...lines, `Total: ${money(c.total)}${c.tbd ? " + placement charge TBD" : ""}`, "",
     `Contact: ${cu.contact}`, `Phone: ${cu.phone}`, `Email: ${cu.email}`,
     cu.billingEmail ? `Billing email: ${cu.billingEmail}` : null,
     `Category: ${cu.category}`, `Billing address: ${cu.street}, ${cu.city} ${cu.zip}`,
@@ -812,21 +921,26 @@ $("#nextBtn").onclick = async () => {
   }
   sending = false;
 
-  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
-    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}</dd>`;
+  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("") +
+    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}${c.tbd ? "<br><small>+ placement charge TBD on invoice</small>" : ""}</dd>`;
   $("#refNo").textContent = order.ref;
+  const cu = order.customer;
   $("#confirmText").textContent =
-    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
-    `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
-    `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
-    (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
-    (how === "demo" ? " (Demo: no request was actually sent.)" : "") +
-    (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
+    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""}.`;
+  const steps = [
+    ["We confirm your placement", `We'll email ${cu.email} within one business day.`],
+    ["You get an invoice", `Sent to ${cu.billingEmail || cu.email}. Nothing is charged today.` + (c.tbd ? " It will include your placement charge." : "")],
+    state.art === "own"
+      ? ["You send your artwork", "Reply to our email with your print-ready PDF."]
+      : ["We design your ad", "Our design team will reach out and send you a proof."],
+  ];
+  if (how === "email") steps.unshift(["Press send in your email app", `It should have opened with this order, addressed to ${CONFIG.salesEmail}.`]);
+  $("#nextSteps").innerHTML = steps.map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><span>${esc(d)}</span></div></li>`).join("");
+  $("#demoNote").classList.toggle("hidden", how !== "demo");
   state.step = 3; render(); toTop();
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
-$("#demoBar").classList.toggle("hidden", !CONFIG.demo);
 $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
 

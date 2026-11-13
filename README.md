@@ -22,13 +22,20 @@ The key can change files in this repo, so only give it to trusted staff. Set an 
 
 Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
 
+## Premium placement
+Step 5 of the checkout offers Standard placement (included), **Right-hand read**, **Front of magazine** and **Centerfold** (`CONFIG.placements` in `index.html`). No price is shown or added to the total for these: each says "Upgrade charge TBD on invoice", and staff set the charge when invoicing. Covers can't take a placement upgrade, and Centerfold is Full Page only.
+
+**Additional placement request** is a free-text add-on, also marked "Charge TBD on invoice".
+
+When either is chosen, the summary, confirmation and order show the total "plus placement charge TBD", and the order data has `placementChargeTBD: true`. Premium positions aren't tracked as sold the way covers are, so staff confirm them for each issue.
+
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
 
 Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed under **Sold covers** in the staff portal show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
 
 ## Demo mode
-`CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. A yellow banner tells visitors it's a demo. Set `demo: false` once the order destination, prices and inventory are real.
+`CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. There is no banner on the page; the only sign is a small "This is a demo. No request was sent." line on the confirmation. Set `demo: false` once the order destination, prices and inventory are real.
 
 ## Where orders go (once demo is off)
 When a customer presses **Request ad space**:
@@ -70,4 +77,4 @@ The checkout is three plain files with no build step: `index.html`, `rates.csv` 
 1. Go to https://app.netlify.com/drop and drag in a folder containing `index.html`, `rates.csv` and `sold.csv`. You get a link like `https://something.netlify.app`. (Optional: in Netlify, rename the site or connect `ads.bestdealsnetworks.com`.)
 2. On your site, add a page and a Code / Embed / Custom HTML block. Paste the contents of `embed.html` into it and replace `https://YOUR-HOSTED-URL/index.html` with your Netlify link. The frame resizes itself to fit each step, so there's no inner scrollbar.
 
-**Going live:** in `index.html`, set `demo: false` (this removes the yellow banner and starts sending orders) and set `orderEndpoint`. Rate changes are made in the staff portal and don't touch `index.html`.
+**Going live:** in `index.html`, set `demo: false` (this starts sending orders) and set `orderEndpoint`. Rate changes are made in the staff portal and don't touch `index.html`.
