@@ -22,6 +22,20 @@ The key can change files in this repo, so only give it to trusted staff. Set an 
 
 Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
 
+## Several ads in one order
+An order can hold more than one ad. After building an ad, **+ Add another ad** saves it to the order summary and starts the next one, with its own size, zones, months, placement and artwork. That's how a customer books different sizes in different months (for example a Full Page in Dec–Feb and a Half Page in Mar–May). Saved ads can be edited or removed from the summary.
+
+- The volume discount counts the different months the whole order runs in, across all ads.
+- A cover already in the order can't be booked twice for the same zone and month.
+- The order data sent on submit has an `ads` array (one entry per ad) and order-level `pricing`.
+
+## Ordering details
+- **Agreement:** there is no terms checkbox. The checkout tells customers they'll get the advertising agreement through DocuSign after placement is confirmed, then the invoice. Sending the DocuSign is a staff step; the page doesn't send it.
+- **Issue deadline:** `CONFIG.issueCloseDay` (placeholder: 10) is the day of the month before an issue mails when booking closes. After that day the issue is no longer offered, and the Issues step shows when the next one closes.
+- **Refresh-safe:** the order and the checkout form are kept in the browser tab (sessionStorage) until the order is sent or a new one is started.
+- **Zone areas:** an optional "Areas covered" value per zone (staff portal → Rates) shows on the zone cards.
+- **Centerfold:** can be marked as sold in the staff portal like a cover; sold months are blocked for that zone.
+
 ## Premium placement
 Step 5 of the checkout offers Standard placement (included), **Right-hand read**, **Front of magazine** and **Centerfold** (`CONFIG.placements` in `index.html`). No price is shown or added to the total for these: each says "Upgrade charge TBD on invoice", and staff set the charge when invoicing. Covers can't take a placement upgrade, and Centerfold is Full Page only.
 

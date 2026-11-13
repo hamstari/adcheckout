@@ -83,6 +83,18 @@
   .sum dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 14px; }
   .sum dt { color: var(--muted); }
   .sum dd { margin: 0; text-align: right; font-weight: 600; }
+  .line { border-bottom: 1px solid var(--line); padding: 0 0 12px; margin-bottom: 12px; font-size: 13.5px; }
+  .line-h { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; font-size: 14.5px; color: var(--black); }
+  .line small { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+  .line .tools { display: flex; gap: 14px; margin-top: 6px; }
+  .line .tools button { background: none; border: 0; padding: 0; color: var(--teal-d); font-weight: 700; font-size: 12.5px; }
+  .line .tools button.rm { color: #b3261e; }
+  .line.cur { border-left: 3px solid var(--teal); padding-left: 10px; }
+  .line .badge { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--tint); color: var(--teal-d); border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-weight: 700; vertical-align: 1px; }
+  .addmore { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .addmore .btn { width: auto; margin: 0; }
+  .receipt dt.hd { grid-column: 1 / -1; background: #f4f4f4; color: var(--black); font-weight: 700; }
+  #sumList:empty + hr { display: none; }
   .sum hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
   .total { display: flex; justify-content: space-between; align-items: baseline; }
   .total strong { font-size: 30px; font-weight: 700; color: var(--black); }
@@ -199,6 +211,7 @@
     <div>
       <!-- STEP 1 -->
       <section id="step1">
+        <div class="note hidden" id="adBanner" style="margin:0 0 20px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal)"></div>
         <div class="panel">
           <div class="panel-h"><div class="num">1</div><h2>Magazine</h2></div>
           <p class="sub">Both magazines mail monthly to targeted Florida neighborhoods.</p>
@@ -227,7 +240,7 @@
             <div class="panel-h"><div class="num">4</div><h2>Issues</h2></div>
             <button type="button" class="link" id="clearMonths">Clear</button>
           </div>
-          <p class="sub">Pick any months. They don't have to be back to back. Book more issues to save on the whole order.</p>
+          <p class="sub">Pick any months. They don't have to be back to back. Book more issues to save on the whole order. <span id="deadlineNote"></span></p>
           <div class="quick" id="quickPicks"></div>
           <div class="months" id="monthOpts"></div>
           <div class="note hidden" id="premiumNote"></div>
@@ -249,6 +262,15 @@
           <div class="panel-h"><div class="num">6</div><h2>Artwork</h2></div>
           <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
           <div class="opts" id="artOpts"></div>
+        </div>
+
+        <div class="panel addmore">
+          <div>
+            <b>Need a different size in other months, or a second ad?</b>
+            <div class="sub" style="margin:2px 0 0">Save this ad and build another. Each ad has its own size, zones, months and placement.</div>
+            <div class="err" id="addErr" role="alert" style="min-height:0"></div>
+          </div>
+          <button class="btn ghost" id="addAd" type="button">+ Add another ad</button>
         </div>
       </section>
 
@@ -293,10 +315,7 @@
             <label style="margin-top:16px">Notes for our team (optional)
               <textarea name="notes" rows="3" placeholder="Offer, coupon, tracking number, placement requests…"></textarea>
             </label>
-            <label class="check" style="margin-top:16px">
-              <input type="checkbox" name="terms" required>
-              <span>I agree to the advertising terms. Space is reserved once your invoice is paid. Artwork is due by the deadline for each issue.</span>
-            </label>
+            <div class="note">✓ <b>Nothing to sign or pay here.</b> After we confirm your placement, we'll email you an advertising agreement to sign through DocuSign, then your invoice. Your space is reserved once the agreement is signed.</div>
           </div>
         </form>
       </section>
@@ -328,13 +347,14 @@
 
     <aside>
       <div class="panel sum" id="summary">
-        <h2>Your ad</h2>
+        <h2>Your order</h2>
+        <div id="sumLines"></div>
         <dl id="sumList"></dl>
         <hr>
         <div class="total"><span>Total</span><strong id="sumTotal">$0</strong></div>
         <div class="per" id="sumPer"></div>
         <button class="btn" id="nextBtn" type="button">Continue to checkout</button>
-        <button class="btn ghost hidden" id="backBtn" type="button">Back to your ad</button>
+        <button class="btn ghost hidden" id="backBtn" type="button">Back to your order</button>
         <div class="err" id="err" role="alert"></div>
       </div>
     </aside>
@@ -384,6 +404,9 @@ const CONFIG = {
   soldUrl: "sold.csv",
   // How many months ahead customers can book.
   monthsAhead: 12,
+  // Booking deadline: an issue closes on this day of the month BEFORE it mails (placeholder).
+  // Example: 10 → the December issue can be booked through November 10. Set to 31 for no cutoff.
+  issueCloseDay: 10,
   // Volume discount by number of issues booked (highest tier that fits wins).
   volume: [
     { min: 1,  discount: 0 },
@@ -417,7 +440,8 @@ const esc = (v) => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<"
 const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
 const MONTHS = (() => {
   const out = [], d = new Date();
-  d.setDate(1); d.setMonth(d.getMonth() + 1);
+  const late = d.getDate() > CONFIG.issueCloseDay;   // next month's issue has already closed
+  d.setDate(1); d.setMonth(d.getMonth() + (late ? 2 : 1));
   for (let i = 0; i < CONFIG.monthsAhead; i++) {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     out.push({
@@ -430,28 +454,59 @@ const MONTHS = (() => {
   }
   return out;
 })();
+// The first issue still open, and when it closes ("Jan 2027 issue closes Dec 10").
+const DEADLINE = (() => {
+  const [y, m] = MONTHS[0].key.split("-").map(Number);
+  const last = new Date(y, m - 1, 0).getDate();     // last day of the month before the issue
+  const close = new Date(y, m - 2, Math.min(CONFIG.issueCloseDay, last));
+  return CONFIG.issueCloseDay >= 31 ? "" : `Booking for the ${MONTHS[0].long} issue closes ${close.toLocaleString("en-US", { month: "long", day: "numeric" })}.`;
+})();
 const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
-const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", place: "std", req: false, reqText: "", step: 1, notice: "", zoneNotice: "" };
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", place: "std", req: false, reqText: "", step: 1, notice: "", zoneNotice: "",
+  items: [],   // ads already saved to this order; the fields above are the ad being built
+};
+const SPEC_KEYS = ["pub", "size", "zones", "months", "art", "place", "req", "reqText"];
+const snapshot = () => ({ ...Object.fromEntries(SPEC_KEYS.map(k => [k, state[k]])), zones: new Set(state.zones), months: new Set(state.months) });
+const loadSpec = (sp) => SPEC_KEYS.forEach(k => { state[k] = sp[k] instanceof Set ? new Set(sp[k]) : sp[k]; });
+const pubsOf = (pubId) => (pubId === "both" ? ["bdb", "ehi"] : [pubId]);
+
+// Zones where another ad in THIS order already books the same cover for this month.
+function ownZones(monthKey) {
+  const mine = slotsOf(state);
+  if (!mine.length) return [];
+  const hit = new Set();
+  state.items.forEach(it => {
+    if (!slotsOf(it).some(x => mine.includes(x)) || !it.months.has(monthKey)) return;
+    if (!pubsOf(it.pub).some(p => pubsOf(state.pub).includes(p))) return;
+    state.zones.forEach(z => { if (it.zones.has(z)) hit.add(z); });
+  });
+  return [...hit].sort();
+}
+const monthBlocked = (k) => takenZones(k).length > 0 || ownZones(k).length > 0;
 
 // Zones where this size is already sold for this month, in the chosen magazine(s).
+// One-per-zone spots the ad being built would occupy: its cover size and/or the centerfold.
+const slotsOf = (sp) => [
+  ...(CONFIG.sizes.find(s => s.id === sp.size).premium ? [sp.size] : []),
+  ...(sp.place === "center" ? ["center"] : []),
+];
+const slotName = (id) => (id === "center" ? "Centerfold" : CONFIG.sizes.find(s => s.id === id).name);
 function takenZones(monthKey) {
-  const size = CONFIG.sizes.find(s => s.id === state.size);
-  if (!size.premium) return [];
   const pubs = state.pub === "both" ? ["bdb", "ehi"] : [state.pub];
   const hit = new Set();
-  pubs.forEach(p => {
-    const byZone = (CONFIG.soldOut[p] || {})[state.size] || {};
+  slotsOf(state).forEach(slot => pubs.forEach(p => {
+    const byZone = (CONFIG.soldOut[p] || {})[slot] || {};
     state.zones.forEach(z => { if ((byZone[z] || []).includes(monthKey)) hit.add(z); });
-  });
+  }));
   return [...hit].sort();
 }
 
 // Drop months that became unavailable after a size/zone/magazine change.
 function pruneMonths() {
-  const dropped = [...state.months].filter(k => takenZones(k).length);
+  const dropped = [...state.months].filter(monthBlocked);
   dropped.forEach(k => state.months.delete(k));
   state.notice = dropped.length
-    ? `Removed ${dropped.map(k => monthByKey[k].long).join(", ")}: that ${CONFIG.sizes.find(s => s.id === state.size).name} is already taken in one of your zones.`
+    ? `Removed ${dropped.map(k => monthByKey[k].long).join(", ")}: that ${slotsOf(state).map(slotName).join(" / ") || "spot"} is already taken in one of your zones, or is in another ad in this order.`
     : "";
 }
 
@@ -532,7 +587,9 @@ function loadRates(text) {
     const entry = { homes: num(r[col.homes]) || 0 };
     CONFIG.sizes.forEach(s => { entry[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null; });
     rates[pub][zone] = entry;
-    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone });
+    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone, areas: "" });
+    const areas = (r[col.areascovered ?? col.areas] || "").trim();
+    if (areas) zones.find(z => z.id === zone).areas = areas;
   });
   if (!zones.length) throw new Error("Rates sheet has no rows");
   CONFIG.rates = rates; CONFIG.zones = zones;
@@ -569,7 +626,7 @@ function loadSold(text) {
   rows.forEach((r, n) => {
     const pub = PUB_ALIASES[norm(r[col.magazine])];
     const sv = norm(r[sizeCol]);
-    const size = CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
+    const size = sv === "centerfold" ? { id: "center" } : CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
     const zone = (r[col.zone] || "").trim();
     const month = monthKey(r[col.month]);
     if (!pub || !size || !zone || !month) { console.warn(`Sold covers row ${n + 2} skipped`, r); return; }
@@ -612,7 +669,7 @@ const rate = (zoneId, sizeId, pubId = state.pub) => {
 };
 const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)).filter(v => v != null));
 // Households per issue for a zone across the chosen magazine(s).
-const zoneHomes = (zoneId) => CONFIG.publications.find(p => p.id === state.pub).includes
+const zoneHomes = (zoneId, pubId = state.pub) => CONFIG.publications.find(p => p.id === pubId).includes
   .reduce((a, p) => a + ((CONFIG.rates[p][zoneId] || {}).homes || 0), 0);
 const pubShort = { bdb: "Best Deals Book", ehi: "Exclusively Home Improvements" };
 // Why a zone can't be booked with the current magazine + size ("" if it can).
@@ -636,32 +693,45 @@ function prunePlace() {
   if (!placeOk(CONFIG.placements.find(x => x.id === state.place), state.size)) state.place = "std";
 }
 
-function calc() {
-  const pub = CONFIG.publications.find(p => p.id === state.pub);
-  const size = CONFIG.sizes.find(s => s.id === state.size);
-  const issues = state.months.size;
-  const discount = CONFIG.volume.filter(v => issues >= v.min).reduce((a, v) => Math.max(a, v.discount), 0);
-  const art = CONFIG.artwork.find(a => a.id === state.art);
-  const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
-  const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
+// One ad (the one being built, or a saved one).
+function calcLine(sp) {
+  const pub = CONFIG.publications.find(p => p.id === sp.pub);
+  const size = CONFIG.sizes.find(s => s.id === sp.size);
+  const issues = sp.months.size;
+  const art = CONFIG.artwork.find(a => a.id === sp.art);
+  const zones = CONFIG.zones.filter(z => sp.zones.has(z.id));
+  const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id, sp.pub) || 0 }));
   const baseIssue = zonePrices.reduce((a, z) => a + z.price, 0);
-  const place = CONFIG.placements.find(x => x.id === state.place);
-  const placeFee = 0;                       // upgrade charge is TBD on the invoice
-  const tbd = place.premium || state.req;   // order has a charge still to be set
+  const place = CONFIG.placements.find(x => x.id === sp.place);
+  const tbd = place.premium || sp.req;       // placement charge is set on the invoice
   const perIssue = baseIssue;
   const gross = perIssue * issues;
   const bundleOff = gross * (pub.discount || 0);
+  const homes = zones.reduce((s, z) => s + zoneHomes(z.id, sp.pub), 0);
+  return { sp, pub, size, issues, art, zones, zonePrices, place, tbd, baseIssue, perIssue, gross, bundleOff, homes,
+           complete: zones.length > 0 && issues > 0 };
+}
+
+// The whole order: saved ads plus the one being built (if it has zones and months).
+// Volume discount counts the different months the order runs in, across all ads.
+function calcOrder() {
+  const draft = calcLine(state);
+  const lines = [...state.items.map(calcLine), ...(draft.complete ? [draft] : [])];
+  const monthSet = new Set(lines.flatMap(l => [...l.sp.months]));
+  const issues = monthSet.size;
+  const discount = CONFIG.volume.filter(v => issues >= v.min).reduce((a, v) => Math.max(a, v.discount), 0);
+  const gross = lines.reduce((a, l) => a + l.gross, 0);
+  const bundleOff = lines.reduce((a, l) => a + l.bundleOff, 0);
   const termOff = (gross - bundleOff) * discount;
-  const total = gross - bundleOff - termOff;
-  const homes = zones.reduce((s, z) => s + zoneHomes(z.id), 0);
-  return { pub, size, issues, discount, art, zones, zonePrices, place, placeFee, tbd, baseIssue, perIssue, gross, bundleOff, termOff, total, homes };
+  return { lines, draft, monthSet, issues, discount, gross, bundleOff, termOff, total: gross - bundleOff - termOff,
+           tbd: lines.some(l => l.tbd) };
 }
 
 /* ===========================================================
    Render
    =========================================================== */
 function render() {
-  const c = calc();
+  const c = calcLine(state), o = calcOrder();
 
   // publications
   const pubEl = $("#pubOpts"); pubEl.innerHTML = "";
@@ -688,7 +758,7 @@ function render() {
       pressed: state.zones.has(z.id),
       html: blocked
         ? `<b>${z.name}</b><small>${blocked}</small>`
-        : `<b>${z.name}</b><small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : "&nbsp;"}</small><div class="price">${money(rate(z.id, state.size))} / issue</div>`,
+        : `<b>${esc(z.name)}</b>${z.areas ? `<small>${esc(z.areas)}</small>` : ""}<small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : "&nbsp;"}</small><div class="price">${money(rate(z.id, state.size))} / issue</div>`,
       onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); state.zoneNotice = ""; pruneMonths(); render(); },
     });
     if (blocked) b.disabled = true;
@@ -706,18 +776,20 @@ function render() {
     b.type = "button"; b.className = "chip"; b.textContent = `Next ${n} available`;
     b.onclick = () => {
       state.months.clear();
-      MONTHS.filter(m => !takenZones(m.key).length).slice(0, n).forEach(m => state.months.add(m.key));
+      MONTHS.filter(m => !monthBlocked(m.key)).slice(0, n).forEach(m => state.months.add(m.key));
       state.notice = ""; render();
     };
     quick.append(b);
   });
   const monthEl = $("#monthOpts"); monthEl.innerHTML = "";
   MONTHS.forEach(m => {
-    const taken = takenZones(m.key);
+    const sold = takenZones(m.key), own = ownZones(m.key);
+    const why = sold.length ? "Taken in " + sold.join(", ") : own.length ? "Already in your order" : "";
+    const taken = why ? [why] : [];
     const b = optButton({
       pressed: state.months.has(m.key),
-      html: `<b>${m.short} ${m.year}</b><small>${taken.length ? "Taken in " + taken.join(", ") : "Available"}</small>`,
-      label: `${m.long}${taken.length ? ", taken in " + taken.join(", ") : ""}`,
+      html: `<b>${m.short} ${m.year}</b><small>${why || "Available"}</small>`,
+      label: `${m.long}${why ? ", " + why.toLowerCase() : ""}`,
       onClick: () => { state.months.has(m.key) ? state.months.delete(m.key) : state.months.add(m.key); state.notice = ""; render(); },
     });
     if (taken.length) b.disabled = true;
@@ -725,11 +797,13 @@ function render() {
     monthEl.append(b);
   });
   const pn = $("#premiumNote");
-  pn.classList.toggle("hidden", !c.size.premium && !state.notice);
-  pn.textContent = state.notice || `${c.size.name} is one advertiser per zone, per issue. Months already booked in your zones show as taken. We'll confirm every month before you're invoiced.`;
-  const next = CONFIG.volume.find(v => v.min > c.issues);
-  $("#tierNote").innerHTML = (c.discount ? `<b>${Math.round(c.discount * 100)}% off</b> for ${c.issues} issues. ` : "") +
-    (next ? `Add ${next.min - c.issues} more issue${next.min - c.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
+  const slots = slotsOf(state);
+  pn.classList.toggle("hidden", !slots.length && !state.notice);
+  pn.textContent = state.notice || `${slots.map(slotName).join(" / ")} is one advertiser per zone, per issue. Months already booked in your zones show as taken. We'll confirm every month before you're invoiced.`;
+  const next = CONFIG.volume.find(v => v.min > o.issues);
+  const across = state.items.length ? " across your order" : "";
+  $("#tierNote").innerHTML = (o.discount ? `<b>${Math.round(o.discount * 100)}% off</b> for ${o.issues} issues${across}. ` : "") +
+    (next ? `Add ${next.min - o.issues} more issue${next.min - o.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
 
   // placement
   const plEl = $("#placeOpts"); plEl.innerHTML = "";
@@ -740,7 +814,7 @@ function render() {
       html: `<b>${pl.name}</b><small>${ok ? pl.desc : (pl.sizes.length === 1 ? "Full Page ads only" : "Not available for cover positions")}</small>` +
         (ok ? `<div class="price">${pl.premium ? "Upgrade charge TBD on invoice" : "Included"}</div>` : "") +
         (ok && pl.limit ? `<span class="tag">${pl.limit}</span>` : ""),
-      onClick: () => { state.place = pl.id; render(); },
+      onClick: () => { state.place = pl.id; pruneMonths(); render(); },
     });
     if (!ok) b.disabled = true;
     plEl.append(b);
@@ -767,22 +841,30 @@ function render() {
   })));
 
   // summary
-  const rows = [
-    ["Magazine", c.pub.name],
-    ["Ad size", c.size.name],
-    ["Zones", c.zones.length ? c.zones.map(z => z.id).join(", ") : "None yet"],
-    ["Homes / issue", c.homes ? "~" + c.homes.toLocaleString() : "—"],
-    ["Issues", `${c.issues}: ${monthList(state.months)}`],
-    ["Placement", c.place.name],
-  ];
-  if (c.place.premium) rows.push(["Placement upgrade", "TBD on invoice"]);
-  if (state.req) rows.push(["Placement request", "TBD on invoice"]);
-  rows.push(["Per issue", money(c.perIssue)]);
-  if (c.bundleOff) rows.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
-  if (c.termOff) rows.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
+  const n = state.items.length;
+  const editing = state.step === 1;
+  const lineHtml = (l, i, cur) => `<div class="line${cur && n && editing ? " cur" : ""}">
+      <div class="line-h"><span>${n ? `Ad ${i + 1} · ` : ""}${l.size.name}${cur && n && editing ? '<span class="badge">Editing</span>' : ""}</span><span>${money(l.gross)}</span></div>
+      <small>${l.pub.name}</small>
+      <small>${l.zones.map(z => z.id).join(", ")} · ~${l.homes.toLocaleString()} homes / issue</small>
+      <small>${l.issues} issue${l.issues > 1 ? "s" : ""}: ${monthList(l.sp.months)} · ${money(l.perIssue)} each</small>
+      ${l.place.premium ? `<small>${l.place.name}: upgrade charge TBD on invoice</small>` : ""}
+      ${l.sp.req ? `<small>Placement request: charge TBD on invoice</small>` : ""}
+      ${cur && editing ? "" : `<div class="tools"><button type="button" data-edit="${i}">Edit</button><button type="button" class="rm" data-rm="${i}">Remove</button></div>`}
+    </div>`;
+  $("#sumLines").innerHTML = state.items.map((it, i) => lineHtml(calcLine(it), i, false)).join("") +
+    (c.complete ? lineHtml(c, n, true)
+      : `<div class="line${n ? " cur" : ""}"><div class="line-h"><span>${n ? `Ad ${n + 1} · ` : ""}${c.size.name}</span></div><small>${c.zones.length ? "Pick at least one month to add this ad." : "Pick at least one zone to add this ad."}</small></div>`);
+  const rows = [];
+  if (o.lines.length > 1) rows.push(["Ads subtotal", money(o.gross)]);
+  if (o.bundleOff) rows.push(["Both-magazine savings", "−" + money(o.bundleOff)]);
+  if (o.termOff) rows.push([`${o.issues}-issue savings (${Math.round(o.discount * 100)}%)`, "−" + money(o.termOff)]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
-  $("#sumTotal").textContent = money(c.total);
-  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money(c.total / c.issues)} per issue after savings${c.tbd ? ". Placement charge TBD on invoice." : ""}` : "";
+  $("#sumTotal").textContent = money(o.total);
+  $("#sumPer").textContent = o.tbd ? "Plus placement charge, TBD on invoice." : "";
+  const ban = $("#adBanner");
+  ban.classList.toggle("hidden", !n);
+  ban.textContent = n ? `Ad ${n + 1} of your order. ${n === 1 ? "Ad 1 is" : `Ads 1–${n} are`} saved in your order summary.` : "";
 
   // step chrome
   ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
@@ -790,10 +872,45 @@ function render() {
   $("#summary").classList.toggle("hidden", state.step === 3);
   document.querySelector(".grid").classList.toggle("done", state.step === 3);
   $("#backBtn").classList.toggle("hidden", state.step !== 2);
+  saveSession();
   if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
-  $("#nextBtn").disabled = c.zones.length === 0 || c.issues === 0;
-  $("#err").textContent = c.zones.length === 0 ? "Choose at least one zone." : c.issues === 0 ? "Choose at least one issue." : "";
+  $("#nextBtn").disabled = o.lines.length === 0;
+  $("#err").textContent = o.lines.length ? "" : c.zones.length === 0 ? "Choose at least one zone." : "Choose at least one issue.";
 }
+
+/* ===========================================================
+   Keep the order through a page refresh (this browser tab only).
+   Cleared when the order is sent or a new one is started.
+   =========================================================== */
+const SAVE_KEY = "bda.order.v1";
+const packSpec = (sp) => ({ ...sp, zones: [...sp.zones], months: [...sp.months] });
+function validSpec(raw) {
+  if (!raw || !CONFIG.publications.some(p => p.id === raw.pub) || !CONFIG.sizes.some(x => x.id === raw.size)) return null;
+  if (!CONFIG.placements.some(x => x.id === raw.place) || !CONFIG.artwork.some(x => x.id === raw.art)) return null;
+  return {
+    pub: raw.pub, size: raw.size, art: raw.art, place: raw.place, req: !!raw.req, reqText: String(raw.reqText || "").slice(0, 300),
+    zones: new Set((raw.zones || []).filter(z => CONFIG.zones.some(x => x.id === z) && rate(z, raw.size, raw.pub) != null)),
+    months: new Set((raw.months || []).filter(k => monthByKey[k])),
+  };
+}
+function saveSession() {
+  if (state.step === 3) return;
+  try {
+    const form = Object.fromEntries(new FormData($("#checkoutForm"))); delete form.website;
+    sessionStorage.setItem(SAVE_KEY, JSON.stringify({ draft: packSpec(snapshot()), items: state.items.map(packSpec), step: state.step, form }));
+  } catch {}
+}
+function clearSession() { try { sessionStorage.removeItem(SAVE_KEY); } catch {} }
+function restoreSession() {
+  let raw; try { raw = JSON.parse(sessionStorage.getItem(SAVE_KEY) || "null"); } catch { return false; }
+  const draft = validSpec(raw && raw.draft); if (!draft) return false;
+  state.items = (raw.items || []).map(validSpec).filter(sp => sp && sp.zones.size && sp.months.size);
+  loadSpec(draft); $("#reqText").value = state.reqText;
+  Object.entries(raw.form || {}).forEach(([k, v]) => { const el = $("#checkoutForm").elements[k]; if (el && k !== "website") el.value = v; });
+  state.step = raw.step === 2 && calcOrder().lines.length ? 2 : 1;
+  return true;
+}
+$("#checkoutForm").addEventListener("input", saveSession);
 
 /* ===========================================================
    Events
@@ -809,64 +926,104 @@ $("#allZones").onclick = () => {
   pruneMonths(); render();
 };
 
+$("#addAd").onclick = () => {
+  const c = calcLine(state);
+  if (!c.complete) { $("#addErr").textContent = "Finish this ad first: it needs at least one zone and one month."; return; }
+  $("#addErr").textContent = "";
+  state.items.push(snapshot());
+  // Start the next ad: keep magazine, zones and artwork choice; clear the rest.
+  state.months = new Set(); state.place = "std"; state.req = false; state.reqText = ""; $("#reqText").value = "";
+  state.notice = ""; state.zoneNotice = "";
+  render(); toTop();
+};
+$("#sumLines").addEventListener("click", (e) => {
+  const ed = e.target.dataset.edit, rm = e.target.dataset.rm;
+  if (rm != null && +rm === state.items.length) {          // removing the ad being built
+    if (state.items.length) loadSpec(state.items.pop()); else state.months = new Set();
+    $("#reqText").value = state.reqText; state.notice = "";
+    if (!calcOrder().lines.length) state.step = 1;
+  }
+  else if (rm != null) { state.items.splice(+rm, 1); pruneMonths(); state.notice = ""; }
+  else if (ed != null && +ed === state.items.length) { state.step = 1; toTop(); }
+  else if (ed != null) {
+    const keep = calcLine(state).complete ? [snapshot()] : [];
+    const [it] = state.items.splice(+ed, 1, ...keep);
+    loadSpec(it); $("#reqText").value = state.reqText; state.notice = ""; state.zoneNotice = "";
+    if (state.step !== 1) state.step = 1;
+    toTop();
+  } else return;
+  render();
+});
+
 function buildOrder(form) {
-  const c = calc();
+  const o = calcOrder();
   const customer = Object.fromEntries(new FormData(form));
   delete customer.website; delete customer.terms;
   return {
-    c,
+    o,
     order: {
       ref: "BDA-" + Date.now().toString(36).toUpperCase().slice(-6),
       createdAt: new Date().toISOString(),
-      magazine: c.pub.name,
-      size: c.size.name,
-      trim: c.size.trim,
-      zones: c.zones.map(z => z.id),
-      months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key),
-      issues: c.issues,
-      placement: c.place.name,
-      placementRequest: state.req ? (state.reqText.trim() || "(requested, no details given)") : null,
-      artwork: c.art.name,
+      ads: o.lines.map(l => ({
+        magazine: l.pub.name,
+        size: l.size.name,
+        trim: l.size.trim,
+        zones: l.zones.map(z => z.id),
+        zonePricesPerIssue: Object.fromEntries(l.zonePrices.map(z => [z.id, z.price])),
+        months: MONTHS.filter(m => l.sp.months.has(m.key)).map(m => m.key),
+        issues: l.issues,
+        placement: l.place.name,
+        placementRequest: l.sp.req ? (l.sp.reqText.trim() || "(requested, no details given)") : null,
+        placementChargeTBD: l.tbd,
+        artwork: l.art.name,
+        perIssue: Math.round(l.perIssue),
+        subtotal: Math.round(l.gross),
+      })),
       pricing: {
-        perIssue: Math.round(c.perIssue),
-        subtotal: Math.round(c.gross),
-        adSpacePerIssue: Math.round(c.baseIssue),
-        placementChargeTBD: c.tbd,
-        bothMagazineSavings: Math.round(c.bundleOff),
-        volumeSavings: Math.round(c.termOff),
-        volumeDiscountPct: Math.round(c.discount * 100),
-        zonePricesPerIssue: Object.fromEntries(c.zonePrices.map(z => [z.id, z.price])),
-        total: Math.round(c.total),
+        subtotal: Math.round(o.gross),
+        bothMagazineSavings: Math.round(o.bundleOff),
+        volumeSavings: Math.round(o.termOff),
+        volumeDiscountPct: Math.round(o.discount * 100),
+        issuesCounted: o.issues,
+        placementChargeTBD: o.tbd,
+        total: Math.round(o.total),
       },
       customer,
     },
   };
 }
 
-function receiptRows(c, order) {
-  const r = [
-    ["Reference", order.ref],
-    ["Business", order.customer.business],
-    ["Magazine", c.pub.name],
-    ["Ad size", `${c.size.name} (${c.size.trim})`],
-    ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
-    ["Issues", `${c.issues}: ${monthList(state.months)}`],
-    ["Placement", c.place.name + (c.place.premium ? " (upgrade charge TBD on invoice)" : "")],
-    ...(order.placementRequest ? [["Placement request", `${order.placementRequest} (charge TBD on invoice)`]] : []),
-    ["Artwork", c.art.name],
-    ["Per issue", money(c.perIssue)],
-  ];
-  if (c.bundleOff) r.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
-  if (c.termOff) r.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
+// Rows for the receipt. A row whose label is "§" is a section heading.
+function receiptRows(o, order) {
+  const many = o.lines.length > 1;
+  const r = [["Reference", order.ref], ["Business", order.customer.business]];
+  o.lines.forEach((l, i) => {
+    const ad = order.ads[i];
+    if (many) r.push(["§", `Ad ${i + 1} · ${l.size.name}`]);
+    r.push(
+      ["Magazine", l.pub.name],
+      ["Ad size", `${l.size.name} (${l.size.trim})`],
+      ["Zones", l.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
+      ["Issues", `${l.issues}: ${monthList(l.sp.months)}`],
+      ["Placement", l.place.name + (l.place.premium ? " (upgrade charge TBD on invoice)" : "")],
+      ...(ad.placementRequest ? [["Placement request", `${ad.placementRequest} (charge TBD on invoice)`]] : []),
+      ["Artwork", l.art.name],
+      ["Per issue", money(l.perIssue)],
+      ...(many ? [["Ad subtotal", money(l.gross)]] : []),
+    );
+  });
+  if (many) r.push(["§", "Order"], ["Ads subtotal", money(o.gross)]);
+  if (o.bundleOff) r.push(["Both-magazine savings", "−" + money(o.bundleOff)]);
+  if (o.termOff) r.push([`${o.issues}-issue savings`, "−" + money(o.termOff)]);
   return r;
 }
 
-function orderText(c, order) {
-  const lines = receiptRows(c, order).map(([k, v]) => `${k}: ${v}`);
+function orderText(o, order) {
+  const lines = receiptRows(o, order).map(([k, v]) => (k === "§" ? `\n--- ${v} ---` : `${k}: ${v}`));
   const cu = order.customer;
   return [
     "New ad space request", "",
-    ...lines, `Total: ${money(c.total)}${c.tbd ? " + placement charge TBD" : ""}`, "",
+    ...lines, `Total: ${money(o.total)}${o.tbd ? " + placement charge TBD" : ""}`, "",
     `Contact: ${cu.contact}`, `Phone: ${cu.phone}`, `Email: ${cu.email}`,
     cu.billingEmail ? `Billing email: ${cu.billingEmail}` : null,
     `Category: ${cu.category}`, `Billing address: ${cu.street}, ${cu.city} ${cu.zip}`,
@@ -874,7 +1031,7 @@ function orderText(c, order) {
   ].filter(l => l !== null).join("\n");
 }
 
-async function sendOrder(c, order) {
+async function sendOrder(o, order) {
   if (CONFIG.demo) {
     console.log("Demo mode, order not sent:", order);
     await new Promise(r => setTimeout(r, 600));
@@ -891,7 +1048,7 @@ async function sendOrder(c, order) {
     return "sent";
   }
   const subject = `Ad space request ${order.ref}: ${order.customer.business}`;
-  window.location.href = `mailto:${CONFIG.salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(orderText(c, order))}`;
+  window.location.href = `mailto:${CONFIG.salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(orderText(o, order))}`;
   return "email";
 }
 
@@ -905,7 +1062,7 @@ $("#nextBtn").onclick = async () => {
     $("#err").textContent = "Please complete the highlighted fields.";
     return;
   }
-  const { c, order } = buildOrder(form);
+  const { o, order } = buildOrder(form);
   if (form.website.value) { state.step = 3; render(); return; } // bot: pretend success, send nothing
 
   sending = true;
@@ -913,7 +1070,7 @@ $("#nextBtn").onclick = async () => {
   btn.disabled = true; btn.textContent = "Sending…"; $("#err").textContent = "";
   let how;
   try {
-    how = await sendOrder(c, order);
+    how = await sendOrder(o, order);
   } catch (e) {
     sending = false; render();
     $("#err").innerHTML = `We couldn't send your request. Please try again, or call <a href="tel:${CONFIG.salesPhone.replace(/\D/g, "")}">${CONFIG.salesPhone}</a>.`;
@@ -921,28 +1078,39 @@ $("#nextBtn").onclick = async () => {
   }
   sending = false;
 
-  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("") +
-    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}${c.tbd ? "<br><small>+ placement charge TBD on invoice</small>" : ""}</dd>`;
+  $("#receipt").innerHTML = receiptRows(o, order).map(([k, v]) => k === "§" ? `<dt class="hd">${esc(v)}</dt>` : `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("") +
+    `<dt class="tot">Total</dt><dd class="tot">${money(o.total)}${o.tbd ? "<br><small>+ placement charge TBD on invoice</small>" : ""}</dd>`;
   $("#refNo").textContent = order.ref;
-  const cu = order.customer;
-  $("#confirmText").textContent =
-    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""}.`;
+  const cu = order.customer, l0 = o.lines[0];
+  const totalIssues = o.lines.reduce((a, l) => a + l.issues, 0);
+  $("#confirmText").textContent = o.lines.length === 1
+    ? `${l0.size.name} in ${l0.pub.id === "both" ? "both magazines" : l0.pub.name}, ${l0.zones.length} zone${l0.zones.length > 1 ? "s" : ""}, ${l0.issues} issue${l0.issues > 1 ? "s" : ""}.`
+    : `${o.lines.length} ads, ${totalIssues} placements in ${o.issues} issue${o.issues > 1 ? "s" : ""}.`;
+  const own = o.lines.some(l => l.sp.art === "own"), design = o.lines.some(l => l.sp.art !== "own");
   const steps = [
     ["We confirm your placement", `We'll email ${cu.email} within one business day.`],
-    ["You get an invoice", `Sent to ${cu.billingEmail || cu.email}. Nothing is charged today.` + (c.tbd ? " It will include your placement charge." : "")],
-    state.art === "own"
-      ? ["You send your artwork", "Reply to our email with your print-ready PDF."]
-      : ["We design your ad", "Our design team will reach out and send you a proof."],
+    ["You sign the agreement", `We'll send our advertising terms through DocuSign to ${cu.email}.`],
+    ["You get an invoice", `Sent to ${cu.billingEmail || cu.email}. Nothing is charged today.` + (o.tbd ? " It will include your placement charge." : "")],
+    ...(own ? [["You send your artwork", "Reply to our email with your print-ready PDF."]] : []),
+    ...(design ? [["We design your ad", "Our design team will reach out and send you a proof."]] : []),
   ];
   if (how === "email") steps.unshift(["Press send in your email app", `It should have opened with this order, addressed to ${CONFIG.salesEmail}.`]);
   $("#nextSteps").innerHTML = steps.map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><span>${esc(d)}</span></div></li>`).join("");
   $("#demoNote").classList.toggle("hidden", how !== "demo");
+  clearSession();
   state.step = 3; render(); toTop();
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
 $("#printOrder").onclick = () => window.print();
-$("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
+$("#newOrder").onclick = () => {
+  clearSession();
+  $("#checkoutForm").reset(); $("#reqText").value = "";
+  Object.assign(state, { items: [], size: "fp", place: "std", req: false, reqText: "", months: new Set(), step: 1, notice: "", zoneNotice: "" });
+  pruneZones(); state.zoneNotice = "";
+  MONTHS.filter(m => !monthBlocked(m.key)).slice(0, 3).forEach(m => state.months.add(m.key));
+  render(); toTop();
+};
 
 /* ===========================================================
    Embedding: when this page sits in an <iframe> on your site, tell the
@@ -960,6 +1128,8 @@ if (embedded) {
   new ResizeObserver(post).observe(document.body);
   addEventListener("load", post);
 }
+
+$("#deadlineNote").textContent = DEADLINE;
 
 // Phone bar mirrors the summary button, total and error message.
 (function () {
@@ -979,10 +1149,11 @@ if (embedded) {
 })();
 
 fetchRates().then(() => {
-  if (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z))) {
+  const restored = restoreSession();
+  if (!restored && (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z)))) {
     state.zones = new Set([CONFIG.zones[0].id]);
   }
-  pruneZones(); pruneMonths(); state.zoneNotice = ""; state.notice = "";
+  prunePlace(); pruneZones(); pruneMonths(); state.zoneNotice = ""; state.notice = "";
   render();
 });
 </script>

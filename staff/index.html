@@ -139,7 +139,7 @@
       <div class="spacer"></div>
       <button class="btn small ghost" id="addZone" type="button">+ Add zone</button>
     </div>
-    <p class="sub">Price per issue for each zone and ad size. The zone name is what customers see. Untick <b>Mails here</b> if the magazine doesn't mail that zone. Leave a price empty if that size isn't sold there.</p>
+    <p class="sub">Price per issue for each zone and ad size. Customers see the zone name and the areas it covers. Untick <b>Mails here</b> if the magazine doesn't mail that zone. Leave a price empty if that size isn't sold there.</p>
     <div class="tabs" role="tablist" id="pubTabs"></div>
     <div class="tablewrap"><table id="ratesTable"></table></div>
   </section>
@@ -152,7 +152,7 @@
       <label class="switch"><input type="checkbox" id="showPast"> Show past months</label>
       <button class="btn small ghost" id="addSold" type="button">+ Add booking</button>
     </div>
-    <p class="sub">Back and inside covers are one advertiser per zone per month. A booking here shows as <b>Taken</b> on the checkout. Delete a row if the booking is cancelled.</p>
+    <p class="sub">Covers and the centerfold are one advertiser per zone per month. A booking here shows as <b>Taken</b> on the checkout. Delete a row if the booking is cancelled.</p>
     <div class="tablewrap"><table id="soldTable"></table></div>
   </section>
 </main>
@@ -217,6 +217,8 @@ const SIZES = [
   { id: "hp",  name: "Half Page" },
   { id: "qp",  name: "Quarter Page" },
 ];
+// One-per-zone spots that can be marked as sold.
+const SOLD_KINDS = [...SIZES.filter(s => s.premium), { id: "center", name: "Centerfold" }];
 const PUBS = [
   { id: "bdb", code: "BDB", name: "Best Deals Book" },
   { id: "ehi", code: "EHI", name: "Exclusively Home Improvements" },
@@ -287,7 +289,9 @@ function parseRates(text) {
     const e = { homes: num(r[col.homes]) };
     SIZES.forEach(s => e[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null);
     rates[pub][zone] = e;
-    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone });
+    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone, areas: "" });
+    const areas = (r[col.areascovered ?? col.areas] || "").trim();
+    if (areas) zones.find(z => z.id === zone).areas = areas;
   });
   return { zones, rates };
 }
@@ -299,7 +303,7 @@ function parseSold(text) {
     const sv = norm(r[sizeCol]);
     return {
       pub: PUB_ALIASES[norm(r[col.magazine])] || "bdb",
-      size: (SIZES.find(s => norm(s.name) === sv || s.id === sv) || SIZES[0]).id,
+      size: (SOLD_KINDS.find(s => norm(s.name) === sv || s.id === sv) || SOLD_KINDS[0]).id,
       zone: (r[col.zone] || "").trim(),
       month: monthKey(r[col.month]) || "",
       advertiser: col.advertiser != null ? (r[col.advertiser] || "").trim() : "",
@@ -307,17 +311,17 @@ function parseSold(text) {
   });
 }
 function ratesCSV(d) {
-  const rows = [["Magazine", "Zone", "Zone name", "Homes", ...SIZES.map(s => s.name)]];
+  const rows = [["Magazine", "Zone", "Zone name", "Areas covered", "Homes", ...SIZES.map(s => s.name)]];
   PUBS.forEach(p => d.zones.forEach(z => {
     const e = d.rates[p.id][z.id]; if (!e) return;
-    rows.push([p.code, z.id, z.name, e.homes ?? "", ...SIZES.map(s => e[s.id] ?? "")]);
+    rows.push([p.code, z.id, z.name, z.areas || "", e.homes ?? "", ...SIZES.map(s => e[s.id] ?? "")]);
   }));
   return toCSV(rows);
 }
 function soldCSV(d) {
   const rows = [["Magazine", "Ad size", "Zone", "Month", "Advertiser"]];
   [...d.sold].sort((a, b) => (a.month || "").localeCompare(b.month || "") || a.zone.localeCompare(b.zone))
-    .forEach(b => rows.push([PUBS.find(p => p.id === b.pub).code, SIZES.find(s => s.id === b.size).name, b.zone, b.month ? monthLabel(b.month) : "", b.advertiser]));
+    .forEach(b => rows.push([PUBS.find(p => p.id === b.pub).code, SOLD_KINDS.find(s => s.id === b.size).name, b.zone, b.month ? monthLabel(b.month) : "", b.advertiser]));
   return toCSV(rows);
 }
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -397,19 +401,20 @@ function render() {
   const R = data.rates[activePub], S = saved.rates[activePub];
   const ch = (z, f) => { const a = (R[z] || {})[f], b = (S[z] || {})[f]; return (!!R[z] !== !!S[z]) || a !== b ? " changed" : ""; };
   $("#ratesTable").innerHTML = `
-    <thead><tr><th>Zone</th><th>Zone name</th><th>Mails here</th><th>Homes</th>${SIZES.map(s => `<th title="${s.name}">${(s.name.startsWith("Inside ") ? s.name.replace("Inside ", "Inside<br>").replace(" Cover", "") : s.name)}</th>`).join("")}<th></th></tr></thead>
+    <thead><tr><th>Zone</th><th>Zone name</th><th>Areas covered</th><th>Mails here</th><th>Homes</th>${SIZES.map(s => `<th title="${s.name}">${(s.name.startsWith("Inside ") ? s.name.replace("Inside ", "Inside<br>").replace(" Cover", "") : s.name)}</th>`).join("")}<th></th></tr></thead>
     <tbody>${data.zones.map((z, i) => {
       const e = R[z.id];
       const zch = (saved.zones.find(x => x.id === z.id) || {}).name !== z.name ? " changed" : "";
       return `<tr class="${e ? "" : "off"}" data-i="${i}">
         <td class="keep"><input type="text" data-f="id" value="${esc(z.id)}" aria-label="Zone code"></td>
         <td class="keep" style="min-width:140px"><input type="text" class="${zch}" data-f="name" value="${esc(z.name)}" aria-label="Zone name"></td>
+        <td class="keep" style="min-width:170px"><input type="text" class="${(saved.zones.find(x => x.id === z.id) || {}).areas !== z.areas ? " changed" : ""}" data-f="areas" value="${esc(z.areas || "")}" placeholder="e.g. Sarasota, Lakewood Ranch" aria-label="Areas covered"></td>
         <td class="keep"><label class="switch"><input type="checkbox" data-f="mails" ${e ? "checked" : ""}> ${e ? "Yes" : "No"}</label></td>
         <td style="min-width:86px"><input type="text" inputmode="numeric" class="num${ch(z.id, "homes")}" data-f="homes" value="${e?.homes ?? ""}" ${e ? "" : "disabled"} aria-label="Homes"></td>
         ${SIZES.map(s => `<td class="moneycell" style="min-width:88px"><input type="text" inputmode="decimal" class="money${ch(z.id, s.id)}" data-f="${s.id}" value="${e?.[s.id] ?? ""}" ${e ? "" : "disabled"} aria-label="${s.name} price"></td>`).join("")}
         <td class="keep"><button class="x" data-del="${i}" title="Remove zone from both magazines" type="button">×</button></td>
       </tr>`;
-    }).join("") || `<tr><td colspan="${SIZES.length + 5}" class="empty">No zones yet. Add one.</td></tr>`}</tbody>`;
+    }).join("") || `<tr><td colspan="${SIZES.length + 6}" class="empty">No zones yet. Add one.</td></tr>`}</tbody>`;
 
   // sold table
   const showPast = $("#showPast").checked;
@@ -423,7 +428,7 @@ function render() {
     <tbody>${rows.map(({ b, i }) => `<tr data-s="${i}">
       <td style="width:170px"><input type="month" data-f="month" value="${b.month}" aria-label="Month"> ${b.month && b.month < thisMonth ? '<span class="pill past">Past</span>' : ""}</td>
       <td style="min-width:110px"><select data-f="pub" aria-label="Magazine">${PUBS.map(p => `<option value="${p.id}" ${p.id === b.pub ? "selected" : ""}>${p.code === "BDB" ? "BDB · Best Deals Book" : "EHI · Excl. Home Impr."}</option>`).join("")}</select></td>
-      <td><select data-f="size" aria-label="Ad size">${SIZES.filter(s => s.premium).map(s => `<option value="${s.id}" ${s.id === b.size ? "selected" : ""}>${s.name}</option>`).join("")}</select></td>
+      <td><select data-f="size" aria-label="Ad size">${SOLD_KINDS.map(s => `<option value="${s.id}" ${s.id === b.size ? "selected" : ""}>${s.name}</option>`).join("")}</select></td>
       <td><select data-f="zone" aria-label="Zone">${zoneOpts(b.zone)}</select></td>
       <td style="min-width:180px"><input type="text" data-f="advertiser" value="${esc(b.advertiser)}" placeholder="Business name" aria-label="Advertiser"></td>
       <td><button class="x" data-dels="${i}" title="Delete booking" type="button">×</button></td>
@@ -439,7 +444,7 @@ function validate() {
   if (new Set(ids).size !== ids.length) problems.push("Two zones have the same code.");
   data.sold.forEach(b => { if (!b.month) problems.push("A sold cover is missing its month."); });
   const seen = new Set();
-  data.sold.forEach(b => { const k = [b.pub, b.size, b.zone, b.month].join("|"); if (b.month && seen.has(k)) problems.push(`${SIZES.find(s => s.id === b.size).name} in ${b.zone} for ${monthLabel(b.month)} is booked twice.`); seen.add(k); });
+  data.sold.forEach(b => { const k = [b.pub, b.size, b.zone, b.month].join("|"); if (b.month && seen.has(k)) problems.push(`${SOLD_KINDS.find(s => s.id === b.size).name} in ${b.zone} for ${monthLabel(b.month)} is booked twice.`); seen.add(k); });
   return [...new Set(problems)];
 }
 
@@ -476,6 +481,10 @@ $("#ratesTable").addEventListener("change", e => {
     z.name = e.target.value.trim();
     e.target.classList.toggle("changed", (saved.zones.find(x => x.id === z.id) || {}).name !== z.name);
     $("#status").classList.remove("ok"); refreshBar(); return;   // no redraw, so Tab keeps working
+  } else if (f === "areas") {
+    z.areas = e.target.value.trim();
+    e.target.classList.toggle("changed", (saved.zones.find(x => x.id === z.id) || {}).areas !== z.areas);
+    $("#status").classList.remove("ok"); refreshBar(); return;
   } else if (f === "mails") {
     if (e.target.checked) R[z.id] = clone(saved.rates[activePub][z.id] || { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) });
     else delete R[z.id];
@@ -501,7 +510,7 @@ $("#ratesTable").addEventListener("click", e => {
 $("#addZone").onclick = () => {
   let n = data.zones.length + 1; while (data.zones.some(z => z.id === "Z" + n)) n++;
   const id = "Z" + n;
-  data.zones.push({ id, name: "Zone " + n });
+  data.zones.push({ id, name: "Zone " + n, areas: "" });
   data.rates[activePub][id] = { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) };
   render();
   const last = $("#ratesTable tbody tr:last-child [data-f='name']"); last && (last.focus(), last.select());
