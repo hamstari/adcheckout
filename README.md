@@ -89,7 +89,7 @@ Rates and sold covers are updated from the staff portal (see above), which saves
 
 The checkout scrolls inside the box. On desktop the summary and total stay pinned, and on phones a bar with the total and the Continue button stays at the bottom of the box. Visitors never leave bestdealsnetworks.com.
 
-**On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code). The box is 900px tall on desktop and 560px on phones, and the checkout scrolls inside it.
+**On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code) and leave **Forced Height** empty. The frame grows to the full height of the checkout, so nothing is cut off and the page scrolls normally, including on phones. If the bottom is cut off after publishing (GoDaddy's own wrapper not growing), use `godaddy-embed-fixed.html`, which is a fixed-height box that scrolls inside.
 
 ## Publishing on your site
 The checkout is four plain files with no build step: `index.html`, `rates.csv`, `zones.csv` and `sold.csv`.

@@ -103,6 +103,10 @@
   .btn { width: 100%; border: 2px solid var(--black); border-radius: 2px; padding: 14px 20px; background: var(--black); color: #fff; font-weight: 600; font-size: 13.5px; letter-spacing: .14em; text-transform: uppercase; margin-top: 18px; }
   .btn:hover:not(:disabled) { background: #333; border-color: #333; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
+  /* The host page resizes the frame to fit (no inner scrolling): nothing can be pinned to the screen */
+  .bda-auto .mbar { display: none !important; }
+  .bda-auto body.has-mbar { padding-bottom: 0; }
+  .bda-auto aside { position: static; }
   .btn.ghost { background: transparent; color: var(--black); margin-top: 10px; }
   .btn.ghost:hover { background: var(--black); color: #fff; }
 
@@ -118,6 +122,10 @@
     .mbar .err { margin: 0 0 6px; min-height: 0; }
     .mbar .err:empty { display: none; }
     body.has-mbar { padding-bottom: 96px; }
+    /* Embedded on a phone: shorter header so more of the checkout shows in the box */
+    .embedded header { padding-top: 22px; padding-bottom: 84px; }
+    .embedded header p { display: none; }
+    .embedded header h1 { margin-bottom: 16px; }
   }
   .err { color: #b3261e; font-size: 13.5px; margin-top: 10px; min-height: 1em; }
 
@@ -1173,6 +1181,10 @@ if (embedded) {
   const post = () => window.parent.postMessage({ type: "bda-height", height: Math.ceil(document.body.getBoundingClientRect().height) }, "*");
   new ResizeObserver(post).observe(document.body);
   addEventListener("load", post);
+  // The embed snippet answers when it is resizing the frame to fit the content.
+  addEventListener("message", (e) => {
+    if (e.source === window.parent && e.data && e.data.type === "bda-auto") { document.documentElement.classList.add("bda-auto"); post(); }
+  });
 }
 
 $("#deadlineNote").textContent = DEADLINE;
