@@ -1,509 +1,876 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Advertise With Us — Build Your Ad &amp; Get Instant Pricing</title>
+<title>Best Deals Ads</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#14213d; --ink-2:#3d4a66; --muted:#6b7488; --line:#e3ddd2;
-    --paper:#faf7f2; --card:#ffffff; --accent:#e4572e; --accent-soft:#fdebe5;
-    --good:#1f8a5b; --good-soft:#e3f4ec; --radius:14px;
+  /* Colors match bestdealsnetworks.com */
+  :root {
+    --black: #161616;
+    --ink: #1f1f1f;
+    --teal: #59abad;        /* site teal (headings, chat button) */
+    --teal-d: #2e7f81;      /* darker teal for small text, readable on white */
+    --tint: #eaf5f5;
+    --grey: #686868;        /* logo grey */
+    --bg: #f7f7f7;
+    --card: #ffffff;
+    --line: #e2e2e2;
+    --muted: #5f5f5f;
+    --radius: 6px;
+    --gutter: clamp(20px, 5vw, 56px);   /* left/right page margin */
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.45}
-  h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;letter-spacing:-.01em}
-  button{font:inherit;cursor:pointer}
-  .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15.5px/1.6 "Montserrat", system-ui, sans-serif; }
+  h1, h2 { font-weight: 600; margin: 0; letter-spacing: .01em; }
+  button { font: inherit; cursor: pointer; }
 
-  header.hero{padding:40px 0 28px;border-bottom:1px solid var(--line)}
-  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-  .hero h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0 12px;max-width:760px}
-  .hero p{color:var(--ink-2);max-width:620px;margin:0;font-size:17px}
-  .steps-mini{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;color:var(--muted);font-size:14px}
-  .steps-mini span b{color:var(--ink)}
+  /* Header */
+  header { background: var(--black); color: #fff; padding: 44px var(--gutter) 100px; position: relative; }
+  header::after { /* stripe in the logo's arrow colors */
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+    background: linear-gradient(90deg, #87cbe4 0 20%, #2f5a82 20% 40%, #347142 40% 60%, #e9b14c 60% 80%, #c83536 80% 100%);
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .eyebrow { color: var(--teal); letter-spacing: .24em; font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
+  header h1 { font-size: clamp(30px, 5.5vw, 46px); margin: 10px 0 14px; line-height: 1.15; }
+  header p { max-width: 640px; color: #d4d4d4; font-size: 16.5px; margin: 0 0 26px; }
+  @media (max-width: 560px) { header { padding-top: 32px; padding-bottom: 88px; } header p { font-size: 15px; } }
+  .steps { display: flex; gap: 8px; flex-wrap: wrap; }
+  .steps span { border: 1px solid #3a3a3a; color: #bdbdbd; padding: 7px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; }
+  .steps span.on { background: var(--teal); border-color: var(--teal); color: var(--black); font-weight: 700; }
 
-  .layout{display:grid;grid-template-columns:1fr 370px;gap:32px;padding:32px 0 120px;align-items:start}
-  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+  /* Layout */
+  main { margin-top: -64px; padding: 0 var(--gutter) 64px; position: relative; z-index: 1; }
+  .grid { display: grid; grid-template-columns: 1fr 330px; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(22px, 3.5vw, 32px); margin-bottom: 20px; }
+  .panel-h { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .num { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+  .panel h2 { font-size: 22px; color: var(--black); }
+  .sub { color: var(--muted); margin: 4px 0 16px; }
 
-  section.step{margin-bottom:38px}
-  .step-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
-  .num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;transform:translateY(-3px)}
-  .step h2{font-size:24px}
-  .step .sub{color:var(--muted);margin:0 0 16px 42px;font-size:14.5px}
+  /* Option cards */
+  .opts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .opts.wide { grid-template-columns: 1fr; }
+  .opt { text-align: left; background: #fff; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px 18px; color: var(--ink); position: relative; }
+  .opt:hover { border-color: var(--teal); }
+  .opt[aria-pressed="true"] { background: var(--tint); border-color: var(--teal-d); box-shadow: inset 0 0 0 1px var(--teal-d); }
+  .opt b { display: block; font-size: 15.5px; font-weight: 600; }
+  .opt small { display: block; color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+  .opt .price { margin-top: 8px; font-weight: 700; color: var(--teal-d); font-size: 13.5px; }
+  .tag { display: inline-block; background: var(--teal); color: var(--black); font-weight: 700; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; margin-top: 8px; }
+  .opt svg { display: block; margin-bottom: 12px; }
+  .note { background: var(--tint); border-left: 3px solid var(--teal); border-radius: 4px; padding: 12px 16px; margin-top: 16px; font-size: 14.5px; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .link { background: none; border: 0; color: var(--teal-d); font-weight: 700; padding: 0; font-size: 14px; }
 
-  /* sizes */
-  .sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
-  .size{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:14px 14px 12px;text-align:left;transition:border-color .15s, box-shadow .15s, transform .15s}
-  .size:hover{border-color:#c9c0b0;transform:translateY(-1px)}
-  .size[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .size svg{display:block;width:100%;height:74px;margin-bottom:10px}
-  .size .nm{font-weight:700;font-size:15px}
-  .size .pr{color:var(--muted);font-size:13px;margin-top:2px}
-  .size .pr b{color:var(--ink)}
-  .badge{position:absolute;top:10px;right:10px;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:#fff;padding:3px 7px;border-radius:999px}
-  .badge.hot{background:var(--accent)}
+  /* Summary */
+  aside { position: sticky; top: 16px; }
+  .sum h2 { font-size: 20px; margin-bottom: 12px; }
+  .sum dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 14px; }
+  .sum dt { color: var(--muted); }
+  .sum dd { margin: 0; text-align: right; font-weight: 600; }
+  .sum hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+  .total { display: flex; justify-content: space-between; align-items: baseline; }
+  .total strong { font-size: 30px; font-weight: 700; color: var(--black); }
+  .per { color: var(--muted); font-size: 13px; text-align: right; }
+  /* Buttons: like the site's LEARN MORE buttons */
+  .btn { width: 100%; border: 2px solid var(--black); border-radius: 2px; padding: 14px 20px; background: var(--black); color: #fff; font-weight: 600; font-size: 13.5px; letter-spacing: .14em; text-transform: uppercase; margin-top: 18px; }
+  .btn:hover:not(:disabled) { background: #333; border-color: #333; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--black); margin-top: 10px; }
+  .btn.ghost:hover { background: var(--black); color: #fff; }
 
-  /* locations */
-  .loc-tools{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px 0;font-size:14px;color:var(--muted)}
-  .linkbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:4px 0}
-  .locs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-  .loc{display:flex;gap:12px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;transition:border-color .15s, box-shadow .15s}
-  .loc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .check{flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid #c9c0b0;display:grid;place-items:center;background:#fff}
-  .loc[aria-pressed="true"] .check{background:var(--accent);border-color:var(--accent)}
-  .loc[aria-pressed="true"] .check::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
-  .loc .nm{font-weight:600}
-  .loc .meta{font-size:12.5px;color:var(--muted)}
-  .loc .lp{margin-left:auto;font-weight:600;font-size:14px;white-space:nowrap}
+  /* Phone: total + Continue pinned to the bottom (also inside a fixed-height embed box) */
+  .mbar { display: none; }
+  @media (max-width: 900px) {
+    .mbar { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--card);
+            border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(0,0,0,.08); padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom)); }
+    .mbar-row { display: flex; align-items: center; gap: 14px; }
+    .mbar small { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.2; text-transform: uppercase; letter-spacing: .08em; }
+    .mbar strong { font-weight: 700; font-size: 22px; line-height: 1.2; color: var(--black); }
+    .mbar .btn { width: auto; flex: 1; margin: 0; padding: 12px 14px; font-size: 12.5px; letter-spacing: .12em; }
+    .mbar .err { margin: 0 0 6px; min-height: 0; }
+    .mbar .err:empty { display: none; }
+    body.has-mbar { padding-bottom: 96px; }
+  }
+  .err { color: #b3261e; font-size: 13.5px; margin-top: 10px; min-height: 1em; }
 
-  /* months */
-  .months{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  @media (max-width:520px){.months{grid-template-columns:repeat(2,1fr)}}
-  .mo{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
-  .mo[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .mo .big{font-family:Fraunces,serif;font-size:28px;font-weight:700;line-height:1}
-  .mo .lbl{font-size:13px;color:var(--muted)}
-  .mo .save{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;color:var(--good);background:var(--good-soft);padding:2px 8px;border-radius:999px}
-  .mo .save.none{color:var(--muted);background:#f0ece4}
+  /* Forms */
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fields .full { grid-column: 1 / -1; }
+  @media (max-width: 560px) { .fields { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13.5px; font-weight: 600; }
+  input, select, textarea { width: 100%; margin-top: 6px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 4px; font: inherit; font-size: 15px; background: #fff; color: var(--ink); }
+  input:focus, select:focus, textarea:focus, .opt:focus-visible, .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 1px; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; }
+  .check input { width: auto; margin-top: 4px; }
 
-  /* design addon */
-  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (max-width:520px){.opts{grid-template-columns:1fr}}
-  .opt{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left}
-  .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .opt .nm{font-weight:700}
-  .opt .meta{font-size:13px;color:var(--muted);margin-top:2px}
-
-  /* summary */
-  aside.summary{position:sticky;top:20px;background:var(--ink);color:#fff;border-radius:18px;padding:22px;box-shadow:0 18px 40px -20px rgba(20,33,61,.55)}
-  @media (max-width:900px){aside.summary{position:static}}
-  .summary h3{font-size:20px;margin-bottom:4px}
-  .summary .choice{color:#b9c2d6;font-size:14px;margin-bottom:16px}
-  .rows{border-top:1px solid rgba(255,255,255,.14);padding-top:12px;font-size:14px}
-  .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:#d6dcea}
-  .row.sm{font-size:13px;color:#9aa5bd;padding:2px 0 2px 10px}
-  .row.disc{color:#7fe0b0}
-  .total{border-top:1px solid rgba(255,255,255,.14);margin-top:10px;padding-top:14px}
-  .total .lab{font-size:13px;color:#b9c2d6;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-  .total .amt{font-family:Fraunces,serif;font-size:42px;font-weight:700;line-height:1.05}
-  .total .per{color:#b9c2d6;font-size:14px}
-  .savepill{display:inline-block;margin-top:10px;background:rgba(127,224,176,.15);color:#7fe0b0;font-weight:700;font-size:13px;padding:5px 10px;border-radius:999px}
-  .cta{display:block;width:100%;margin-top:18px;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:15px;font-weight:700;font-size:16px;transition:filter .15s}
-  .cta:hover{filter:brightness(1.07)}
-  .cta:disabled{background:#56607a;color:#aab3c7;cursor:not-allowed}
-  .fine{font-size:12px;color:#8d98b1;margin-top:12px}
-  .empty{color:#b9c2d6;font-size:14px;padding:8px 0}
-
-  /* mobile sticky bar */
-  .mbar{display:none;position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:12px 18px calc(12px + env(safe-area-inset-bottom));z-index:20;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -10px 30px -10px rgba(0,0,0,.35)}
-  .mbar .t{font-family:Fraunces,serif;font-size:24px;font-weight:700;line-height:1}
-  .mbar .s{font-size:12px;color:#b9c2d6}
-  .mbar button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700}
-  @media (max-width:900px){.mbar{display:flex}}
-
-  /* modal */
-  .scrim{position:fixed;inset:0;background:rgba(20,33,61,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
-  .scrim.open{display:flex}
-  .modal{background:var(--card);border-radius:18px;max-width:560px;width:100%;padding:24px;position:relative}
-  .modal.wide{max-width:760px}
-  .modal h3{font-size:24px;margin-bottom:4px}
-  .modal .sub{color:var(--muted);font-size:14px;margin:0 0 16px}
-  .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:0;background:#f0ece4;font-size:18px;line-height:1}
-  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media (max-width:520px){.fgrid{grid-template-columns:1fr}}
-  label.f{display:block;font-size:13px;font-weight:600;color:var(--ink-2)}
-  label.f.full{grid-column:1/-1}
-  .f input,.f select,.f textarea{display:block;width:100%;margin-top:5px;font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
-  .f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--accent)}
-  .err{color:#c0392b;font-size:13px;margin-top:10px;min-height:18px}
-  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-  .btn{border:0;border-radius:10px;padding:12px 16px;font-weight:700;background:var(--accent);color:#fff}
-  .btn.ghost{background:#f0ece4;color:var(--ink)}
-  .quote{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:pre-wrap;max-height:300px;overflow:auto}
-  .ok{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-  .ok .dot{width:40px;height:40px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center;font-size:22px;font-weight:700;flex:none}
-
-  table.rates{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:18px}
-  table.rates th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line)}
-  table.rates td{padding:5px 6px;border-bottom:1px solid #f0ece4}
-  table.rates input{width:100%;font:inherit;font-size:14px;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px}
-  .ed-h{font-family:Inter,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:8px 0 6px}
-
-  footer{border-top:1px solid var(--line);padding:22px 0 100px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.2s;z-index:60;pointer-events:none}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .months { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+  .months .opt { padding: 12px 14px; }
+  .months .opt b { font-size: 14.5px; }
+  .opt:disabled { background: #f4f4f4; color: #9a9a9a; cursor: not-allowed; border-style: dashed; box-shadow: none; }
+  .opt:disabled small { color: #b3261e; }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .chip:hover { border-color: var(--teal); }
+  .tiers { font-size: 13.5px; color: var(--muted); margin-top: 14px; }
+  .tiers b { color: var(--teal-d); }
+  .demo-bar { background: #e9b14c; color: #2a1d00; text-align: center; font-size: 13.5px; font-weight: 600; padding: 8px var(--gutter); }
+  .hidden { display: none !important; }
+  .confirm { text-align: center; padding: 48px clamp(22px, 4vw, 40px); }
+  .confirm .big { width: 64px; height: 64px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 30px; margin: 0 auto 16px; }
+  .confirm h2 { font-size: 28px; margin-bottom: 8px; }
+  .ref { font-weight: 700; letter-spacing: .08em; }
+  .receipt { text-align: left; max-width: 520px; margin: 24px auto 8px; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
+  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 0; font-size: 14px; }
+  .receipt dt { color: var(--muted); }
+  .receipt dd { margin: 0; text-align: right; padding-left: 16px; }
+  .receipt .tot { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; font-weight: 700; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .actions .btn { width: auto; min-width: 220px; margin-top: 0; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  @media print {
+    body { background: #fff; }
+    header .steps, header p, aside, footer, .actions, #step1, #step2, .mbar, .demo-bar { display: none !important; }
+    header { padding: 20px 0; background: #fff; color: var(--ink); }
+    header::after { display: none; }
+    main { margin-top: 0; padding: 0; }
+    .grid { display: block; }
+    .panel { border: 0; padding: 0; }
+  }
+  footer { text-align: center; color: var(--muted); font-size: 13.5px; padding: 0 var(--gutter) 40px; }
+  footer a { color: var(--teal-d); font-weight: 600; }
 </style>
 </head>
 <body>
 
-<header class="hero">
+<div class="demo-bar hidden" id="demoBar">Demo: prices and availability are examples, and nothing you enter is sent or saved.</div>
+<header>
   <div class="wrap">
-    <div class="eyebrow">Advertise in Your Local Home Magazine</div>
-    <h1>Build your ad, see your price, and reserve your spot — no sales call needed.</h1>
-    <p>Pick an ad size, choose the areas you want to reach, and decide how many months to run. Your price updates instantly, with savings for longer runs and more locations.</p>
-    <div class="steps-mini"><span><b>1</b> Ad size</span><span><b>2</b> Locations</span><span><b>3</b> Months</span><span><b>4</b> Artwork</span><span><b>5</b> Reserve</span></div>
+    <div class="eyebrow">Best Deals Networks</div>
+    <h1>Best Deals Ads</h1>
+    <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and months, then check out. Printing and mailing included.</p>
+    <div class="steps" id="steps">
+      <span class="on">1 · Build your ad</span>
+      <span>2 · Checkout</span>
+      <span>3 · Confirmation</span>
+    </div>
   </div>
 </header>
 
-<main class="wrap layout">
-  <div>
-    <section class="step">
-      <div class="step-head"><div class="num">1</div><h2>Choose your ad size</h2></div>
-      <p class="sub">Prices shown are per location, per month, before discounts.</p>
-      <div class="sizes" id="sizes"></div>
-    </section>
+<main>
+  <div class="wrap grid">
+    <div>
+      <!-- STEP 1 -->
+      <section id="step1">
+        <div class="panel">
+          <div class="panel-h"><div class="num">1</div><h2>Magazine</h2></div>
+          <p class="sub">Both magazines mail monthly to targeted Florida neighborhoods.</p>
+          <div class="opts wide" id="pubOpts"></div>
+        </div>
 
-    <section class="step">
-      <div class="step-head"><div class="num">2</div><h2>Pick your locations</h2></div>
-      <p class="sub" id="locSub">Each location is a separate mailed edition. Add 3+ for a multi-area discount.</p>
-      <div class="loc-tools"><span id="locCount">0 selected</span><button class="linkbtn" id="allLocs">Select all</button></div>
-      <div class="locs" id="locs"></div>
-    </section>
+        <div class="panel">
+          <div class="panel-h"><div class="num">2</div><h2>Ad size</h2></div>
+          <p class="sub">Rates vary by zone. You'll see each zone's price in the next step.</p>
+          <div class="opts" id="sizeOpts"></div>
+          <div class="note" id="specNote"></div>
+        </div>
 
-    <section class="step">
-      <div class="step-head"><div class="num">3</div><h2>How many months?</h2></div>
-      <p class="sub">Longer runs build recognition — and cost less per month.</p>
-      <div class="months" id="months"></div>
-    </section>
+        <div class="panel">
+          <div class="row-head">
+            <div class="panel-h"><div class="num">3</div><h2>Zones</h2></div>
+            <button type="button" class="link" id="allZones">Select all</button>
+          </div>
+          <p class="sub" id="zoneSub">Choose the zones you want to reach. Each zone is its own mailing.</p>
+          <div class="opts" id="zoneOpts"></div>
+          <div class="note hidden" id="zoneNote"></div>
+        </div>
 
-    <section class="step">
-      <div class="step-head"><div class="num">4</div><h2>Your artwork</h2></div>
-      <p class="sub">Already have an ad? Great. If not, our design team can create one.</p>
-      <div class="opts" id="opts"></div>
-    </section>
+        <div class="panel">
+          <div class="row-head">
+            <div class="panel-h"><div class="num">4</div><h2>Issues</h2></div>
+            <button type="button" class="link" id="clearMonths">Clear</button>
+          </div>
+          <p class="sub">Pick any months. They don't have to be back to back. Book more issues to save on the whole order.</p>
+          <div class="quick" id="quickPicks"></div>
+          <div class="months" id="monthOpts"></div>
+          <div class="note hidden" id="premiumNote"></div>
+          <div class="tiers" id="tierNote"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h"><div class="num">5</div><h2>Artwork</h2></div>
+          <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
+          <div class="opts" id="artOpts"></div>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section id="step2" class="hidden">
+        <form id="checkoutForm" novalidate>
+          <div class="panel">
+            <div class="panel-h"><div class="num">1</div><h2>Business</h2></div>
+            <p class="sub">This is how the business appears on your invoice.</p>
+            <div class="fields">
+              <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+              <label class="full">Business name<input name="business" required autocomplete="organization"></label>
+              <label>Contact name<input name="contact" required autocomplete="name"></label>
+              <label>Phone<input name="phone" type="tel" required autocomplete="tel"></label>
+              <label class="full">Email<input name="email" type="email" required autocomplete="email"></label>
+              <label class="full">Service category
+                <select name="category" required>
+                  <option value="">Choose one</option>
+                  <option>Roofing</option><option>HVAC / AC</option><option>Plumbing</option>
+                  <option>Electrical</option><option>Windows &amp; Doors</option><option>Garage Doors</option>
+                  <option>Pavers &amp; Pressure Washing</option><option>Pools</option><option>Kitchen &amp; Bath</option>
+                  <option>Flooring</option><option>Landscaping</option><option>Other</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><div class="num">2</div><h2>Billing address</h2></div>
+            <div class="fields" style="margin-top:14px">
+              <label class="full">Street address<input name="street" required autocomplete="street-address"></label>
+              <label>City<input name="city" required autocomplete="address-level2"></label>
+              <label>ZIP<input name="zip" required inputmode="numeric" pattern="\d{5}" autocomplete="postal-code"></label>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><div class="num">3</div><h2>Invoice</h2></div>
+            <p class="sub">No payment is taken here. We confirm your placement, then email you an invoice.</p>
+            <div class="note" style="margin-top:0">✓ Your invoice goes to the email above. Add a different billing email below if it should go elsewhere.</div>
+            <label style="margin-top:16px">Billing email (optional)<input name="billingEmail" type="email" autocomplete="email" placeholder="accounts@yourbusiness.com"></label>
+            <label style="margin-top:16px">Notes for our team (optional)
+              <textarea name="notes" rows="3" placeholder="Offer, coupon, tracking number, placement requests…"></textarea>
+            </label>
+            <label class="check" style="margin-top:16px">
+              <input type="checkbox" name="terms" required>
+              <span>I agree to the advertising terms. Space is reserved once your invoice is paid. Artwork is due by the deadline for each issue.</span>
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <!-- STEP 3 -->
+      <section id="step3" class="hidden">
+        <div class="panel confirm">
+          <div class="big">✓</div>
+          <h2>Your ad space is requested</h2>
+          <p>Reference <span class="ref" id="refNo"></span></p>
+          <p class="sub" id="confirmText"></p>
+          <div class="receipt"><dl id="receipt"></dl></div>
+          <div class="actions">
+            <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
+            <button class="btn" id="newOrder" type="button">Book another ad</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside>
+      <div class="panel sum" id="summary">
+        <h2>Your ad</h2>
+        <dl id="sumList"></dl>
+        <hr>
+        <div class="total"><span>Total</span><strong id="sumTotal">$0</strong></div>
+        <div class="per" id="sumPer"></div>
+        <button class="btn" id="nextBtn" type="button">Continue to checkout</button>
+        <button class="btn ghost hidden" id="backBtn" type="button">Back to your ad</button>
+        <div class="err" id="err" role="alert"></div>
+      </div>
+    </aside>
   </div>
-
-  <aside class="summary" id="summary" aria-live="polite"></aside>
 </main>
 
-<div class="wrap"><footer>
-  <span>All rates, locations and circulation figures are sample placeholders.</span>
-  <button class="linkbtn" id="openRates">Staff: edit rates</button>
-</footer></div>
-
-<div class="mbar" id="mbar">
-  <div><div class="t" id="mTotal">$0</div><div class="s" id="mSub">Select a size & location</div></div>
-  <button id="mGo">Review &amp; reserve</button>
-</div>
-
-<!-- Reserve modal -->
-<div class="scrim" id="reserveScrim" role="dialog" aria-modal="true" aria-labelledby="resTitle">
-  <div class="modal" id="reserveModal"></div>
-</div>
-
-<!-- Rates editor -->
-<div class="scrim" id="ratesScrim" role="dialog" aria-modal="true" aria-labelledby="ratesTitle">
-  <div class="modal wide">
-    <button class="x" data-close="ratesScrim" aria-label="Close">×</button>
-    <h3 id="ratesTitle">Edit rates</h3>
-    <p class="sub">Changes save in this browser only. Use “Copy rates” to send them to whoever maintains the page so they can be made permanent for every visitor.</p>
-    <div id="ratesBody"></div>
-    <div class="btnrow">
-      <button class="btn" id="saveRates">Save rates</button>
-      <button class="btn ghost" id="copyRates">Copy rates</button>
-      <button class="btn ghost" id="resetRates">Reset to defaults</button>
-    </div>
+<div class="mbar" id="mbar" aria-hidden="true">
+  <div class="err" id="mErr"></div>
+  <div class="mbar-row">
+    <div><small>Total</small><strong id="mTotal">$0</strong></div>
+    <button class="btn" id="mNext" type="button" tabindex="-1">Continue</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<footer>Questions? Call <a href="tel:8446008846">844-600-8846</a></footer>
 
 <script>
-/* ============================================================
-   RATE CARD — all placeholder values. Edit here to make permanent.
-   base = price per location, per month, before discounts.
-   mult = location price multiplier (bigger / pricier markets > 1).
-   ============================================================ */
-const DEFAULT_RATES = {
-  contactEmail: "sales@yourmagazine.com",
-  contactPhone: "(555) 555-0100",
+/* ===========================================================
+   CONFIG: edit prices, sizes and zones here.
+   All prices below are PLACEHOLDERS. Swap in the real rate card.
+   =========================================================== */
+const CONFIG = {
+  // Where order requests go. Set orderEndpoint to a webhook URL (Zapier, Make,
+  // Google Apps Script, your CRM). It receives the order as JSON in a POST.
+  // If it's empty, the customer's email app opens with the order pre-filled to salesEmail.
+  // demo: true = nothing is sent anywhere; the flow runs end to end and shows a demo banner.
+  demo: true,
+  orderEndpoint: "",
+  salesEmail: "advertise@bestdealsbook.com",
+  salesPhone: "844-600-8846",
+  publications: [
+    { id: "bdb",  name: "Best Deals Book", desc: "Coupons and offers from trusted local home service pros", mult: 1, includes: ["bdb"] },
+    { id: "ehi",  name: "Exclusively Home Improvements", desc: "Home improvement magazine for affluent homeowners", mult: 1, includes: ["ehi"] },
+    { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, includes: ["bdb", "ehi"], discount: 0.10, tag: "Save 10%" },
+  ],
   sizes: [
-    { id:"front",  name:"Front Cover",     base:2400, badge:"1 per edition", hot:true },
-    { id:"back",   name:"Back Cover",      base:1950, badge:"1 per edition" },
-    { id:"spread", name:"2-Page Spread",   base:2800 },
-    { id:"full",   name:"Full Page",       base:1400, badge:"Popular" },
-    { id:"half",   name:"Half Page",       base:800 },
-    { id:"quarter",name:"Quarter Page",    base:450 }
+    { id: "bc",  name: "Back Cover",          trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "ifc", name: "Inside Front Cover",  trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "ibc", name: "Inside Back Cover",   trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "fp",  name: "Full Page",           trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', shape: [34, 44] },
+    { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null,  shape: [34, 22] },
+    { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
   ],
-  locations: [
-    { id:"srq",  name:"Sarasota",           homes:30000, mult:1.00 },
-    { id:"man",  name:"Manatee / Bradenton",homes:22000, mult:0.85 },
-    { id:"tpa",  name:"Tampa",              homes:40000, mult:1.25 },
-    { id:"pin",  name:"St. Pete / Clearwater", homes:32000, mult:1.10 },
-    { id:"ftm",  name:"Fort Myers / Naples",homes:35000, mult:1.15 },
-    { id:"mia",  name:"Miami-Dade",         homes:50000, mult:1.40 }
+  // RATES + SOLD COVERS come from two CSV files next to this page, not from this file.
+  // Edit them in Excel and re-upload; see UPDATING-RATES.md.
+  ratesUrl: "rates.csv",
+  soldUrl: "sold.csv",
+  // How many months ahead customers can book.
+  monthsAhead: 12,
+  // Volume discount by number of issues booked (highest tier that fits wins).
+  volume: [
+    { min: 1,  discount: 0 },
+    { min: 3,  discount: 0.05 },
+    { min: 6,  discount: 0.10 },
+    { min: 12, discount: 0.15 },
   ],
-  terms: [ { months:1, disc:0 }, { months:3, disc:5 }, { months:6, disc:10 }, { months:12, disc:15 } ],
-  multiLocation: [ { min:3, disc:5 }, { min:5, disc:10 } ],
-  designFee: 150
+  // Filled from the "Sold covers" sheet: magazine → size → zone → ["YYYY-MM", ...].
+  soldOut: {},
+  artwork: [
+    { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
+    { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
+  ],
 };
 
-const STORE_KEY = "adCheckoutRates.v1";
-let RATES = loadRates();
-const state = { size:"full", locs:new Set(["srq"]), months:3, design:"have" };
-
-function loadRates(){
-  try{ const s = localStorage.getItem(STORE_KEY); if(s) return JSON.parse(s); }catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT_RATES));
-}
-const $ = s => document.querySelector(s);
-const money = n => "$" + Math.round(n).toLocaleString("en-US");
-const round5 = n => Math.round(n/5)*5;
-const sizeById = id => RATES.sizes.find(s=>s.id===id);
-const locPrice = (size, loc) => round5(size.base * loc.mult);
-
-/* ---------- page-footprint diagrams ---------- */
-function diagram(id){
-  const W=44,H=58,y=8, L=22, R=L+W;     // two pages side by side
-  const pg = (x,fill)=>`<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="2" fill="${fill?'var(--accent)':'#fff'}" stroke="#c9c0b0" stroke-width="1.2"/>`;
-  const area = (x,yy,w,h)=>`<rect x="${x}" y="${yy}" width="${w}" height="${h}" rx="1.5" fill="var(--accent)"/>`;
-  const lines = x=>[0,1,2,3].map(i=>`<rect x="${x+6}" y="${y+10+i*9}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`).join("");
-  let g="";
-  if(id==="front") g = pg(L+W/2,true)+`<rect x="${L+W/2+6}" y="${y+5}" width="${W-12}" height="6" rx="1" fill="#fff" opacity=".9"/>`;
-  else if(id==="back") g = pg(L+W/2,true);
-  else if(id==="spread") g = pg(L,true)+pg(R,true);
-  else if(id==="full") g = pg(L,false)+lines(L)+pg(R,true);
-  else if(id==="half") g = pg(L,false)+lines(L)+pg(R,false)+area(R+3,y+H/2+1.5,W-6,H/2-4.5)+`<rect x="${R+6}" y="${y+8}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/><rect x="${R+6}" y="${y+16}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`;
-  else g = pg(L,false)+lines(L)+pg(R,false)+area(R+W/2+1.5,y+H/2+1.5,W/2-4.5,H/2-4.5)+`<rect x="${R+6}" y="${y+8}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/><rect x="${R+6}" y="${y+16}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`;
-  return `<svg viewBox="0 0 132 74" aria-hidden="true">${g}</svg>`;
-}
-
-/* ---------- pricing ---------- */
-function quote(){
-  const size = sizeById(state.size);
-  const locs = RATES.locations.filter(l=>state.locs.has(l.id));
-  const lines = locs.map(l=>({ loc:l, monthly:locPrice(size,l) }));
-  const monthlyList = lines.reduce((a,b)=>a+b.monthly,0);
-  const term = RATES.terms.find(t=>t.months===state.months) || {disc:0};
-  const multi = [...RATES.multiLocation].sort((a,b)=>b.min-a.min).find(m=>locs.length>=m.min) || {disc:0, min:0};
-  const afterTerm = monthlyList*(1-term.disc/100);
-  const monthly = afterTerm*(1-multi.disc/100);
-  const media = monthly*state.months;
-  const design = state.design==="need" ? Number(RATES.designFee)||0 : 0;
-  const listTotal = monthlyList*state.months;
-  return { size, locs, lines, monthlyList, term, multi,
-    termSave:(monthlyList-afterTerm)*state.months, multiSave:(afterTerm-monthly)*state.months,
-    monthly, media, design, total:media+design, saved:listTotal-media,
-    homes: locs.reduce((a,l)=>a+Number(l.homes||0),0) };
-}
-
-/* ---------- render ---------- */
-function renderSizes(){
-  const minMult = Math.min(...RATES.locations.map(l=>l.mult));
-  $("#sizes").innerHTML = RATES.sizes.map(s=>`
-    <button class="size" aria-pressed="${state.size===s.id}" data-size="${s.id}">
-      ${s.badge?`<span class="badge ${s.hot?'hot':''}">${s.badge}</span>`:""}
-      ${diagram(s.id)}
-      <div class="nm">${s.name}</div>
-      <div class="pr">from <b>${money(round5(s.base*minMult))}</b>/mo</div>
-    </button>`).join("");
-}
-function renderLocs(){
-  const size = sizeById(state.size);
-  $("#locs").innerHTML = RATES.locations.map(l=>`
-    <button class="loc" aria-pressed="${state.locs.has(l.id)}" data-loc="${l.id}">
-      <span class="check"></span>
-      <span><div class="nm">${l.name}</div><div class="meta">~${Number(l.homes).toLocaleString()} homes</div></span>
-      <span class="lp">${money(locPrice(size,l))}<span style="color:var(--muted);font-weight:500">/mo</span></span>
-    </button>`).join("");
-  const n = state.locs.size;
-  $("#locCount").textContent = `${n} selected`;
-  $("#allLocs").textContent = n===RATES.locations.length ? "Clear all" : "Select all";
-  const tiers = [...RATES.multiLocation].sort((a,b)=>a.min-b.min).map(m=>`${m.min}+ save ${m.disc}%`).join(", ");
-  $("#locSub").textContent = `Each location is a separate mailed edition. Multi-area savings: ${tiers}.`;
-}
-function renderMonths(){
-  $("#months").innerHTML = RATES.terms.map(t=>`
-    <button class="mo" aria-pressed="${state.months===t.months}" data-mo="${t.months}">
-      <div class="big">${t.months}</div><div class="lbl">month${t.months>1?"s":""}</div>
-      <span class="save ${t.disc?'':'none'}">${t.disc?`Save ${t.disc}%`:"Standard"}</span>
-    </button>`).join("");
-}
-function renderOpts(){
-  const o = [
-    {id:"have", nm:"I have my artwork", meta:"Upload print-ready files after you reserve."},
-    {id:"need", nm:"Design it for me", meta:`One-time ${money(RATES.designFee)} — includes 2 rounds of edits.`}
-  ];
-  $("#opts").innerHTML = o.map(x=>`<button class="opt" aria-pressed="${state.design===x.id}" data-opt="${x.id}"><div class="nm">${x.nm}</div><div class="meta">${x.meta}</div></button>`).join("");
-}
-function renderSummary(){
-  const q = quote(), ok = q.locs.length>0;
-  let h = `<h3>Your ad</h3><div class="choice">${q.size.name} · ${state.months} month${state.months>1?"s":""} · ${q.locs.length} location${q.locs.length===1?"":"s"}</div>`;
-  if(!ok){ h += `<div class="empty">Select at least one location to see your price.</div>`; }
-  else{
-    h += `<div class="rows">` +
-      q.lines.map(l=>`<div class="row sm"><span>${l.loc.name}</span><span>${money(l.monthly)}/mo</span></div>`).join("") +
-      `<div class="row"><span>Ad space (${state.months} × ${money(q.monthlyList)})</span><span>${money(q.monthlyList*state.months)}</span></div>` +
-      (q.term.disc?`<div class="row disc"><span>${state.months}-month discount (${q.term.disc}%)</span><span>−${money(q.termSave)}</span></div>`:"") +
-      (q.multi.disc?`<div class="row disc"><span>Multi-location discount (${q.multi.disc}%)</span><span>−${money(q.multiSave)}</span></div>`:"") +
-      (q.design?`<div class="row"><span>Ad design (one-time)</span><span>${money(q.design)}</span></div>`:"") +
-      `</div>
-      <div class="total"><div class="lab">Total for ${state.months} month${state.months>1?"s":""}</div>
-      <div class="amt">${money(q.total)}</div>
-      <div class="per">${money(q.monthly)}/month · reaches ~${q.homes.toLocaleString()} homes each month</div>
-      ${q.saved>0?`<span class="savepill">You save ${money(q.saved)}</span>`:""}</div>`;
+/* ===========================================================
+   State + helpers
+   =========================================================== */
+const $ = (s) => document.querySelector(s);
+const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
+const MONTHS = (() => {
+  const out = [], d = new Date();
+  d.setDate(1); d.setMonth(d.getMonth() + 1);
+  for (let i = 0; i < CONFIG.monthsAhead; i++) {
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    out.push({
+      key,
+      short: d.toLocaleString("en-US", { month: "short" }),
+      year: d.getFullYear(),
+      long: d.toLocaleString("en-US", { month: "long", year: "numeric" }),
+    });
+    d.setMonth(d.getMonth() + 1);
   }
-  h += `<button class="cta" id="reserveBtn" ${ok?"":"disabled"}>Reserve this ad</button>
-        <div class="fine">No payment today. We'll confirm availability and send your agreement.</div>`;
-  $("#summary").innerHTML = h;
-  $("#reserveBtn").onclick = openReserve;
-  $("#mTotal").textContent = ok?money(q.total):"$0";
-  $("#mSub").textContent = ok?`${q.size.name} · ${state.months} mo · ${q.locs.length} loc`:"Select a location";
-}
-function renderAll(){ renderSizes(); renderLocs(); renderMonths(); renderOpts(); renderSummary(); }
-
-/* ---------- interactions ---------- */
-document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-size],[data-loc],[data-mo],[data-opt],[data-close]");
-  if(!t) return;
-  if(t.dataset.size){ state.size=t.dataset.size; renderSizes(); renderLocs(); renderSummary(); }
-  else if(t.dataset.loc){ const id=t.dataset.loc; state.locs.has(id)?state.locs.delete(id):state.locs.add(id); renderLocs(); renderSummary(); }
-  else if(t.dataset.mo){ state.months=Number(t.dataset.mo); renderMonths(); renderSummary(); }
-  else if(t.dataset.opt){ state.design=t.dataset.opt; renderOpts(); renderSummary(); }
-  else if(t.dataset.close){ $("#"+t.dataset.close).classList.remove("open"); }
-});
-$("#allLocs").onclick = ()=>{
-  if(state.locs.size===RATES.locations.length) state.locs.clear();
-  else RATES.locations.forEach(l=>state.locs.add(l.id));
-  renderLocs(); renderSummary();
-};
-$("#mGo").onclick = ()=>{ if(state.locs.size) openReserve(); else $("#locs").scrollIntoView({behavior:"smooth",block:"center"}); };
-document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{ if(e.target===s) s.classList.remove("open"); }));
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".scrim.open").forEach(s=>s.classList.remove("open")); });
-
-function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1800); }
-async function copy(text, msg){
-  try{ await navigator.clipboard.writeText(text); toast(msg||"Copied"); }
-  catch(e){ toast("Couldn't copy — select the text and copy it manually"); }
-}
-const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-/* ---------- reserve flow ---------- */
-function nextMonths(){
-  const out=[], d=new Date(); d.setDate(1);
-  for(let i=1;i<=6;i++){ const m=new Date(d.getFullYear(), d.getMonth()+i, 1); out.push(m.toLocaleString("en-US",{month:"long",year:"numeric"})); }
   return out;
-}
-function openReserve(){
-  const q = quote();
-  $("#reserveModal").innerHTML = `
-    <button class="x" data-close="reserveScrim" aria-label="Close">×</button>
-    <h3 id="resTitle">Reserve your ad</h3>
-    <p class="sub">${q.size.name} · ${state.months} months · ${q.locs.map(l=>l.name).join(", ")} — <b>${money(q.total)}</b></p>
-    <form id="resForm" novalidate>
-      <div class="fgrid">
-        <label class="f">Your name<input name="name" autocomplete="name" required></label>
-        <label class="f">Business name<input name="biz" autocomplete="organization" required></label>
-        <label class="f">Phone<input name="phone" type="tel" autocomplete="tel" required></label>
-        <label class="f">Email<input name="email" type="email" autocomplete="email" required></label>
-        <label class="f">Type of business<input name="type" placeholder="e.g. Roofing, HVAC, Pools"></label>
-        <label class="f">Start with the<select name="start">${nextMonths().map(m=>`<option>${m}</option>`).join("")}</select></label>
-        <label class="f full">Anything we should know?<textarea name="notes" rows="3" placeholder="Offers to feature, preferred placement, questions…"></textarea></label>
-      </div>
-      <div class="err" id="resErr"></div>
-      <div class="btnrow"><button class="btn" type="submit">Reserve my spot</button><button class="btn ghost" type="button" data-close="reserveScrim">Keep editing</button></div>
-    </form>`;
-  $("#reserveScrim").classList.add("open");
-  $("#resForm").addEventListener("submit", submitReserve);
-  setTimeout(()=>$("#resForm [name=name]").focus(),50);
-}
-function submitReserve(e){
-  e.preventDefault();
-  const f = Object.fromEntries(new FormData(e.target).entries());
-  const missing = ["name","biz","phone","email"].filter(k=>!String(f[k]||"").trim());
-  if(missing.length){ $("#resErr").textContent="Please fill in your name, business, phone and email."; return; }
-  if(!/^\S+@\S+\.\S+$/.test(f.email)){ $("#resErr").textContent="Please check your email address."; return; }
-  const q = quote();
-  const id = "Q-" + Date.now().toString(36).toUpperCase().slice(-6);
-  const txt =
-`AD RESERVATION REQUEST — ${id}
-Date: ${new Date().toLocaleDateString("en-US")}
+})();
+const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", step: 1, notice: "", zoneNotice: "" };
 
-CONTACT
-${f.name} — ${f.biz}${f.type?` (${f.type})`:""}
-${f.phone} · ${f.email}
-
-AD
-Size: ${q.size.name}
-Run: ${state.months} month${state.months>1?"s":""}, starting ${f.start}
-Artwork: ${state.design==="need"?"Design requested":"Customer supplies artwork"}
-
-LOCATIONS
-${q.lines.map(l=>`- ${l.loc.name}: ${money(l.monthly)}/mo (~${Number(l.loc.homes).toLocaleString()} homes)`).join("\n")}
-
-PRICING
-Ad space: ${money(q.monthlyList*state.months)}
-${q.term.disc?`${state.months}-month discount (${q.term.disc}%): -${money(q.termSave)}\n`:""}${q.multi.disc?`Multi-location discount (${q.multi.disc}%): -${money(q.multiSave)}\n`:""}${q.design?`Ad design: ${money(q.design)}\n`:""}TOTAL: ${money(q.total)}  (${money(q.monthly)}/month)
-${f.notes?`\nNOTES\n${f.notes}\n`:""}`;
-  const mail = `mailto:${RATES.contactEmail}?subject=${encodeURIComponent("Ad reservation "+id+" — "+f.biz)}&body=${encodeURIComponent(txt)}`;
-  $("#reserveModal").innerHTML = `
-    <button class="x" data-close="reserveScrim" aria-label="Close">×</button>
-    <div class="ok"><div class="dot">✓</div><div><h3 id="resTitle">Your quote is ready</h3><div style="color:var(--muted);font-size:14px">Reference ${id} · ${money(q.total)}</div></div></div>
-    <p class="sub">Send it to us to lock in your spot. Email <b>${esc(RATES.contactEmail)}</b> or call <b>${esc(RATES.contactPhone)}</b> and mention reference ${id}.</p>
-    <div class="quote">${esc(txt)}</div>
-    <div class="btnrow">
-      <a class="btn" href="${mail}" style="text-decoration:none">Email this quote</a>
-      <button class="btn ghost" id="copyQuote">Copy quote</button>
-    </div>`;
-  $("#copyQuote").onclick = ()=>copy(txt,"Quote copied");
-}
-
-/* ---------- staff rate editor ---------- */
-function openRates(){
-  const r = RATES;
-  $("#ratesBody").innerHTML = `
-    <div class="ed-h">Ad sizes — base price per location / month</div>
-    <table class="rates"><tr><th>Size</th><th style="width:140px">Base $</th><th style="width:150px">Badge</th></tr>
-      ${r.sizes.map((s,i)=>`<tr><td><input data-k="sizes.${i}.name" value="${esc(s.name)}"></td><td><input type="number" data-k="sizes.${i}.base" value="${s.base}"></td><td><input data-k="sizes.${i}.badge" value="${esc(s.badge||"")}"></td></tr>`).join("")}
-    </table>
-    <div class="ed-h">Locations</div>
-    <table class="rates"><tr><th>Name</th><th style="width:120px">Homes</th><th style="width:110px">Price ×</th></tr>
-      ${r.locations.map((l,i)=>`<tr><td><input data-k="locations.${i}.name" value="${esc(l.name)}"></td><td><input type="number" data-k="locations.${i}.homes" value="${l.homes}"></td><td><input type="number" step="0.05" data-k="locations.${i}.mult" value="${l.mult}"></td></tr>`).join("")}
-    </table>
-    <div class="ed-h">Discounts</div>
-    <table class="rates"><tr><th>Run length (months)</th><th style="width:140px">Discount %</th></tr>
-      ${r.terms.map((t,i)=>`<tr><td><input type="number" data-k="terms.${i}.months" value="${t.months}"></td><td><input type="number" data-k="terms.${i}.disc" value="${t.disc}"></td></tr>`).join("")}
-    </table>
-    <table class="rates"><tr><th>Minimum locations</th><th style="width:140px">Discount %</th></tr>
-      ${r.multiLocation.map((m,i)=>`<tr><td><input type="number" data-k="multiLocation.${i}.min" value="${m.min}"></td><td><input type="number" data-k="multiLocation.${i}.disc" value="${m.disc}"></td></tr>`).join("")}
-    </table>
-    <div class="ed-h">Other</div>
-    <div class="fgrid">
-      <label class="f">Design fee ($)<input type="number" data-k="designFee" value="${r.designFee}"></label>
-      <label class="f">Sales email<input data-k="contactEmail" value="${esc(r.contactEmail)}"></label>
-      <label class="f">Sales phone<input data-k="contactPhone" value="${esc(r.contactPhone)}"></label>
-    </div>`;
-  $("#ratesScrim").classList.add("open");
-}
-function collectRates(){
-  const r = JSON.parse(JSON.stringify(RATES));
-  document.querySelectorAll("#ratesBody [data-k]").forEach(inp=>{
-    const path = inp.dataset.k.split("."); let o = r;
-    while(path.length>1) o = o[path.shift()];
-    o[path[0]] = inp.type==="number" ? Number(inp.value) : inp.value;
+// Zones where this size is already sold for this month, in the chosen magazine(s).
+function takenZones(monthKey) {
+  const size = CONFIG.sizes.find(s => s.id === state.size);
+  if (!size.premium) return [];
+  const pubs = state.pub === "both" ? ["bdb", "ehi"] : [state.pub];
+  const hit = new Set();
+  pubs.forEach(p => {
+    const byZone = (CONFIG.soldOut[p] || {})[state.size] || {};
+    state.zones.forEach(z => { if ((byZone[z] || []).includes(monthKey)) hit.add(z); });
   });
-  r.terms.sort((a,b)=>a.months-b.months);
+  return [...hit].sort();
+}
+
+// Drop months that became unavailable after a size/zone/magazine change.
+function pruneMonths() {
+  const dropped = [...state.months].filter(k => takenZones(k).length);
+  dropped.forEach(k => state.months.delete(k));
+  state.notice = dropped.length
+    ? `Removed ${dropped.map(k => monthByKey[k].long).join(", ")}: that ${CONFIG.sizes.find(s => s.id === state.size).name} is already taken in one of your zones.`
+    : "";
+}
+
+function monthList(keys) {
+  const ms = MONTHS.filter(m => keys.has(m.key));
+  if (!ms.length) return "None yet";
+  if (ms.every(m => m.year === ms[0].year)) return ms.map(m => m.short).join(", ") + " " + ms[0].year;
+  return ms.map(m => `${m.short} ’${String(m.year).slice(2)}`).join(", ");
+}
+
+function adIcon([w, h]) {
+  return `<svg width="48" height="52" viewBox="0 0 48 52" aria-hidden="true">
+    <rect x="4" y="2" width="36" height="46" rx="3" fill="none" stroke="#cfe3e3" stroke-width="2" stroke-dasharray="3 3"/>
+    <rect x="5" y="${3 + 44 - h}" width="${w}" height="${h}" rx="2" fill="#eaf5f5" stroke="#59abad" stroke-width="2"/>
+    <rect x="9" y="${3 + 44 - h + 5}" width="${Math.max(8, w - 10)}" height="4" rx="1" fill="#59abad"/>
+  </svg>`;
+}
+
+function optButton({ pressed, html, onClick, label }) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "opt";
+  b.setAttribute("aria-pressed", pressed ? "true" : "false");
+  if (label) b.setAttribute("aria-label", label);
+  b.innerHTML = html; b.onclick = onClick;
+  return b;
+}
+
+/* ===========================================================
+   Rates spreadsheet
+   =========================================================== */
+// Only used when rates.csv can't be fetched (e.g. the page is opened straight from disk).
+const FALLBACK_RATES_CSV = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page
+BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315
+BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285
+BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360
+BDB,Z4,Zone 4,20000,1195,955,875,715,420,250
+BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315
+BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345
+BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270
+EHI,Z1,Zone 1,18000,1195,955,875,715,420,250
+EHI,Z2,Zone 2,18000,1120,895,820,670,395,235
+EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285
+EHI,Z5,Zone 5,18000,1045,835,765,625,370,220`;
+
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim()));
+}
+
+const norm = (v) => String(v || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+const num = (v) => { const n = parseFloat(String(v || "").replace(/[$,\s]/g, "")); return isFinite(n) ? n : null; };
+const PUB_ALIASES = { bdb: "bdb", bestdealsbook: "bdb", ehi: "ehi", exclusivelyhomeimprovements: "ehi" };
+
+function loadRates(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  const need = ["magazine", "zone"];
+  need.forEach(h => { if (!(h in col)) throw new Error(`Rates sheet is missing a "${h}" column`); });
+  const rates = { bdb: {}, ehi: {} }, zones = [];
+  rows.forEach((r, n) => {
+    const pub = PUB_ALIASES[norm(r[col.magazine])];
+    const zone = (r[col.zone] || "").trim();
+    if (!pub || !zone) { console.warn(`Rates row ${n + 2} skipped: unknown magazine or zone`, r); return; }
+    const entry = { homes: num(r[col.homes]) || 0 };
+    CONFIG.sizes.forEach(s => { entry[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null; });
+    rates[pub][zone] = entry;
+    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone });
+  });
+  if (!zones.length) throw new Error("Rates sheet has no rows");
+  CONFIG.rates = rates; CONFIG.zones = zones;
+}
+
+const FALLBACK_SOLD_CSV = `Magazine,Ad size,Zone,Month,Advertiser
+BDB,Back Cover,Z1,Jan 2027,Example Roofing
+BDB,Back Cover,Z1,Feb 2027,Example Roofing
+BDB,Back Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+EHI,Back Cover,Z1,Apr 2027,Example Windows`;
+
+// "2027-01", "Jan 2027", "January 2027", "Jan-27" (Excel), "1/2027", "1/1/2027", "1/1/27" → "2027-01"
+function monthKey(v) {
+  v = String(v || "").trim();
+  let m;
+  const MON = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  if ((m = v.match(/^([A-Za-z]{3,})[-\s.']+(\d{2})$/)) && MON.includes(m[1].slice(0, 3).toLowerCase()))
+    return `20${m[2]}-${String(MON.indexOf(m[1].slice(0, 3).toLowerCase()) + 1).padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{2})$/))) return `20${m[2]}-${m[1].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{4})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  const d = new Date("1 " + v);
+  if (!isNaN(d)) return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  return null;
+}
+
+function loadSold(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  const sizeCol = col.adsize ?? col.size;
+  const sold = {};
+  rows.forEach((r, n) => {
+    const pub = PUB_ALIASES[norm(r[col.magazine])];
+    const sv = norm(r[sizeCol]);
+    const size = CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
+    const zone = (r[col.zone] || "").trim();
+    const month = monthKey(r[col.month]);
+    if (!pub || !size || !zone || !month) { console.warn(`Sold covers row ${n + 2} skipped`, r); return; }
+    ((sold[pub] ??= {})[size.id] ??= {})[zone] ??= [];
+    sold[pub][size.id][zone].push(month);
+  });
+  CONFIG.soldOut = sold;
+}
+
+async function fetchText(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.text();
+}
+
+async function fetchRates() {
+  const ratesSrc = CONFIG.ratesUrl, soldSrc = CONFIG.soldUrl;
+  const [rates, sold] = await Promise.allSettled([fetchText(ratesSrc), fetchText(soldSrc)]);
+  try {
+    if (rates.status !== "fulfilled") throw rates.reason;
+    loadRates(rates.value);
+  } catch (e) {
+    console.warn("Couldn't load rates from " + ratesSrc + ", using built-in demo rates.", e);
+    loadRates(FALLBACK_RATES_CSV);
+  }
+  try {
+    if (sold.status !== "fulfilled") throw sold.reason;
+    loadSold(sold.value);
+  } catch (e) {
+    console.warn("Couldn't load sold covers from " + soldSrc + ", using built-in demo list.", e);
+    loadSold(FALLBACK_SOLD_CSV);
+  }
+}
+
+// Per-issue price for a zone in the chosen magazine(s); null if not offered there.
+const rate = (zoneId, sizeId, pubId = state.pub) => {
+  const pubs = CONFIG.publications.find(p => p.id === pubId).includes;
+  const parts = pubs.map(p => CONFIG.rates[p][zoneId] && CONFIG.rates[p][zoneId][sizeId]);
+  return parts.some(v => v == null) ? null : parts.reduce((a, v) => a + v, 0);
+};
+const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)).filter(v => v != null));
+// Households per issue for a zone across the chosen magazine(s).
+const zoneHomes = (zoneId) => CONFIG.publications.find(p => p.id === state.pub).includes
+  .reduce((a, p) => a + ((CONFIG.rates[p][zoneId] || {}).homes || 0), 0);
+const pubShort = { bdb: "Best Deals Book", ehi: "Exclusively Home Improvements" };
+// Why a zone can't be booked with the current magazine + size ("" if it can).
+function zoneBlock(zoneId) {
+  const missing = CONFIG.publications.find(p => p.id === state.pub).includes.filter(p => !CONFIG.rates[p][zoneId]);
+  if (missing.length) return `${pubShort[missing[0]]} doesn't mail here`;
+  if (rate(zoneId, state.size) == null) return `${CONFIG.sizes.find(s => s.id === state.size).name} isn't offered here`;
+  return "";
+}
+
+// Drop zones that can't be booked after a magazine or size change.
+function pruneZones() {
+  const dropped = [...state.zones].filter(z => !CONFIG.zones.some(x => x.id === z) || zoneBlock(z));
+  dropped.forEach(z => state.zones.delete(z));
+  state.zoneNotice = dropped.length ? `Removed ${dropped.join(", ")}: not available with this magazine and ad size.` : "";
+}
+
+function calc() {
+  const pub = CONFIG.publications.find(p => p.id === state.pub);
+  const size = CONFIG.sizes.find(s => s.id === state.size);
+  const issues = state.months.size;
+  const discount = CONFIG.volume.filter(v => issues >= v.min).reduce((a, v) => Math.max(a, v.discount), 0);
+  const art = CONFIG.artwork.find(a => a.id === state.art);
+  const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
+  const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
+  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0);
+  const gross = perIssue * issues;
+  const bundleOff = gross * (pub.discount || 0);
+  const termOff = (gross - bundleOff) * discount;
+  const total = gross - bundleOff - termOff;
+  const homes = zones.reduce((s, z) => s + zoneHomes(z.id), 0);
+  return { pub, size, issues, discount, art, zones, zonePrices, perIssue, gross, bundleOff, termOff, total, homes };
+}
+
+/* ===========================================================
+   Render
+   =========================================================== */
+function render() {
+  const c = calc();
+
+  // publications
+  const pubEl = $("#pubOpts"); pubEl.innerHTML = "";
+  CONFIG.publications.forEach(p => pubEl.append(optButton({
+    pressed: state.pub === p.id,
+    html: `<b>${p.name}</b><small>${p.desc}</small>${p.tag ? `<span class="tag">${p.tag}</span>` : ""}`,
+    onClick: () => { state.pub = p.id; pruneZones(); pruneMonths(); render(); },
+  })));
+
+  // sizes
+  const sizeEl = $("#sizeOpts"); sizeEl.innerHTML = "";
+  CONFIG.sizes.forEach(s => sizeEl.append(optButton({
+    pressed: state.size === s.id,
+    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">${isFinite(sizeFrom(s.id)) ? `From ${money(sizeFrom(s.id))} / zone / issue` : "Not available"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
+    onClick: () => { state.size = s.id; pruneZones(); pruneMonths(); render(); },
+  })));
+  $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
+
+  // zones
+  const zoneEl = $("#zoneOpts"); zoneEl.innerHTML = "";
+  CONFIG.zones.forEach(z => {
+    const blocked = zoneBlock(z.id);
+    const b = optButton({
+      pressed: state.zones.has(z.id),
+      html: blocked
+        ? `<b>${z.name}</b><small>${blocked}</small>`
+        : `<b>${z.name}</b><small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : "&nbsp;"}</small><div class="price">${money(rate(z.id, state.size))} / issue</div>`,
+      onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); state.zoneNotice = ""; pruneMonths(); render(); },
+    });
+    if (blocked) b.disabled = true;
+    zoneEl.append(b);
+  });
+  $("#zoneNote").classList.toggle("hidden", !state.zoneNotice);
+  $("#zoneNote").textContent = state.zoneNotice || "";
+  $("#zoneSub").textContent = `Choose the zones you want to reach. Each zone is its own mailing. Prices shown are for a ${c.size.name}${c.pub.mult > 1 ? " in both magazines" : ""}.`;
+  $("#allZones").textContent = CONFIG.zones.filter(z => !zoneBlock(z.id)).every(z => state.zones.has(z.id)) ? "Clear all" : "Select all";
+
+  // issues
+  const quick = $("#quickPicks"); quick.innerHTML = "";
+  [3, 6, 12].filter(n => n <= MONTHS.length).forEach(n => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = `Next ${n} available`;
+    b.onclick = () => {
+      state.months.clear();
+      MONTHS.filter(m => !takenZones(m.key).length).slice(0, n).forEach(m => state.months.add(m.key));
+      state.notice = ""; render();
+    };
+    quick.append(b);
+  });
+  const monthEl = $("#monthOpts"); monthEl.innerHTML = "";
+  MONTHS.forEach(m => {
+    const taken = takenZones(m.key);
+    const b = optButton({
+      pressed: state.months.has(m.key),
+      html: `<b>${m.short} ${m.year}</b><small>${taken.length ? "Taken in " + taken.join(", ") : "Available"}</small>`,
+      label: `${m.long}${taken.length ? ", taken in " + taken.join(", ") : ""}`,
+      onClick: () => { state.months.has(m.key) ? state.months.delete(m.key) : state.months.add(m.key); state.notice = ""; render(); },
+    });
+    if (taken.length) b.disabled = true;
+    else if (!state.months.has(m.key)) b.querySelector("small").style.color = "var(--muted)";
+    monthEl.append(b);
+  });
+  const pn = $("#premiumNote");
+  pn.classList.toggle("hidden", !c.size.premium && !state.notice);
+  pn.textContent = state.notice || `${c.size.name} is one advertiser per zone, per issue. Months already booked in your zones show as taken. We'll confirm every month before you're invoiced.`;
+  const next = CONFIG.volume.find(v => v.min > c.issues);
+  $("#tierNote").innerHTML = (c.discount ? `<b>${Math.round(c.discount * 100)}% off</b> for ${c.issues} issues. ` : "") +
+    (next ? `Add ${next.min - c.issues} more issue${next.min - c.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
+
+  // artwork
+  const artEl = $("#artOpts"); artEl.innerHTML = "";
+  CONFIG.artwork.forEach(a => artEl.append(optButton({
+    pressed: state.art === a.id,
+    html: `<b>${a.name}</b><small>${a.desc}</small><div class="price">Included</div>`,
+    onClick: () => { state.art = a.id; render(); },
+  })));
+
+  // summary
+  const rows = [
+    ["Magazine", c.pub.name],
+    ["Ad size", c.size.name],
+    ["Zones", c.zones.length ? c.zones.map(z => z.id).join(", ") : "None yet"],
+    ["Homes / issue", c.homes ? "~" + c.homes.toLocaleString() : "—"],
+    ["Issues", `${c.issues}: ${monthList(state.months)}`],
+    ["Per issue", money(c.perIssue)],
+  ];
+  if (c.bundleOff) rows.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
+  if (c.termOff) rows.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
+  $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  $("#sumTotal").textContent = money(c.total);
+  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money(c.total / c.issues)} per issue after savings` : "";
+
+  // step chrome
+  ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
+  [...$("#steps").children].forEach((el, i) => el.classList.toggle("on", state.step === i + 1));
+  $("#summary").classList.toggle("hidden", state.step === 3);
+  $("#backBtn").classList.toggle("hidden", state.step !== 2);
+  if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
+  $("#nextBtn").disabled = c.zones.length === 0 || c.issues === 0;
+  $("#err").textContent = c.zones.length === 0 ? "Choose at least one zone." : c.issues === 0 ? "Choose at least one issue." : "";
+}
+
+/* ===========================================================
+   Events
+   =========================================================== */
+$("#clearMonths").onclick = () => { state.months.clear(); state.notice = ""; render(); };
+
+$("#allZones").onclick = () => {
+  const open = CONFIG.zones.filter(z => !zoneBlock(z.id));
+  if (open.every(z => state.zones.has(z.id))) state.zones.clear();
+  else open.forEach(z => state.zones.add(z.id));
+  state.zoneNotice = "";
+  pruneMonths(); render();
+};
+
+function buildOrder(form) {
+  const c = calc();
+  const customer = Object.fromEntries(new FormData(form));
+  delete customer.website; delete customer.terms;
+  return {
+    c,
+    order: {
+      ref: "BDA-" + Date.now().toString(36).toUpperCase().slice(-6),
+      createdAt: new Date().toISOString(),
+      magazine: c.pub.name,
+      size: c.size.name,
+      trim: c.size.trim,
+      zones: c.zones.map(z => z.id),
+      months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key),
+      issues: c.issues,
+      artwork: c.art.name,
+      pricing: {
+        perIssue: Math.round(c.perIssue),
+        subtotal: Math.round(c.gross),
+        bothMagazineSavings: Math.round(c.bundleOff),
+        volumeSavings: Math.round(c.termOff),
+        volumeDiscountPct: Math.round(c.discount * 100),
+        zonePricesPerIssue: Object.fromEntries(c.zonePrices.map(z => [z.id, z.price])),
+        total: Math.round(c.total),
+      },
+      customer,
+    },
+  };
+}
+
+function receiptRows(c, order) {
+  const r = [
+    ["Reference", order.ref],
+    ["Business", order.customer.business],
+    ["Magazine", c.pub.name],
+    ["Ad size", `${c.size.name} (${c.size.trim})`],
+    ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
+    ["Issues", `${c.issues}: ${monthList(state.months)}`],
+    ["Artwork", c.art.name],
+    ["Per issue", money(c.perIssue)],
+  ];
+  if (c.bundleOff) r.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
+  if (c.termOff) r.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
   return r;
 }
-$("#openRates").onclick = openRates;
-$("#saveRates").onclick = ()=>{
-  RATES = collectRates();
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(RATES)); toast("Rates saved in this browser"); }
-  catch(e){ toast("Applied for this visit (browser storage unavailable)"); }
-  if(!RATES.terms.some(t=>t.months===state.months)) state.months = RATES.terms[0].months;
-  $("#ratesScrim").classList.remove("open"); renderAll();
-};
-$("#copyRates").onclick = ()=>copy(JSON.stringify(collectRates(),null,2),"Rates copied");
-$("#resetRates").onclick = ()=>{
-  RATES = JSON.parse(JSON.stringify(DEFAULT_RATES));
-  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
-  openRates(); renderAll(); toast("Reset to default rates");
+
+function orderText(c, order) {
+  const lines = receiptRows(c, order).map(([k, v]) => `${k}: ${v}`);
+  const cu = order.customer;
+  return [
+    "New ad space request", "",
+    ...lines, `Total: ${money(c.total)}`, "",
+    `Contact: ${cu.contact}`, `Phone: ${cu.phone}`, `Email: ${cu.email}`,
+    cu.billingEmail ? `Billing email: ${cu.billingEmail}` : null,
+    `Category: ${cu.category}`, `Billing address: ${cu.street}, ${cu.city} ${cu.zip}`,
+    cu.notes ? `Notes: ${cu.notes}` : null,
+  ].filter(l => l !== null).join("\n");
+}
+
+async function sendOrder(c, order) {
+  if (CONFIG.demo) {
+    console.log("Demo mode, order not sent:", order);
+    await new Promise(r => setTimeout(r, 600));
+    return "demo";
+  }
+  if (CONFIG.orderEndpoint) {
+    // text/plain keeps this a "simple" request, so webhooks without CORS preflight support still accept it.
+    const res = await fetch(CONFIG.orderEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(order),
+    });
+    if (!res.ok && res.type !== "opaque") throw new Error("HTTP " + res.status);
+    return "sent";
+  }
+  const subject = `Ad space request ${order.ref}: ${order.customer.business}`;
+  window.location.href = `mailto:${CONFIG.salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(orderText(c, order))}`;
+  return "email";
+}
+
+let sending = false;
+$("#nextBtn").onclick = async () => {
+  if (state.step === 1) { state.step = 2; render(); toTop(); return; }
+  if (sending) return;
+  const form = $("#checkoutForm");
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    $("#err").textContent = "Please complete the highlighted fields.";
+    return;
+  }
+  const { c, order } = buildOrder(form);
+  if (form.website.value) { state.step = 3; render(); return; } // bot: pretend success, send nothing
+
+  sending = true;
+  const btn = $("#nextBtn");
+  btn.disabled = true; btn.textContent = "Sending…"; $("#err").textContent = "";
+  let how;
+  try {
+    how = await sendOrder(c, order);
+  } catch (e) {
+    sending = false; render();
+    $("#err").innerHTML = `We couldn't send your request. Please try again, or call <a href="tel:${CONFIG.salesPhone.replace(/\D/g, "")}">${CONFIG.salesPhone}</a>.`;
+    return;
+  }
+  sending = false;
+
+  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
+    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}</dd>`;
+  $("#refNo").textContent = order.ref;
+  $("#confirmText").textContent =
+    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
+    `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
+    `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
+    (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
+    (how === "demo" ? " (Demo: no request was actually sent.)" : "") +
+    (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
+  state.step = 3; render(); toTop();
 };
 
-renderAll();
+$("#backBtn").onclick = () => { state.step = 1; render(); };
+$("#demoBar").classList.toggle("hidden", !CONFIG.demo);
+$("#printOrder").onclick = () => window.print();
+$("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
+
+/* ===========================================================
+   Embedding: when this page sits in an <iframe> on your site, tell the
+   parent page how tall it is (so there's no inner scrollbar) and when to
+   scroll back to the top. See embed.html for the snippet.
+   =========================================================== */
+const embedded = window.parent !== window;
+function toTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (embedded) window.parent.postMessage({ type: "bda-scrolltop" }, "*");
+}
+if (embedded) {
+  document.documentElement.classList.add("embedded");
+  const post = () => window.parent.postMessage({ type: "bda-height", height: Math.ceil(document.body.getBoundingClientRect().height) }, "*");
+  new ResizeObserver(post).observe(document.body);
+  addEventListener("load", post);
+}
+
+// Phone bar mirrors the summary button, total and error message.
+(function () {
+  const next = $("#nextBtn"), err = $("#err"), total = $("#sumTotal"), mbar = $("#mbar");
+  const sync = () => {
+    $("#mNext").textContent = next.textContent;
+    $("#mNext").disabled = next.disabled;
+    $("#mTotal").textContent = total.textContent;
+    $("#mErr").innerHTML = err.innerHTML;
+    const show = state.step !== 3;
+    mbar.style.visibility = show ? "visible" : "hidden";
+    document.body.classList.toggle("has-mbar", show);
+  };
+  new MutationObserver(sync).observe(document.querySelector("aside"), { subtree: true, childList: true, characterData: true, attributes: true });
+  new MutationObserver(sync).observe($("#step3"), { attributes: true });
+  $("#mNext").onclick = () => next.click();
+})();
+
+fetchRates().then(() => {
+  if (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z))) {
+    state.zones = new Set([CONFIG.zones[0].id]);
+  }
+  pruneZones(); pruneMonths(); state.zoneNotice = ""; state.notice = "";
+  render();
+});
 </script>
 </body>
 </html>
