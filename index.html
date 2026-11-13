@@ -121,23 +121,46 @@
   .chip:hover { border-color: var(--teal); }
   .tiers { font-size: 13.5px; color: var(--muted); margin-top: 14px; }
   .tiers b { color: var(--teal-d); }
-  .demo-bar { background: #e9b14c; color: #2a1d00; text-align: center; font-size: 13.5px; font-weight: 600; padding: 8px var(--gutter); }
   .hidden { display: none !important; }
-  .confirm { text-align: center; padding: 48px clamp(22px, 4vw, 40px); }
-  .confirm .big { width: 64px; height: 64px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 30px; margin: 0 auto 16px; }
-  .confirm h2 { font-size: 28px; margin-bottom: 8px; }
-  .ref { font-weight: 700; letter-spacing: .08em; }
-  .receipt { text-align: left; max-width: 520px; margin: 24px auto 8px; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
-  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 0; font-size: 14px; }
+  /* Confirmation */
+  .grid.done { grid-template-columns: 1fr; max-width: 760px; }
+  .confirm { padding: 0; overflow: hidden; }
+  .confirm-top { background: var(--black); color: #fff; text-align: center; padding: 44px clamp(22px, 5vw, 48px) 40px; position: relative; }
+  .confirm-top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg, #87cbe4 0 20%, #2f5a82 20% 40%, #347142 40% 60%, #e9b14c 60% 80%, #c83536 80% 100%); }
+  .confirm .big { width: 60px; height: 60px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 28px; font-weight: 700; margin: 0 auto 18px; }
+  .confirm-top .eyebrow { margin-bottom: 8px; }
+  .confirm h2 { font-size: clamp(24px, 4vw, 30px); color: #fff; margin-bottom: 18px; line-height: 1.2; }
+  .refchip { display: inline-flex; gap: 10px; align-items: baseline; border: 1px solid #3a3a3a; border-radius: 999px; padding: 8px 18px; font-size: 13px; color: #bdbdbd; }
+  .ref { font-weight: 700; letter-spacing: .1em; color: #fff; font-size: 15px; }
+  .confirm-top p { color: #d4d4d4; max-width: 520px; margin: 18px auto 0; font-size: 15px; }
+  .confirm-body { padding: clamp(24px, 4vw, 40px); }
+  .confirm-body h3 { font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--teal-d); font-weight: 700; margin: 0 0 14px; }
+  .next { list-style: none; margin: 0 0 32px; padding: 0; display: grid; gap: 14px; }
+  .next li { display: flex; gap: 14px; align-items: flex-start; }
+  .next .n { width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--black); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+  .next b { display: block; font-weight: 600; }
+  .next span { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+  .receipt { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; font-size: 14px; }
+  .receipt dt, .receipt dd { margin: 0; padding: 10px 18px; border-bottom: 1px solid var(--line); }
   .receipt dt { color: var(--muted); }
-  .receipt dd { margin: 0; text-align: right; padding-left: 16px; }
-  .receipt .tot { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; font-weight: 700; }
+  .receipt dd { text-align: right; font-weight: 500; overflow-wrap: anywhere; }
+  .receipt .tot { background: var(--black); color: #fff; border: 0; font-weight: 700; padding-top: 14px; padding-bottom: 14px; }
+  .receipt dd.tot { font-size: 20px; }
+  .receipt dd.tot small { display: block; font-size: 12px; font-weight: 500; color: #bdbdbd; }
+  .demo-note { text-align: center; color: var(--muted); font-size: 12.5px; margin: 16px 0 0; }
   .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
   .actions .btn { width: auto; min-width: 220px; margin-top: 0; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   @media print {
     body { background: #fff; }
-    header .steps, header p, aside, footer, .actions, #step1, #step2, .mbar, .demo-bar { display: none !important; }
+    header .steps, header p, aside, footer, .actions, #step1, #step2, .mbar, .demo-note { display: none !important; }
+    .confirm-top, .receipt .tot { background: #fff !important; color: var(--ink) !important; }
+    .confirm-top::after { display: none; }
+    .confirm h2, .ref { color: var(--ink) !important; }
+    .confirm-top p, .refchip, .receipt dd.tot small { color: var(--muted) !important; }
+    .receipt .tot { border-top: 2px solid var(--ink); }
     header { padding: 20px 0; background: #fff; color: var(--ink); }
     header::after { display: none; }
     main { margin-top: 0; padding: 0; }
@@ -150,7 +173,6 @@
 </head>
 <body>
 
-<div class="demo-bar hidden" id="demoBar">Demo: prices and availability are examples, and nothing you enter is sent or saved.</div>
 <header>
   <div class="wrap">
     <div class="eyebrow">Best Deals Networks</div>
@@ -274,14 +296,23 @@
       <!-- STEP 3 -->
       <section id="step3" class="hidden">
         <div class="panel confirm">
-          <div class="big">✓</div>
-          <h2>Your ad space is requested</h2>
-          <p>Reference <span class="ref" id="refNo"></span></p>
-          <p class="sub" id="confirmText"></p>
-          <div class="receipt"><dl id="receipt"></dl></div>
-          <div class="actions">
-            <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
-            <button class="btn" id="newOrder" type="button">Book another ad</button>
+          <div class="confirm-top">
+            <div class="big">✓</div>
+            <div class="eyebrow">Thank you</div>
+            <h2>Your ad space is requested</h2>
+            <div class="refchip">Reference <span class="ref" id="refNo"></span></div>
+            <p id="confirmText"></p>
+          </div>
+          <div class="confirm-body">
+            <h3>What happens next</h3>
+            <ol class="next" id="nextSteps"></ol>
+            <h3>Your order</h3>
+            <div class="receipt"><dl id="receipt"></dl></div>
+            <div class="actions">
+              <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
+              <button class="btn" id="newOrder" type="button">Book another ad</button>
+            </div>
+            <p class="demo-note hidden" id="demoNote">This is a demo. No request was sent.</p>
           </div>
         </div>
       </section>
@@ -749,6 +780,7 @@ function render() {
   ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
   [...$("#steps").children].forEach((el, i) => el.classList.toggle("on", state.step === i + 1));
   $("#summary").classList.toggle("hidden", state.step === 3);
+  document.querySelector(".grid").classList.toggle("done", state.step === 3);
   $("#backBtn").classList.toggle("hidden", state.step !== 2);
   if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
   $("#nextBtn").disabled = c.zones.length === 0 || c.issues === 0;
@@ -882,20 +914,25 @@ $("#nextBtn").onclick = async () => {
   sending = false;
 
   $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("") +
-    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}${c.tbd ? "<br><small style='font-weight:500;color:var(--muted)'>+ placement charge TBD on invoice</small>" : ""}</dd>`;
+    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}${c.tbd ? "<br><small>+ placement charge TBD on invoice</small>" : ""}</dd>`;
   $("#refNo").textContent = order.ref;
+  const cu = order.customer;
   $("#confirmText").textContent =
-    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
-    `Total ${money(c.total)}${c.tbd ? ", plus a placement charge to be confirmed on your invoice" : ""}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
-    `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
-    (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
-    (how === "demo" ? " (Demo: no request was actually sent.)" : "") +
-    (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
+    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""}.`;
+  const steps = [
+    ["We confirm your placement", `We'll email ${cu.email} within one business day.`],
+    ["You get an invoice", `Sent to ${cu.billingEmail || cu.email}. Nothing is charged today.` + (c.tbd ? " It will include your placement charge." : "")],
+    state.art === "own"
+      ? ["You send your artwork", "Reply to our email with your print-ready PDF."]
+      : ["We design your ad", "Our design team will reach out and send you a proof."],
+  ];
+  if (how === "email") steps.unshift(["Press send in your email app", `It should have opened with this order, addressed to ${CONFIG.salesEmail}.`]);
+  $("#nextSteps").innerHTML = steps.map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><span>${esc(d)}</span></div></li>`).join("");
+  $("#demoNote").classList.toggle("hidden", how !== "demo");
   state.step = 3; render(); toTop();
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
-$("#demoBar").classList.toggle("hidden", !CONFIG.demo);
 $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
 
