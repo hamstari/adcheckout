@@ -205,7 +205,18 @@
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">5</div><h2>Artwork</h2></div>
+          <div class="panel-h"><div class="num">5</div><h2>Placement</h2></div>
+          <p class="sub">Standard placement is included. Upgrade to a premium position for more attention.</p>
+          <div class="opts" id="placeOpts"></div>
+          <div class="note hidden" id="placeNote"></div>
+          <div class="opts wide" style="margin-top:12px" id="reqOpt"></div>
+          <label id="reqWrap" class="hidden" style="margin-top:12px">Describe the placement you'd like
+            <textarea id="reqText" rows="2" maxlength="300" placeholder="For example: near the roofing section, opposite editorial, first half of the book…"></textarea>
+          </label>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h"><div class="num">6</div><h2>Artwork</h2></div>
           <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
           <div class="opts" id="artOpts"></div>
         </div>
@@ -343,6 +354,16 @@ const CONFIG = {
   ],
   // Filled from the "Sold covers" sheet: magazine → size → zone → ["YYYY-MM", ...].
   soldOut: {},
+  // PREMIUM PLACEMENT (placeholders). upcharge = extra % on the ad price, per issue.
+  // sizes = which ad sizes can book it. Covers are already fixed positions, so they're left out.
+  placements: [
+    { id: "std",    name: "Standard placement", desc: "We place your ad for the best fit in the issue", upcharge: 0 },
+    { id: "rhr",    name: "Right-hand read",    desc: "On a right-hand page, where readers look first", upcharge: 0.10, sizes: ["fp", "hp", "qp"] },
+    { id: "front",  name: "Front of magazine",  desc: "In the opening pages of the issue",               upcharge: 0.15, sizes: ["fp", "hp", "qp"] },
+    { id: "center", name: "Centerfold",         desc: "The center spread, where the magazine falls open", upcharge: 0.25, sizes: ["fp"], limit: "One per zone" },
+  ],
+  // Free-text placement request add-on. No automatic charge: staff confirm and quote it.
+  placementRequest: { name: "Additional placement request", desc: "Ask for a specific spot or neighbor. We'll confirm availability and any extra cost before you're invoiced." },
   artwork: [
     { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
     { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
@@ -353,6 +374,7 @@ const CONFIG = {
    State + helpers
    =========================================================== */
 const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
 const MONTHS = (() => {
   const out = [], d = new Date();
@@ -370,7 +392,7 @@ const MONTHS = (() => {
   return out;
 })();
 const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
-const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", step: 1, notice: "", zoneNotice: "" };
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", place: "std", req: false, reqText: "", step: 1, notice: "", zoneNotice: "" };
 
 // Zones where this size is already sold for this month, in the chosen magazine(s).
 function takenZones(monthKey) {
@@ -569,6 +591,12 @@ function pruneZones() {
   state.zoneNotice = dropped.length ? `Removed ${dropped.join(", ")}: not available with this magazine and ad size.` : "";
 }
 
+const placeOk = (pl, sizeId) => !pl.sizes || pl.sizes.includes(sizeId);
+// Reset the placement if the chosen ad size can't book it.
+function prunePlace() {
+  if (!placeOk(CONFIG.placements.find(x => x.id === state.place), state.size)) state.place = "std";
+}
+
 function calc() {
   const pub = CONFIG.publications.find(p => p.id === state.pub);
   const size = CONFIG.sizes.find(s => s.id === state.size);
@@ -577,13 +605,16 @@ function calc() {
   const art = CONFIG.artwork.find(a => a.id === state.art);
   const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
   const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
-  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0);
+  const baseIssue = zonePrices.reduce((a, z) => a + z.price, 0);
+  const place = CONFIG.placements.find(x => x.id === state.place);
+  const placeFee = Math.round(baseIssue * place.upcharge);   // per issue
+  const perIssue = baseIssue + placeFee;
   const gross = perIssue * issues;
   const bundleOff = gross * (pub.discount || 0);
   const termOff = (gross - bundleOff) * discount;
   const total = gross - bundleOff - termOff;
   const homes = zones.reduce((s, z) => s + zoneHomes(z.id), 0);
-  return { pub, size, issues, discount, art, zones, zonePrices, perIssue, gross, bundleOff, termOff, total, homes };
+  return { pub, size, issues, discount, art, zones, zonePrices, place, placeFee, baseIssue, perIssue, gross, bundleOff, termOff, total, homes };
 }
 
 /* ===========================================================
@@ -605,7 +636,7 @@ function render() {
   CONFIG.sizes.forEach(s => sizeEl.append(optButton({
     pressed: state.size === s.id,
     html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">${isFinite(sizeFrom(s.id)) ? `From ${money(sizeFrom(s.id))} / zone / issue` : "Not available"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
-    onClick: () => { state.size = s.id; pruneZones(); pruneMonths(); render(); },
+    onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
   })));
   $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
 
@@ -660,6 +691,34 @@ function render() {
   $("#tierNote").innerHTML = (c.discount ? `<b>${Math.round(c.discount * 100)}% off</b> for ${c.issues} issues. ` : "") +
     (next ? `Add ${next.min - c.issues} more issue${next.min - c.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
 
+  // placement
+  const plEl = $("#placeOpts"); plEl.innerHTML = "";
+  CONFIG.placements.forEach(pl => {
+    const ok = placeOk(pl, state.size);
+    const fee = Math.round(c.baseIssue * pl.upcharge);
+    const b = optButton({
+      pressed: state.place === pl.id,
+      html: `<b>${pl.name}</b><small>${ok ? pl.desc : (pl.sizes.length === 1 ? "Full Page ads only" : "Not available for cover positions")}</small>` +
+        (ok ? `<div class="price">${pl.upcharge ? `+${Math.round(pl.upcharge * 100)}%${fee ? ` · +${money(fee)} / issue` : ""}` : "Included"}</div>` : "") +
+        (ok && pl.limit ? `<span class="tag">${pl.limit}</span>` : ""),
+      onClick: () => { state.place = pl.id; render(); },
+    });
+    if (!ok) b.disabled = true;
+    plEl.append(b);
+  });
+  const pNote = $("#placeNote");
+  pNote.classList.toggle("hidden", !(c.size.premium || c.place.upcharge));
+  pNote.textContent = c.size.premium
+    ? `${c.size.name} is already a premium position, so placement upgrades don't apply.`
+    : "Premium positions are limited. We'll confirm yours for every issue before you're invoiced.";
+  const rq = $("#reqOpt"); rq.innerHTML = "";
+  rq.append(optButton({
+    pressed: state.req,
+    html: `<b>${state.req ? "✓ " : "+ "}${CONFIG.placementRequest.name}</b><small>${CONFIG.placementRequest.desc}</small><div class="price">Quoted by our team</div>`,
+    onClick: () => { state.req = !state.req; render(); if (state.req) $("#reqText").focus(); },
+  }));
+  $("#reqWrap").classList.toggle("hidden", !state.req);
+
   // artwork
   const artEl = $("#artOpts"); artEl.innerHTML = "";
   CONFIG.artwork.forEach(a => artEl.append(optButton({
@@ -675,8 +734,11 @@ function render() {
     ["Zones", c.zones.length ? c.zones.map(z => z.id).join(", ") : "None yet"],
     ["Homes / issue", c.homes ? "~" + c.homes.toLocaleString() : "—"],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
-    ["Per issue", money(c.perIssue)],
+    ["Placement", c.place.name],
   ];
+  if (state.req) rows.push(["Placement request", "To be quoted"]);
+  if (c.placeFee) rows.push(["Ad space / issue", money(c.baseIssue)], [`${c.place.name} (+${Math.round(c.place.upcharge * 100)}%)`, "+" + money(c.placeFee)]);
+  rows.push(["Per issue", money(c.perIssue)]);
   if (c.bundleOff) rows.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
   if (c.termOff) rows.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
@@ -696,6 +758,7 @@ function render() {
 /* ===========================================================
    Events
    =========================================================== */
+$("#reqText").oninput = (e) => { state.reqText = e.target.value; };
 $("#clearMonths").onclick = () => { state.months.clear(); state.notice = ""; render(); };
 
 $("#allZones").onclick = () => {
@@ -721,10 +784,14 @@ function buildOrder(form) {
       zones: c.zones.map(z => z.id),
       months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key),
       issues: c.issues,
+      placement: c.place.name,
+      placementRequest: state.req ? (state.reqText.trim() || "(requested, no details given)") : null,
       artwork: c.art.name,
       pricing: {
         perIssue: Math.round(c.perIssue),
         subtotal: Math.round(c.gross),
+        adSpacePerIssue: Math.round(c.baseIssue),
+        placementFeePerIssue: c.placeFee,
         bothMagazineSavings: Math.round(c.bundleOff),
         volumeSavings: Math.round(c.termOff),
         volumeDiscountPct: Math.round(c.discount * 100),
@@ -744,6 +811,8 @@ function receiptRows(c, order) {
     ["Ad size", `${c.size.name} (${c.size.trim})`],
     ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
+    ["Placement", c.place.name + (c.placeFee ? ` (+${money(c.placeFee)} / issue)` : "")],
+    ...(order.placementRequest ? [["Placement request", `${order.placementRequest} (to be quoted)`]] : []),
     ["Artwork", c.art.name],
     ["Per issue", money(c.perIssue)],
   ];
@@ -812,7 +881,7 @@ $("#nextBtn").onclick = async () => {
   }
   sending = false;
 
-  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
+  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("") +
     `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}</dd>`;
   $("#refNo").textContent = order.ref;
   $("#confirmText").textContent =
