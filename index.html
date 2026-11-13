@@ -105,6 +105,22 @@
   .confirm .big { width: 64px; height: 64px; border-radius: 50%; background: var(--teal); color: var(--ink); display: grid; place-items: center; font-size: 32px; margin: 0 auto 16px; }
   .confirm h2 { font-size: 34px; margin-bottom: 8px; }
   .ref { font-weight: 700; letter-spacing: .08em; }
+  .receipt { text-align: left; max-width: 520px; margin: 24px auto 8px; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .receipt dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 0; font-size: 15px; }
+  .receipt dt { color: var(--muted); }
+  .receipt dd { margin: 0; text-align: right; padding-left: 16px; }
+  .receipt .tot { border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 4px; font-weight: 700; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .actions .btn { width: auto; min-width: 200px; margin-top: 0; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  @media print {
+    body { background: #fff; }
+    header .steps, header p, aside, footer, .actions, #step1, #step2 { display: none !important; }
+    header { padding: 20px 0; background: #fff; color: var(--ink); border: 0; }
+    main { margin-top: 0; }
+    .grid { display: block; }
+    .panel { box-shadow: none; padding: 0; }
+  }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 0 16px 40px; }
   footer a { color: var(--teal-d); }
 </style>
@@ -177,6 +193,7 @@
             <div class="panel-h"><div class="num">1</div><h2>Business</h2></div>
             <p class="sub">This is how the business appears on your invoice.</p>
             <div class="fields">
+              <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
               <label class="full">Business name<input name="business" required autocomplete="organization"></label>
               <label>Contact name<input name="contact" required autocomplete="name"></label>
               <label>Phone<input name="phone" type="tel" required autocomplete="tel"></label>
@@ -225,7 +242,11 @@
           <h2>Your ad space is requested</h2>
           <p>Reference <span class="ref" id="refNo"></span></p>
           <p class="sub" id="confirmText"></p>
-          <button class="btn" style="max-width:320px" id="newOrder" type="button">Book another ad</button>
+          <div class="receipt"><dl id="receipt"></dl></div>
+          <div class="actions">
+            <button class="btn ghost" id="printOrder" type="button">Print or save as PDF</button>
+            <button class="btn" id="newOrder" type="button">Book another ad</button>
+          </div>
         </div>
       </section>
     </div>
@@ -253,6 +274,12 @@
    All prices below are PLACEHOLDERS. Swap in the real rate card.
    =========================================================== */
 const CONFIG = {
+  // Where order requests go. Set orderEndpoint to a webhook URL (Zapier, Make,
+  // Google Apps Script, your CRM). It receives the order as JSON in a POST.
+  // If it's empty, the customer's email app opens with the order pre-filled to salesEmail.
+  orderEndpoint: "",
+  salesEmail: "advertise@bestdealsbook.com",
+  salesPhone: "844-600-8846",
   publications: [
     { id: "bdb",  name: "Best Deals Book", desc: "Coupons and offers from trusted local home service pros", mult: 1 },
     { id: "ehi",  name: "Exclusively Home Improvements", desc: "Home improvement magazine for affluent homeowners", mult: 1 },
@@ -480,7 +507,7 @@ function render() {
   [...$("#steps").children].forEach((el, i) => el.classList.toggle("on", state.step === i + 1));
   $("#summary").classList.toggle("hidden", state.step === 3);
   $("#backBtn").classList.toggle("hidden", state.step !== 2);
-  $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
+  if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
   $("#nextBtn").disabled = c.zones.length === 0 || c.issues === 0;
   $("#err").textContent = c.zones.length === 0 ? "Choose at least one zone." : c.issues === 0 ? "Choose at least one issue." : "";
 }
@@ -496,36 +523,122 @@ $("#allZones").onclick = () => {
   pruneMonths(); render();
 };
 
-$("#nextBtn").onclick = () => {
+function buildOrder(form) {
+  const c = calc();
+  const customer = Object.fromEntries(new FormData(form));
+  delete customer.website; delete customer.terms;
+  return {
+    c,
+    order: {
+      ref: "BDA-" + Date.now().toString(36).toUpperCase().slice(-6),
+      createdAt: new Date().toISOString(),
+      magazine: c.pub.name,
+      size: c.size.name,
+      trim: c.size.trim,
+      zones: c.zones.map(z => z.id),
+      months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key),
+      issues: c.issues,
+      artwork: c.art.name,
+      pricing: {
+        perIssue: Math.round(c.perIssue),
+        subtotal: Math.round(c.gross),
+        bothMagazineSavings: Math.round(c.bundleOff),
+        volumeSavings: Math.round(c.termOff),
+        volumeDiscountPct: Math.round(c.discount * 100),
+        designFee: c.art.fee,
+        total: Math.round(c.total),
+      },
+      customer,
+    },
+  };
+}
+
+function receiptRows(c, order) {
+  const r = [
+    ["Reference", order.ref],
+    ["Business", order.customer.business],
+    ["Magazine", c.pub.name],
+    ["Ad size", `${c.size.name} (${c.size.trim})`],
+    ["Zones", order.zones.join(", ")],
+    ["Issues", `${c.issues}: ${monthList(state.months)}`],
+    ["Artwork", c.art.name],
+    ["Per issue", money(c.perIssue)],
+  ];
+  if (c.bundleOff) r.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
+  if (c.termOff) r.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
+  if (c.art.fee) r.push(["Ad design", "+" + money(c.art.fee)]);
+  return r;
+}
+
+function orderText(c, order) {
+  const lines = receiptRows(c, order).map(([k, v]) => `${k}: ${v}`);
+  const cu = order.customer;
+  return [
+    "New ad space request", "",
+    ...lines, `Total: ${money(c.total)}`, "",
+    `Contact: ${cu.contact}`, `Phone: ${cu.phone}`, `Email: ${cu.email}`,
+    cu.billingEmail ? `Billing email: ${cu.billingEmail}` : null,
+    `Category: ${cu.category}`, `Billing address: ${cu.street}, ${cu.city} ${cu.zip}`,
+    cu.notes ? `Notes: ${cu.notes}` : null,
+  ].filter(l => l !== null).join("\n");
+}
+
+async function sendOrder(c, order) {
+  if (CONFIG.orderEndpoint) {
+    // text/plain keeps this a "simple" request, so webhooks without CORS preflight support still accept it.
+    const res = await fetch(CONFIG.orderEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(order),
+    });
+    if (!res.ok && res.type !== "opaque") throw new Error("HTTP " + res.status);
+    return "sent";
+  }
+  const subject = `Ad space request ${order.ref}: ${order.customer.business}`;
+  window.location.href = `mailto:${CONFIG.salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(orderText(c, order))}`;
+  return "email";
+}
+
+let sending = false;
+$("#nextBtn").onclick = async () => {
   if (state.step === 1) { state.step = 2; render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (sending) return;
   const form = $("#checkoutForm");
   if (!form.checkValidity()) {
     form.reportValidity();
     $("#err").textContent = "Please complete the highlighted fields.";
     return;
   }
-  const c = calc();
-  const order = {
-    ref: "BDA-" + Date.now().toString(36).toUpperCase().slice(-6),
-    createdAt: new Date().toISOString(),
-    magazine: c.pub.name, size: c.size.name, zones: c.zones.map(z => z.id),
-    months: MONTHS.filter(m => state.months.has(m.key)).map(m => m.key), artwork: c.art.name,
-    total: Math.round(c.total),
-    customer: Object.fromEntries(new FormData(form)),
-  };
-  // TODO: POST `order` to the order backend / CRM / invoicing system.
-  console.log("Order request", order);
+  const { c, order } = buildOrder(form);
+  if (form.website.value) { state.step = 3; render(); return; } // bot: pretend success, send nothing
 
+  sending = true;
+  const btn = $("#nextBtn");
+  btn.disabled = true; btn.textContent = "Sending…"; $("#err").textContent = "";
+  let how;
+  try {
+    how = await sendOrder(c, order);
+  } catch (e) {
+    sending = false; render();
+    $("#err").innerHTML = `We couldn't send your request. Please try again, or call <a href="tel:${CONFIG.salesPhone.replace(/\D/g, "")}">${CONFIG.salesPhone}</a>.`;
+    return;
+  }
+  sending = false;
+
+  $("#receipt").innerHTML = receiptRows(c, order).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
+    `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}</dd>`;
   $("#refNo").textContent = order.ref;
   $("#confirmText").textContent =
     `${c.size.name} in ${c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
     `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
     `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
-    (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.");
+    (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
+    (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
   state.step = 3; render(); window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
+$("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
 
 render();
