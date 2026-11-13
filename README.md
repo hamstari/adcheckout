@@ -6,10 +6,26 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
-## Pricing
-Each magazine has its own rate table (`CONFIG.rates.bdb` and `CONFIG.rates.ehi`): zone → ad size → price per issue. Set a zone to `null` if that magazine doesn't mail there. That zone then shows as unavailable, and it's removed from the order if the customer switches magazines.
+## Updating rates
+All prices, zones and household counts live in **`rates.csv`**, a normal spreadsheet with one row per magazine and zone:
 
-"Both magazines" adds the two rates for each zone and then takes 10% off. It's only offered in zones both magazines mail. Zone cards show the price for the selected size and magazine, and size cards show the lowest zone price ("From $X"). Ad design is included at no charge. The volume discount applies on top.
+| Magazine | Zone | Zone name | Homes | Back Cover | Inside Front Cover | Inside Back Cover | Full Page | Half Page | Quarter Page |
+|---|---|---|---|---|---|---|---|---|---|
+| BDB | Z1 | Zone 1 | 20000 | 1495 | 1195 | 1095 | 895 | 525 | 315 |
+
+- **Change a price:** edit the number. `$1,495` and `1495` both work.
+- **Add a zone:** add a row. It shows up on the page automatically, named from "Zone name".
+- **A magazine doesn't mail a zone:** leave that row out.
+- **A size isn't sold in a zone:** leave that cell blank.
+- Magazine can be `BDB` / `Best Deals Book` or `EHI` / `Exclusively Home Improvements`.
+
+**Option A, edit the file:** open `rates.csv` in Excel, Google Sheets or Smartsheet, edit it, save it as CSV, and upload it in place of the old one. On GitHub that's: open the file, then the pencil (edit) or Add file → Upload files.
+
+**Option B, live Google Sheet:** paste the sheet in, then use File → Share → Publish to web → choose the tab → **Comma-separated values (.csv)** → Publish. Put that link in `CONFIG.ratesUrl` in `index.html`, once. After that, edits to the sheet show up on the page within about 5 minutes.
+
+Other pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
+
+If the page is opened straight from disk (not from a web server), browsers block it from reading `rates.csv`, so it uses a built-in copy of the demo rates instead.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
@@ -27,7 +43,7 @@ When a customer presses **Request ad space**:
 The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices, sizes, zones:** all in `CONFIG` at the top of the `<script>`; per-zone rates are in `CONFIG.rates`. The current values are placeholders.
+- **Prices, zones, homes:** replace the demo numbers in `rates.csv`.
 - **Sold covers:** replace the example `CONFIG.soldOut` entries with real bookings.
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
