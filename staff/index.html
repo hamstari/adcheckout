@@ -50,14 +50,8 @@
 
   .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
   table { border-collapse: collapse; width: 100%; min-width: 860px; }
-  /* keep zone code + name visible when the grid scrolls sideways */
-  #ratesTable th:nth-child(1), #ratesTable td:nth-child(1) { position: sticky; left: 0; z-index: 2; background: #fff; width: 72px; min-width: 72px; }
-  #ratesTable th:nth-child(2), #ratesTable td:nth-child(2) { position: sticky; left: 72px; z-index: 2; background: #fff; box-shadow: 1px 0 0 var(--line); }
-  #ratesTable th:nth-child(1), #ratesTable th:nth-child(2) { background: #fafafa; }
-  th, td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-  th { background: #fafafa; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; white-space: nowrap; }
-  tr:last-child td { border-bottom: 0; }
-  tr.off td:not(.keep) { opacity: .45; }
+  tr.grp td { background: #f4f4f4; font-weight: 700; font-size: 13px; }
+  td.lbl { white-space: nowrap; color: var(--muted); font-size: 13px; }
   td input[type="text"], td input[type="number"], td input[type="month"], td select {
     width: 100%; padding: 7px 8px; border: 1.5px solid var(--line); border-radius: 4px; background: #fff; color: var(--ink); min-width: 70px; }
   td input.money, td input.num { text-align: right; }
@@ -132,27 +126,33 @@
     <button class="btn small teal" id="connectBtn" type="button">Connect to save</button>
   </div>
 
-  <!-- RATES -->
+  <!-- RATE CARD -->
+  <section class="panel">
+    <div class="phead"><h2>Rate card</h2></div>
+    <p class="sub">Price <b>per issue, per magazine</b>, by ad size, number of zones and frequency. Both magazines use this card. More than 3 zones is worked out automatically: the 3-zone price plus the price of the extra zones, minus 15%.</p>
+    <div class="tablewrap"><table id="cardTable" style="min-width:560px"></table></div>
+  </section>
+
+  <!-- ZONES -->
   <section class="panel">
     <div class="phead">
-      <h2>Rates</h2>
+      <h2>Zones</h2>
       <div class="spacer"></div>
       <button class="btn small ghost" id="addZone" type="button">+ Add zone</button>
     </div>
-    <p class="sub">Price per issue for each zone and ad size. Customers see the zone name and the areas it covers. Untick <b>Mails here</b> if the magazine doesn't mail that zone. Leave a price empty if that size isn't sold there.</p>
-    <div class="tabs" role="tablist" id="pubTabs"></div>
-    <div class="tablewrap"><table id="ratesTable"></table></div>
+    <p class="sub">Customers see the zone name, the areas it covers and the homes. Untick a magazine if it doesn't mail that zone.</p>
+    <div class="tablewrap"><table id="zonesTable" style="min-width:720px"></table></div>
   </section>
 
   <!-- SOLD COVERS -->
   <section class="panel">
     <div class="phead">
-      <h2>Sold covers</h2>
+      <h2>Sold spots</h2>
       <div class="spacer"></div>
       <label class="switch"><input type="checkbox" id="showPast"> Show past months</label>
       <button class="btn small ghost" id="addSold" type="button">+ Add booking</button>
     </div>
-    <p class="sub">Covers and the centerfold are one advertiser per zone per month. A booking here shows as <b>Taken</b> on the checkout. Delete a row if the booking is cancelled.</p>
+    <p class="sub">Covers and one-per-zone positions (inside covers, page 3, centerfold) take one advertiser per zone per month. A booking here shows as <b>Taken</b> on the checkout. Delete a row if the booking is cancelled.</p>
     <div class="tablewrap"><table id="soldTable"></table></div>
   </section>
 </main>
@@ -206,19 +206,24 @@ const SETTINGS = {
   repo: "adcheckout",
   branch: "main",
   ratesPath: "rates.csv",
+  zonesPath: "zones.csv",
   soldPath: "sold.csv",
 };
 
 const SIZES = [
-  { id: "bc",  name: "Back Cover",         premium: true },
-  { id: "ifc", name: "Inside Front Cover", premium: true },
-  { id: "ibc", name: "Inside Back Cover",  premium: true },
-  { id: "fp",  name: "Full Page" },
-  { id: "hp",  name: "Half Page" },
-  { id: "qp",  name: "Quarter Page" },
+  { id: "fp", name: "Full Page" },
+  { id: "hp", name: "Half Page" },
+  { id: "qp", name: "Quarter Page" },
+  { id: "fc", name: "Front Cover", flat: true, premium: true },
+  { id: "bc", name: "Back Cover", flat: true, premium: true },
+  { id: "sp", name: "2-Page Full Spread", flat: true },
 ];
+const FREQS = [["3x", "3x monthly"], ["6x", "6x monthly"], ["12x", "12 issues"]];
+const ZONE_COUNTS = [1, 2, 3];
 // One-per-zone spots that can be marked as sold.
-const SOLD_KINDS = [...SIZES.filter(s => s.premium), { id: "center", name: "Centerfold" }];
+const SOLD_KINDS = [...SIZES.filter(s => s.premium),
+  { id: "ifc", name: "Inside Front Cover" }, { id: "ibc", name: "Inside Back Cover" },
+  { id: "p3", name: "Page 3" }, { id: "center", name: "Centerfold" }];
 const PUBS = [
   { id: "bdb", code: "BDB", name: "Best Deals Book" },
   { id: "ehi", code: "EHI", name: "Exclusively Home Improvements" },
@@ -273,32 +278,37 @@ const monthLabel = (k) => { const [y, m] = k.split("-").map(Number); return new 
 const thisMonth = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; })();
 
 /* ---------- data model ----------
-   zones: [{ id, name }]
-   rates: { bdb: { Z1: { homes, bc, ifc, ... } }, ehi: {...} }   (missing zone = doesn't mail there)
+   card:  { fp: { 1: { "3x": n, "6x": n, "12x": n }, 2: {...}, 3: {...} }, ... }
+   zones: [{ id, name, areas, homes, bdb, ehi }]
    sold:  [{ pub, size, zone, month, advertiser }]
 */
-let data = null, saved = null, activePub = "bdb";
+let data = null, saved = null;
+const yes = (v) => !/^(no|n|false|0|)$/i.test(String(v ?? "yes").trim());
 
-function parseRates(text) {
+function parseCard(text) {
   const [head, ...rows] = parseCSV(text);
   const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
-  const zones = [], rates = { bdb: {}, ehi: {} };
+  const card = Object.fromEntries(SIZES.map(s => [s.id, Object.fromEntries(ZONE_COUNTS.map(k => [k, { "3x": null, "6x": null, "12x": null }]))]));
   rows.forEach(r => {
-    const pub = PUB_ALIASES[norm(r[col.magazine])], zone = (r[col.zone] || "").trim();
-    if (!pub || !zone) return;
-    const e = { homes: num(r[col.homes]) };
-    SIZES.forEach(s => e[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null);
-    rates[pub][zone] = e;
-    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone, areas: "" });
-    const areas = (r[col.areascovered ?? col.areas] || "").trim();
-    if (areas) zones.find(z => z.id === zone).areas = areas;
+    const sv = norm(r[col.adsize]); const size = SIZES.find(s => norm(s.name) === sv || s.id === sv); const k = num(r[col.zones]);
+    if (!size || !ZONE_COUNTS.includes(k)) return;
+    FREQS.forEach(([f]) => card[size.id][k][f] = num(r[col[f]]));
   });
-  return { zones, rates };
+  return card;
+}
+function parseZones(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  return rows.map(r => ({
+    id: (r[col.zone] || "").trim(), name: (r[col.zonename] || "").trim() || (r[col.zone] || "").trim(),
+    areas: (r[col.areascovered ?? col.areas] || "").trim(), homes: num(r[col.homes]),
+    bdb: yes(r[col.bdb]), ehi: yes(r[col.ehi]),
+  })).filter(z => z.id);
 }
 function parseSold(text) {
   const [head, ...rows] = parseCSV(text);
   const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
-  const sizeCol = col.adsize ?? col.size;
+  const sizeCol = col.spot ?? col.adsize ?? col.size;
   return rows.map(r => {
     const sv = norm(r[sizeCol]);
     return {
@@ -311,21 +321,27 @@ function parseSold(text) {
   });
 }
 function ratesCSV(d) {
-  const rows = [["Magazine", "Zone", "Zone name", "Areas covered", "Homes", ...SIZES.map(s => s.name)]];
-  PUBS.forEach(p => d.zones.forEach(z => {
-    const e = d.rates[p.id][z.id]; if (!e) return;
-    rows.push([p.code, z.id, z.name, z.areas || "", e.homes ?? "", ...SIZES.map(s => e[s.id] ?? "")]);
+  const rows = [["Ad size", "Zones", ...FREQS.map(f => f[0])]];
+  SIZES.forEach(s => ZONE_COUNTS.forEach(k => {
+    const e = d.card[s.id][k];
+    const v = s.flat ? [e["3x"], e["3x"], e["3x"]] : FREQS.map(([f]) => e[f]);
+    if (v.some(x => x != null)) rows.push([s.name, k, ...v.map(x => x ?? "")]);
   }));
   return toCSV(rows);
 }
+function zonesCSV(d) {
+  return toCSV([["Zone", "Zone name", "Areas covered", "Homes", "BDB", "EHI"],
+    ...d.zones.map(z => [z.id, z.name, z.areas || "", z.homes ?? "", z.bdb ? "Yes" : "No", z.ehi ? "Yes" : "No"])]);
+}
 function soldCSV(d) {
-  const rows = [["Magazine", "Ad size", "Zone", "Month", "Advertiser"]];
+  const rows = [["Magazine", "Spot", "Zone", "Month", "Advertiser"]];
   [...d.sold].sort((a, b) => (a.month || "").localeCompare(b.month || "") || a.zone.localeCompare(b.zone))
     .forEach(b => rows.push([PUBS.find(p => p.id === b.pub).code, SOLD_KINDS.find(s => s.id === b.size).name, b.zone, b.month ? monthLabel(b.month) : "", b.advertiser]));
   return toCSV(rows);
 }
 const clone = (o) => JSON.parse(JSON.stringify(o));
-const dirty = () => saved && (ratesCSV(data) !== ratesCSV(saved) || soldCSV(data) !== soldCSV(saved));
+const FILES = [["ratesPath", ratesCSV, "rate card"], ["zonesPath", zonesCSV, "zones"], ["soldPath", soldCSV, "sold spots"]];
+const dirty = () => saved && FILES.some(([, csv]) => csv(data) !== csv(saved));
 
 /* ---------- GitHub storage ---------- */
 const cfg = () => ({
@@ -369,24 +385,23 @@ async function ghWrite(path, text, message) {
 }
 
 /* ---------- load ---------- */
+const PATHS = () => [SETTINGS.ratesPath, SETTINGS.zonesPath, SETTINGS.soldPath];
 async function load() {
   setStatus("Loading…");
-  let ratesText, soldText;
+  let texts = null;
   if (token) {
-    try {
-      [ratesText, soldText] = await Promise.all([ghRead(SETTINGS.ratesPath), ghRead(SETTINGS.soldPath)]);
-      setConnected(true);
-    } catch (e) {
+    try { texts = await Promise.all(PATHS().map(ghRead)); setConnected(true); }
+    catch (e) {
       setConnected(false);
       setStatus("Couldn't connect: " + e.message + " Showing the published files in demo mode.", "err");
     }
   }
-  if (ratesText == null) {
+  if (!texts) {
     const get = async (p) => { const r = await fetch("../" + p, { cache: "no-store" }); if (!r.ok) throw new Error(r.status); return r.text(); };
-    try { [ratesText, soldText] = await Promise.all([get(SETTINGS.ratesPath), get(SETTINGS.soldPath)]); }
-    catch { ratesText = FALLBACK_RATES; soldText = FALLBACK_SOLD; }
+    try { texts = await Promise.all(PATHS().map(get)); }
+    catch { texts = [FALLBACK_RATES, FALLBACK_ZONES, FALLBACK_SOLD]; }
   }
-  data = { ...parseRates(ratesText), sold: parseSold(soldText) };
+  data = { card: parseCard(texts[0]), zones: parseZones(texts[1]), sold: parseSold(texts[2]) };
   saved = clone(data);
   render();
   if (!$("#status").classList.contains("err")) setStatus(token && connected ? "Up to date." : "Demo mode: edits aren't saved.");
@@ -394,27 +409,29 @@ async function load() {
 
 /* ---------- render ---------- */
 function render() {
-  // tabs
-  $("#pubTabs").innerHTML = PUBS.map(p => `<button class="tab" role="tab" aria-selected="${p.id === activePub}" data-pub="${p.id}" type="button">${p.name}</button>`).join("");
+  // rate card
+  const chg = (a, b) => (a !== b ? " changed" : "");
+  const cell = (s, k, f) => `<td class="moneycell"><input type="text" inputmode="decimal" class="money${chg(data.card[s.id][k][f], saved.card[s.id][k][f])}" data-size="${s.id}" data-k="${k}" data-freq="${f}" value="${data.card[s.id][k][f] ?? ""}" aria-label="${s.name}, ${k} zone${k > 1 ? "s" : ""}, ${f}"></td>`;
+  $("#cardTable").innerHTML = `
+    <thead><tr><th>Ad size</th><th>Zones</th>${FREQS.map(f => `<th>${f[1]}</th>`).join("")}</tr></thead>
+    <tbody>${SIZES.map(s => `<tr class="grp"><td colspan="5">${s.name}${s.flat ? " · same price at any frequency" : ""}</td></tr>` +
+      ZONE_COUNTS.map(k => `<tr><td></td><td class="lbl">${k} zone${k > 1 ? "s" : ""}</td>${s.flat
+        ? cell(s, k, "3x") + `<td colspan="2" class="lbl">per issue</td>`
+        : FREQS.map(([f]) => cell(s, k, f)).join("")}</tr>`).join("")).join("")}</tbody>`;
 
-  // rates table
-  const R = data.rates[activePub], S = saved.rates[activePub];
-  const ch = (z, f) => { const a = (R[z] || {})[f], b = (S[z] || {})[f]; return (!!R[z] !== !!S[z]) || a !== b ? " changed" : ""; };
-  $("#ratesTable").innerHTML = `
-    <thead><tr><th>Zone</th><th>Zone name</th><th>Areas covered</th><th>Mails here</th><th>Homes</th>${SIZES.map(s => `<th title="${s.name}">${(s.name.startsWith("Inside ") ? s.name.replace("Inside ", "Inside<br>").replace(" Cover", "") : s.name)}</th>`).join("")}<th></th></tr></thead>
-    <tbody>${data.zones.map((z, i) => {
-      const e = R[z.id];
-      const zch = (saved.zones.find(x => x.id === z.id) || {}).name !== z.name ? " changed" : "";
-      return `<tr class="${e ? "" : "off"}" data-i="${i}">
-        <td class="keep"><input type="text" data-f="id" value="${esc(z.id)}" aria-label="Zone code"></td>
-        <td class="keep" style="min-width:140px"><input type="text" class="${zch}" data-f="name" value="${esc(z.name)}" aria-label="Zone name"></td>
-        <td class="keep" style="min-width:170px"><input type="text" class="${(saved.zones.find(x => x.id === z.id) || {}).areas !== z.areas ? " changed" : ""}" data-f="areas" value="${esc(z.areas || "")}" placeholder="e.g. Sarasota, Lakewood Ranch" aria-label="Areas covered"></td>
-        <td class="keep"><label class="switch"><input type="checkbox" data-f="mails" ${e ? "checked" : ""}> ${e ? "Yes" : "No"}</label></td>
-        <td style="min-width:86px"><input type="text" inputmode="numeric" class="num${ch(z.id, "homes")}" data-f="homes" value="${e?.homes ?? ""}" ${e ? "" : "disabled"} aria-label="Homes"></td>
-        ${SIZES.map(s => `<td class="moneycell" style="min-width:88px"><input type="text" inputmode="decimal" class="money${ch(z.id, s.id)}" data-f="${s.id}" value="${e?.[s.id] ?? ""}" ${e ? "" : "disabled"} aria-label="${s.name} price"></td>`).join("")}
-        <td class="keep"><button class="x" data-del="${i}" title="Remove zone from both magazines" type="button">×</button></td>
-      </tr>`;
-    }).join("") || `<tr><td colspan="${SIZES.length + 6}" class="empty">No zones yet. Add one.</td></tr>`}</tbody>`;
+  // zones
+  const sz = (z) => saved.zones.find(x => x.id === z.id) || {};
+  $("#zonesTable").innerHTML = `
+    <thead><tr><th>Zone</th><th>Zone name</th><th>Areas covered</th><th>Homes</th><th>Best Deals Book</th><th>Excl. Home Impr.</th><th></th></tr></thead>
+    <tbody>${data.zones.map((z, i) => `<tr data-i="${i}">
+        <td style="width:80px"><input type="text" data-f="id" value="${esc(z.id)}" aria-label="Zone code"></td>
+        <td style="min-width:140px"><input type="text" class="${chg(z.name, sz(z).name)}" data-f="name" value="${esc(z.name)}" aria-label="Zone name"></td>
+        <td style="min-width:200px"><input type="text" class="${chg(z.areas, sz(z).areas)}" data-f="areas" value="${esc(z.areas || "")}" placeholder="e.g. Sarasota, Lakewood Ranch" aria-label="Areas covered"></td>
+        <td style="width:120px"><input type="text" inputmode="numeric" class="num${chg(z.homes, sz(z).homes)}" data-f="homes" value="${z.homes ?? ""}" aria-label="Homes"></td>
+        <td><label class="switch"><input type="checkbox" data-f="bdb" ${z.bdb ? "checked" : ""}> Mails here</label></td>
+        <td><label class="switch"><input type="checkbox" data-f="ehi" ${z.ehi ? "checked" : ""}> Mails here</label></td>
+        <td><button class="x" data-del="${i}" title="Remove zone" type="button">×</button></td>
+      </tr>`).join("") || `<tr><td colspan="7" class="empty">No zones yet. Add one.</td></tr>`}</tbody>`;
 
   // sold table
   const showPast = $("#showPast").checked;
@@ -424,7 +441,7 @@ function render() {
   const zoneOpts = (sel) => data.zones.map(z => `<option value="${esc(z.id)}" ${z.id === sel ? "selected" : ""}>${esc(z.id)}${z.name && z.name !== z.id ? " · " + esc(z.name) : ""}</option>`).join("")
     + (sel && !data.zones.some(z => z.id === sel) ? `<option value="${esc(sel)}" selected>${esc(sel)} (removed zone)</option>` : "");
   $("#soldTable").innerHTML = `
-    <thead><tr><th>Month</th><th>Magazine</th><th>Ad size</th><th>Zone</th><th>Advertiser (staff only)</th><th></th></tr></thead>
+    <thead><tr><th>Month</th><th>Magazine</th><th>Spot</th><th>Zone</th><th>Advertiser (staff only)</th><th></th></tr></thead>
     <tbody>${rows.map(({ b, i }) => `<tr data-s="${i}">
       <td style="width:170px"><input type="month" data-f="month" value="${b.month}" aria-label="Month"> ${b.month && b.month < thisMonth ? '<span class="pill past">Past</span>' : ""}</td>
       <td style="min-width:110px"><select data-f="pub" aria-label="Magazine">${PUBS.map(p => `<option value="${p.id}" ${p.id === b.pub ? "selected" : ""}>${p.code === "BDB" ? "BDB · Best Deals Book" : "EHI · Excl. Home Impr."}</option>`).join("")}</select></td>
@@ -442,7 +459,8 @@ function validate() {
   const ids = data.zones.map(z => z.id.trim());
   if (ids.some(id => !id)) problems.push("Every zone needs a code (e.g. Z8).");
   if (new Set(ids).size !== ids.length) problems.push("Two zones have the same code.");
-  data.sold.forEach(b => { if (!b.month) problems.push("A sold cover is missing its month."); });
+  data.sold.forEach(b => { if (!b.month) problems.push("A sold spot is missing its month."); });
+  SIZES.forEach(s => ZONE_COUNTS.forEach(k => { if (data.card[s.id][k]["3x"] == null && (s.flat || data.card[s.id][k]["6x"] != null || data.card[s.id][k]["12x"] != null)) problems.push(`${s.name}, ${k} zone${k > 1 ? "s" : ""}: the first price is missing.`); }));
   const seen = new Set();
   data.sold.forEach(b => { const k = [b.pub, b.size, b.zone, b.month].join("|"); if (b.month && seen.has(k)) problems.push(`${SOLD_KINDS.find(s => s.id === b.size).name} in ${b.zone} for ${monthLabel(b.month)} is booked twice.`); seen.add(k); });
   return [...new Set(problems)];
@@ -467,53 +485,43 @@ function refreshBar() {
 }
 
 /* ---------- edits ---------- */
-$("#pubTabs").addEventListener("click", e => { const t = e.target.closest("[data-pub]"); if (t) { activePub = t.dataset.pub; render(); } });
-
-$("#ratesTable").addEventListener("change", e => {
-  const tr = e.target.closest("tr[data-i]"); if (!tr) return;
-  const z = data.zones[+tr.dataset.i], f = e.target.dataset.f, R = data.rates[activePub];
-  if (f === "id") {
-    const old = z.id, nu = e.target.value.trim().toUpperCase();
-    z.id = nu;
-    PUBS.forEach(p => { if (data.rates[p.id][old]) { data.rates[p.id][nu] = data.rates[p.id][old]; delete data.rates[p.id][old]; } });
-    data.sold.forEach(b => { if (b.zone === old) b.zone = nu; });
-  } else if (f === "name") {
-    z.name = e.target.value.trim();
-    e.target.classList.toggle("changed", (saved.zones.find(x => x.id === z.id) || {}).name !== z.name);
-    $("#status").classList.remove("ok"); refreshBar(); return;   // no redraw, so Tab keeps working
-  } else if (f === "areas") {
-    z.areas = e.target.value.trim();
-    e.target.classList.toggle("changed", (saved.zones.find(x => x.id === z.id) || {}).areas !== z.areas);
-    $("#status").classList.remove("ok"); refreshBar(); return;
-  } else if (f === "mails") {
-    if (e.target.checked) R[z.id] = clone(saved.rates[activePub][z.id] || { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) });
-    else delete R[z.id];
-  } else if (R[z.id]) {
-    const v = e.target.value === "" ? null : num(e.target.value);
-    e.target.classList.toggle("bad", e.target.value !== "" && (v == null || v < 0));
-    R[z.id][f] = v != null && v >= 0 ? Math.round(v) : null;
-    if (R[z.id][f] != null) e.target.value = R[z.id][f];   // "$1,495" → 1495
-    e.target.classList.toggle("changed", (saved.rates[activePub][z.id] || {})[f] !== R[z.id][f]);
-    $("#status").classList.remove("ok"); refreshBar(); return;   // no redraw, so Tab keeps working
-  }
-  $("#status").classList.remove("ok");
-  render();
+$("#cardTable").addEventListener("change", e => {
+  const { size, k, freq } = e.target.dataset; if (!size) return;
+  const v = e.target.value.trim() === "" ? null : num(e.target.value);
+  const bad = e.target.value.trim() !== "" && (v == null || v < 0);
+  e.target.classList.toggle("bad", bad);
+  data.card[size][k][freq] = v != null && v >= 0 ? Math.round(v) : null;
+  if (data.card[size][k][freq] != null) e.target.value = data.card[size][k][freq];
+  e.target.classList.toggle("changed", saved.card[size][k][freq] !== data.card[size][k][freq]);
+  $("#status").classList.remove("ok"); refreshBar();
 });
-$("#ratesTable").addEventListener("click", e => {
+
+$("#zonesTable").addEventListener("change", e => {
+  const tr = e.target.closest("tr[data-i]"); if (!tr) return;
+  const z = data.zones[+tr.dataset.i], f = e.target.dataset.f;
+  const was = (saved.zones.find(x => x.id === z.id) || {})[f];
+  if (f === "id") {
+    const old = z.id; z.id = e.target.value.trim().toUpperCase(); e.target.value = z.id;
+    data.sold.forEach(b => { if (b.zone === old) b.zone = z.id; });
+    $("#status").classList.remove("ok"); render(); return;
+  }
+  if (f === "bdb" || f === "ehi") z[f] = e.target.checked;
+  else if (f === "homes") { const v = num(e.target.value); z.homes = v != null && v >= 0 ? Math.round(v) : null; e.target.value = z.homes ?? ""; }
+  else z[f] = e.target.value.trim();
+  if (e.target.type !== "checkbox") e.target.classList.toggle("changed", was !== z[f]);
+  $("#status").classList.remove("ok"); refreshBar();
+});
+$("#zonesTable").addEventListener("click", e => {
   const i = e.target.dataset.del; if (i == null) return;
   const z = data.zones[+i];
-  if (!confirm(`Remove ${z.id}${z.name !== z.id ? " (" + z.name + ")" : ""} from both magazines?`)) return;
-  data.zones.splice(+i, 1);
-  PUBS.forEach(p => delete data.rates[p.id][z.id]);
-  render();
+  if (!confirm(`Remove ${z.id}${z.name !== z.id ? " (" + z.name + ")" : ""}?`)) return;
+  data.zones.splice(+i, 1); render();
 });
 $("#addZone").onclick = () => {
   let n = data.zones.length + 1; while (data.zones.some(z => z.id === "Z" + n)) n++;
-  const id = "Z" + n;
-  data.zones.push({ id, name: "Zone " + n, areas: "" });
-  data.rates[activePub][id] = { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) };
+  data.zones.push({ id: "Z" + n, name: "Zone " + n, areas: "", homes: 100000, bdb: true, ehi: true });
   render();
-  const last = $("#ratesTable tbody tr:last-child [data-f='name']"); last && (last.focus(), last.select());
+  const last = $("#zonesTable tbody tr:last-child [data-f='name']"); last && (last.focus(), last.select());
 };
 
 $("#soldTable").addEventListener("change", e => {
@@ -524,7 +532,7 @@ $("#soldTable").addEventListener("change", e => {
 });
 $("#soldTable").addEventListener("click", e => { const i = e.target.dataset.dels; if (i != null) { data.sold.splice(+i, 1); render(); } });
 $("#addSold").onclick = () => {
-  data.sold.push({ pub: activePub, size: "bc", zone: data.zones[0]?.id || "", month: thisMonth, advertiser: "" });
+  data.sold.push({ pub: "bdb", size: "bc", zone: data.zones[0]?.id || "", month: thisMonth, advertiser: "" });
   render();
   const tr = $(`#soldTable tr[data-s="${data.sold.length - 1}"]`);
   if (tr) { tr.scrollIntoView({ block: "center" }); tr.querySelector("[data-f='month']").focus(); }
@@ -539,8 +547,9 @@ $("#saveBtn").onclick = async () => {
   try {
     const who = store.get("bda.name");
     const msg = (what) => `Staff portal: update ${what}${who ? " (" + who + ")" : ""}`;
-    if (ratesCSV(data) !== ratesCSV(saved)) await ghWrite(SETTINGS.ratesPath, ratesCSV(data), msg("rates"));
-    if (soldCSV(data) !== soldCSV(saved)) await ghWrite(SETTINGS.soldPath, soldCSV(data), msg("sold covers"));
+    for (const [key, csv, what] of FILES) {
+      if (csv(data) !== csv(saved)) await ghWrite(SETTINGS[key], csv(data), msg(what));
+    }
     saved = clone(data);
     render();
     setStatus("Saved. The checkout updates within a couple of minutes.", "ok");
@@ -573,7 +582,7 @@ $("#connectForm").onsubmit = async (e) => {
   $("#doConnect").disabled = true; $("#connectErr").textContent = "Checking…";
   try {
     const pending = dirty() ? clone(data) : null;
-    await Promise.all([ghRead(SETTINGS.ratesPath), ghRead(SETTINGS.soldPath)]);
+    await Promise.all(PATHS().map(ghRead));
     if ($("#rememberInput").checked) store.set("bda.token", t); else { store.del("bda.token"); try { sessionStorage.setItem("bda.token", t); } catch {} }
     $("#connectDlg").close();
     setConnected(true);
@@ -586,23 +595,38 @@ $("#connectForm").onsubmit = async (e) => {
 };
 
 /* Used only if the published files can't be fetched (e.g. opened from disk). */
-const FALLBACK_RATES = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page
-BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315
-BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285
-BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360
-BDB,Z4,Zone 4,20000,1195,955,875,715,420,250
-BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315
-BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345
-BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270
-EHI,Z1,Zone 1,18000,1195,955,875,715,420,250
-EHI,Z2,Zone 2,18000,1120,895,820,670,395,235
-EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285
-EHI,Z5,Zone 5,18000,1045,835,765,625,370,220`;
-const FALLBACK_SOLD = `Magazine,Ad size,Zone,Month,Advertiser
-BDB,Back Cover,Z1,Jan 2027,Example Roofing
+const FALLBACK_RATES = `Ad size,Zones,3x,6x,12x
+Full Page,1,3299,2999,2699
+Full Page,2,5599,5299,4799
+Full Page,3,7999,7499,6599
+Half Page,1,1899,1699,1499
+Half Page,2,3599,2899,2699
+Half Page,3,4999,3799,3499
+Quarter Page,1,1099,999,899
+Quarter Page,2,1998,1799,1599
+Quarter Page,3,2699,2399,1999
+Front Cover,1,5999,5999,5999
+Front Cover,2,10999,10999,10999
+Front Cover,3,14999,14999,14999
+Back Cover,1,3999,3999,3999
+Back Cover,2,6999,6999,6999
+Back Cover,3,8999,8999,8999
+2-Page Full Spread,1,4999,4999,4999
+2-Page Full Spread,2,8999,8999,8999
+2-Page Full Spread,3,11999,11999,11999`;
+const FALLBACK_ZONES = `Zone,Zone name,Areas covered,Homes,BDB,EHI
+Z1,Zone 1,,100000,Yes,Yes
+Z2,Zone 2,,100000,Yes,Yes
+Z3,Zone 3,,100000,Yes,Yes
+Z4,Zone 4,,100000,Yes,No
+Z5,Zone 5,,100000,Yes,Yes
+Z6,Zone 6,,100000,Yes,No
+Z7,Zone 7,,100000,Yes,No`;
+const FALLBACK_SOLD = `Magazine,Spot,Zone,Month,Advertiser
 BDB,Back Cover,Z1,Feb 2027,Example Roofing
-BDB,Back Cover,Z3,Mar 2027,Example AC
-BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+BDB,Back Cover,Z1,Mar 2027,Example Roofing
+BDB,Front Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Feb 2027,Example Pavers
 EHI,Back Cover,Z1,Apr 2027,Example Windows`;
 
 load();

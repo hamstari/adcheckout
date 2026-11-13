@@ -220,7 +220,7 @@
 
         <div class="panel">
           <div class="panel-h"><div class="num">2</div><h2>Ad size</h2></div>
-          <p class="sub">Rates vary by zone. You'll see each zone's price in the next step.</p>
+          <p class="sub">"From" prices are per issue for one zone at the 12-issue rate. Your price updates as you pick zones and months.</p>
           <div class="opts" id="sizeOpts"></div>
           <div class="note" id="specNote"></div>
         </div>
@@ -232,6 +232,7 @@
           </div>
           <p class="sub" id="zoneSub">Choose the zones you want to reach. Each zone is its own mailing.</p>
           <div class="opts" id="zoneOpts"></div>
+          <div class="note" id="zonePrice"></div>
           <div class="note hidden" id="zoneNote"></div>
         </div>
 
@@ -385,44 +386,55 @@ const CONFIG = {
   orderEndpoint: "",
   salesEmail: "advertise@bestdealsbook.com",
   salesPhone: "844-600-8846",
+  // Both magazines use the same rate card. "Both" is the two prices added together.
   publications: [
     { id: "bdb",  name: "Best Deals Book", desc: "Coupons and offers from trusted local home service pros", mult: 1, includes: ["bdb"] },
     { id: "ehi",  name: "Exclusively Home Improvements", desc: "Home improvement magazine for affluent homeowners", mult: 1, includes: ["ehi"] },
-    { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, includes: ["bdb", "ehi"], discount: 0.10, tag: "Save 10%" },
+    { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, includes: ["bdb", "ehi"] },
   ],
+  // premium: true = one advertiser per zone per issue (tracked as sold). flat: true = same price at any frequency.
   sizes: [
-    { id: "bc",  name: "Back Cover",          trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "ifc", name: "Inside Front Cover",  trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "ibc", name: "Inside Back Cover",   trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "fp",  name: "Full Page",           trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', shape: [34, 44] },
-    { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null,  shape: [34, 22] },
-    { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
+    { id: "fc",  name: "Front Cover",        note: "Includes the full inside front cover", trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', premium: true, flat: true, limit: "One per zone", shape: [34, 44] },
+    { id: "bc",  name: "Back Cover",         trim: '8.375" × 10.875"',  bleed: '8.625" × 11.125"', premium: true, flat: true, limit: "One per zone", shape: [34, 44] },
+    { id: "sp",  name: "2-Page Full Spread", trim: '16.75" × 10.875"',  bleed: '17" × 11.125"', flat: true, shape: [34, 44] },
+    { id: "fp",  name: "Full Page",          trim: '8.375" × 10.875"',  bleed: '8.625" × 11.125"', shape: [34, 44] },
+    { id: "hp",  name: "Half Page",          trim: '7.375" × 4.875"',   bleed: null, shape: [34, 22] },
+    { id: "qp",  name: "Quarter Page",       trim: '3.625" × 4.875"',   bleed: null, shape: [17, 22] },
   ],
-  // RATES + SOLD COVERS come from two CSV files next to this page, not from this file.
-  // Edit them in Excel and re-upload; see UPDATING-RATES.md.
+  // RATE CARD RULES (from the 2026 rate card).
+  // Frequency: the rate column is chosen by how many different months the order runs in.
+  //   1 or 2 issues are allowed and charged the 3x rate.
+  frequencies: [
+    { id: "3x",  min: 1,  name: "3x rate" },
+    { id: "6x",  min: 6,  name: "6x rate" },
+    { id: "12x", min: 12, name: "12-issue rate" },
+  ],
+  // Zones: the card prices 1, 2 and 3 zones. More than 3 = the 3-zone price plus the price of the
+  // remaining zones, minus 15% (7 zones = 3 + 3 + 1, minus 15%).
+  zoneBlock: 3,
+  extraZonesDiscount: 0.15,
+  // The rate card, zones and sold spots come from three CSV files next to this page.
+  // Staff edit them in the staff portal (/staff/).
   ratesUrl: "rates.csv",
+  zonesUrl: "zones.csv",
   soldUrl: "sold.csv",
   // How many months ahead customers can book.
   monthsAhead: 12,
   // Booking deadline: an issue closes on this day of the month BEFORE it mails (placeholder).
   // Example: 10 → the December issue can be booked through November 10. Set to 31 for no cutoff.
   issueCloseDay: 10,
-  // Volume discount by number of issues booked (highest tier that fits wins).
-  volume: [
-    { min: 1,  discount: 0 },
-    { min: 3,  discount: 0.05 },
-    { min: 6,  discount: 0.10 },
-    { min: 12, discount: 0.15 },
-  ],
   // Filled from the "Sold covers" sheet: magazine → size → zone → ["YYYY-MM", ...].
   soldOut: {},
   // PREMIUM PLACEMENT. No price is shown or added to the total: the upgrade charge is set on the invoice.
   // sizes = which ad sizes can book it. Covers are already fixed positions, so they're left out.
   placements: [
-    { id: "std",    name: "Standard placement", desc: "We place your ad for the best fit in the issue", premium: false },
-    { id: "rhr",    name: "Right-hand read",    desc: "On a right-hand page, where readers look first", premium: true, sizes: ["fp", "hp", "qp"] },
-    { id: "front",  name: "Front of magazine",  desc: "In the opening pages of the issue",               premium: true, sizes: ["fp", "hp", "qp"] },
-    { id: "center", name: "Centerfold",         desc: "The center spread, where the magazine falls open", premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "std",    name: "Standard placement",  desc: "We place your ad for the best fit in the issue", premium: false },
+    { id: "rhr",    name: "Right-hand read",     desc: "On a right-hand page, where readers look first", premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "front",  name: "First ten pages",     desc: "In the opening pages of the issue",              premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "p3",     name: "Page 3",              desc: "The first right-hand page readers see",          premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "ifc",    name: "Inside front cover",  desc: "The inside of the front cover",                  premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "ibc",    name: "Inside back cover",   desc: "The inside of the back cover",                   premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "center", name: "Centerfold",          desc: "The center spread, where the magazine falls open", premium: true, sizes: ["fp", "sp"], limit: "One per zone" },
   ],
   // Free-text placement request add-on. No automatic charge: staff confirm it and set any charge on the invoice.
   placementRequest: { name: "Additional placement request", desc: "Ask for a specific spot or neighbor. We'll confirm availability before you're invoiced." },
@@ -488,9 +500,9 @@ const monthBlocked = (k) => takenZones(k).length > 0 || ownZones(k).length > 0;
 // One-per-zone spots the ad being built would occupy: its cover size and/or the centerfold.
 const slotsOf = (sp) => [
   ...(CONFIG.sizes.find(s => s.id === sp.size).premium ? [sp.size] : []),
-  ...(sp.place === "center" ? ["center"] : []),
+  ...(CONFIG.placements.find(x => x.id === sp.place).limit ? [sp.place] : []),
 ];
-const slotName = (id) => (id === "center" ? "Centerfold" : CONFIG.sizes.find(s => s.id === id).name);
+const slotName = (id) => (CONFIG.sizes.find(s => s.id === id) || CONFIG.placements.find(x => x.id === id)).name;
 function takenZones(monthKey) {
   const pubs = state.pub === "both" ? ["bdb", "ehi"] : [state.pub];
   const hit = new Set();
@@ -538,18 +550,33 @@ function optButton({ pressed, html, onClick, label }) {
    Rates spreadsheet
    =========================================================== */
 // Only used when rates.csv can't be fetched (e.g. the page is opened straight from disk).
-const FALLBACK_RATES_CSV = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page
-BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315
-BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285
-BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360
-BDB,Z4,Zone 4,20000,1195,955,875,715,420,250
-BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315
-BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345
-BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270
-EHI,Z1,Zone 1,18000,1195,955,875,715,420,250
-EHI,Z2,Zone 2,18000,1120,895,820,670,395,235
-EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285
-EHI,Z5,Zone 5,18000,1045,835,765,625,370,220`;
+const FALLBACK_RATES_CSV = `Ad size,Zones,3x,6x,12x
+Full Page,1,3299,2999,2699
+Full Page,2,5599,5299,4799
+Full Page,3,7999,7499,6599
+Half Page,1,1899,1699,1499
+Half Page,2,3599,2899,2699
+Half Page,3,4999,3799,3499
+Quarter Page,1,1099,999,899
+Quarter Page,2,1998,1799,1599
+Quarter Page,3,2699,2399,1999
+Front Cover,1,5999,5999,5999
+Front Cover,2,10999,10999,10999
+Front Cover,3,14999,14999,14999
+Back Cover,1,3999,3999,3999
+Back Cover,2,6999,6999,6999
+Back Cover,3,8999,8999,8999
+2-Page Full Spread,1,4999,4999,4999
+2-Page Full Spread,2,8999,8999,8999
+2-Page Full Spread,3,11999,11999,11999`;
+const FALLBACK_ZONES_CSV = `Zone,Zone name,Areas covered,Homes,BDB,EHI
+Z1,Zone 1,,100000,Yes,Yes
+Z2,Zone 2,,100000,Yes,Yes
+Z3,Zone 3,,100000,Yes,Yes
+Z4,Zone 4,,100000,Yes,No
+Z5,Zone 5,,100000,Yes,Yes
+Z6,Zone 6,,100000,Yes,No
+Z7,Zone 7,,100000,Yes,No`;
 
 function parseCSV(text) {
   const rows = []; let row = [], cell = "", q = false;
@@ -574,32 +601,46 @@ const norm = (v) => String(v || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "
 const num = (v) => { const n = parseFloat(String(v || "").replace(/[$,\s]/g, "")); return isFinite(n) ? n : null; };
 const PUB_ALIASES = { bdb: "bdb", bestdealsbook: "bdb", ehi: "ehi", exclusivelyhomeimprovements: "ehi" };
 
+const yes = (v) => !/^(no|n|false|0|)$/i.test(String(v ?? "yes").trim());
+
+// Rate card: Ad size, Zones (1/2/3), 3x, 6x, 12x  →  CONFIG.card[sizeId][zones] = { "3x": n, "6x": n, "12x": n }
 function loadRates(text) {
   const [head, ...rows] = parseCSV(text);
   const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
-  const need = ["magazine", "zone"];
-  need.forEach(h => { if (!(h in col)) throw new Error(`Rates sheet is missing a "${h}" column`); });
-  const rates = { bdb: {}, ehi: {} }, zones = [];
+  ["adsize", "zones", "3x"].forEach(h => { if (!(h in col)) throw new Error(`Rate card is missing a "${h}" column`); });
+  const card = {};
   rows.forEach((r, n) => {
-    const pub = PUB_ALIASES[norm(r[col.magazine])];
-    const zone = (r[col.zone] || "").trim();
-    if (!pub || !zone) { console.warn(`Rates row ${n + 2} skipped: unknown magazine or zone`, r); return; }
-    const entry = { homes: num(r[col.homes]) || 0 };
-    CONFIG.sizes.forEach(s => { entry[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null; });
-    rates[pub][zone] = entry;
-    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone, areas: "" });
-    const areas = (r[col.areascovered ?? col.areas] || "").trim();
-    if (areas) zones.find(z => z.id === zone).areas = areas;
+    const sv = norm(r[col.adsize]);
+    const size = CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
+    const z = num(r[col.zones]), x3 = num(r[col["3x"]]);
+    if (!size || !z || x3 == null) { console.warn(`Rate card row ${n + 2} skipped`, r); return; }
+    (card[size.id] ??= {})[z] = { "3x": x3, "6x": num(r[col["6x"]]) ?? x3, "12x": num(r[col["12x"]]) ?? num(r[col["6x"]]) ?? x3 };
   });
-  if (!zones.length) throw new Error("Rates sheet has no rows");
-  CONFIG.rates = rates; CONFIG.zones = zones;
+  if (!Object.keys(card).length) throw new Error("Rate card has no rows");
+  CONFIG.card = card;
 }
 
-const FALLBACK_SOLD_CSV = `Magazine,Ad size,Zone,Month,Advertiser
-BDB,Back Cover,Z1,Jan 2027,Example Roofing
+// Zones: Zone, Zone name, Areas covered, Homes, BDB (Yes/No), EHI (Yes/No)
+function loadZones(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  if (!("zone" in col)) throw new Error('Zones file is missing a "Zone" column');
+  const zones = rows.map(r => ({
+    id: (r[col.zone] || "").trim(),
+    name: (r[col.zonename] || "").trim() || (r[col.zone] || "").trim(),
+    areas: (r[col.areascovered ?? col.areas] || "").trim(),
+    homes: num(r[col.homes]) || 0,
+    pubs: { bdb: yes(r[col.bdb]), ehi: yes(r[col.ehi]) },
+  })).filter(z => z.id);
+  if (!zones.length) throw new Error("Zones file has no rows");
+  CONFIG.zones = zones;
+}
+
+const FALLBACK_SOLD_CSV = `Magazine,Spot,Zone,Month,Advertiser
 BDB,Back Cover,Z1,Feb 2027,Example Roofing
-BDB,Back Cover,Z3,Mar 2027,Example AC
-BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+BDB,Back Cover,Z1,Mar 2027,Example Roofing
+BDB,Front Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Feb 2027,Example Pavers
 EHI,Back Cover,Z1,Apr 2027,Example Windows`;
 
 // "2027-01", "Jan 2027", "January 2027", "Jan-27" (Excel), "1/2027", "1/1/2027", "1/1/27" → "2027-01"
@@ -621,12 +662,13 @@ function monthKey(v) {
 function loadSold(text) {
   const [head, ...rows] = parseCSV(text);
   const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
-  const sizeCol = col.adsize ?? col.size;
+  const sizeCol = col.spot ?? col.adsize ?? col.size;
   const sold = {};
   rows.forEach((r, n) => {
     const pub = PUB_ALIASES[norm(r[col.magazine])];
     const sv = norm(r[sizeCol]);
-    const size = sv === "centerfold" ? { id: "center" } : CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
+    const size = CONFIG.sizes.find(s => s.premium && (norm(s.name) === sv || s.id === sv))
+      || CONFIG.placements.find(x => x.limit && (norm(x.name) === sv || x.id === sv));
     const zone = (r[col.zone] || "").trim();
     const month = monthKey(r[col.month]);
     if (!pub || !size || !zone || !month) { console.warn(`Sold covers row ${n + 2} skipped`, r); return; }
@@ -643,48 +685,55 @@ async function fetchText(url) {
 }
 
 async function fetchRates() {
-  const ratesSrc = CONFIG.ratesUrl, soldSrc = CONFIG.soldUrl;
-  const [rates, sold] = await Promise.allSettled([fetchText(ratesSrc), fetchText(soldSrc)]);
-  try {
-    if (rates.status !== "fulfilled") throw rates.reason;
-    loadRates(rates.value);
-  } catch (e) {
-    console.warn("Couldn't load rates from " + ratesSrc + ", using built-in demo rates.", e);
-    loadRates(FALLBACK_RATES_CSV);
-  }
-  try {
-    if (sold.status !== "fulfilled") throw sold.reason;
-    loadSold(sold.value);
-  } catch (e) {
-    console.warn("Couldn't load sold covers from " + soldSrc + ", using built-in demo list.", e);
-    loadSold(FALLBACK_SOLD_CSV);
-  }
+  const jobs = [
+    [CONFIG.ratesUrl, loadRates, FALLBACK_RATES_CSV, "rate card"],
+    [CONFIG.zonesUrl, loadZones, FALLBACK_ZONES_CSV, "zones"],
+    [CONFIG.soldUrl,  loadSold,  FALLBACK_SOLD_CSV,  "sold spots"],
+  ];
+  const got = await Promise.allSettled(jobs.map(j => fetchText(j[0])));
+  jobs.forEach(([url, load, fallback, what], i) => {
+    try {
+      if (got[i].status !== "fulfilled") throw got[i].reason;
+      load(got[i].value);
+    } catch (e) {
+      console.warn(`Couldn't load ${what} from ${url}, using the built-in copy.`, e);
+      load(fallback);
+    }
+  });
 }
 
-// Per-issue price for a zone in the chosen magazine(s); null if not offered there.
-const rate = (zoneId, sizeId, pubId = state.pub) => {
-  const pubs = CONFIG.publications.find(p => p.id === pubId).includes;
-  const parts = pubs.map(p => CONFIG.rates[p][zoneId] && CONFIG.rates[p][zoneId][sizeId]);
-  return parts.some(v => v == null) ? null : parts.reduce((a, v) => a + v, 0);
-};
-const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)).filter(v => v != null));
+// Which rate column applies for a given number of issues.
+const freqFor = (issues) => CONFIG.frequencies.filter(f => issues >= f.min).pop() || CONFIG.frequencies[0];
+
+// Rate-card price per issue, in ONE magazine, for a size in `n` zones at a frequency.
+// Up to 3 zones comes straight from the card; more is built from blocks of 3, minus 15%.
+function cardPrice(sizeId, n, freqId) {
+  const t = CONFIG.card[sizeId]; if (!t || n < 1) return null;
+  const at = (k) => (t[k] ? t[k][freqId] : null);
+  if (n <= CONFIG.zoneBlock) return at(n);
+  let sum = 0, left = n;
+  while (left > 0) { const k = Math.min(left, CONFIG.zoneBlock); const v = at(k); if (v == null) return null; sum += v; left -= k; }
+  return Math.round(sum * (1 - CONFIG.extraZonesDiscount));
+}
+const pubCount = (pubId) => CONFIG.publications.find(p => p.id === pubId).includes.length;
+const sizeFrom = (sizeId) => cardPrice(sizeId, 1, CONFIG.frequencies[CONFIG.frequencies.length - 1].id);
+const zoneOf = (zoneId) => CONFIG.zones.find(z => z.id === zoneId);
 // Households per issue for a zone across the chosen magazine(s).
-const zoneHomes = (zoneId, pubId = state.pub) => CONFIG.publications.find(p => p.id === pubId).includes
-  .reduce((a, p) => a + ((CONFIG.rates[p][zoneId] || {}).homes || 0), 0);
+const zoneHomes = (zoneId, pubId = state.pub) => (zoneOf(zoneId)?.homes || 0) * pubCount(pubId);
+const zoneMails = (zoneId, pubId) => { const z = zoneOf(zoneId); return !!z && CONFIG.publications.find(p => p.id === pubId).includes.every(p => z.pubs[p]); };
 const pubShort = { bdb: "Best Deals Book", ehi: "Exclusively Home Improvements" };
-// Why a zone can't be booked with the current magazine + size ("" if it can).
+// Why a zone can't be booked with the current magazine ("" if it can).
 function zoneBlock(zoneId) {
-  const missing = CONFIG.publications.find(p => p.id === state.pub).includes.filter(p => !CONFIG.rates[p][zoneId]);
-  if (missing.length) return `${pubShort[missing[0]]} doesn't mail here`;
-  if (rate(zoneId, state.size) == null) return `${CONFIG.sizes.find(s => s.id === state.size).name} isn't offered here`;
-  return "";
+  const z = zoneOf(zoneId);
+  const missing = CONFIG.publications.find(p => p.id === state.pub).includes.filter(p => !z.pubs[p]);
+  return missing.length ? `${pubShort[missing[0]]} doesn't mail here` : "";
 }
 
 // Drop zones that can't be booked after a magazine or size change.
 function pruneZones() {
   const dropped = [...state.zones].filter(z => !CONFIG.zones.some(x => x.id === z) || zoneBlock(z));
   dropped.forEach(z => state.zones.delete(z));
-  state.zoneNotice = dropped.length ? `Removed ${dropped.join(", ")}: not available with this magazine and ad size.` : "";
+  state.zoneNotice = dropped.length ? `Removed ${dropped.join(", ")}: not mailed by this magazine.` : "";
 }
 
 const placeOk = (pl, sizeId) => !pl.sizes || pl.sizes.includes(sizeId);
@@ -693,51 +742,46 @@ function prunePlace() {
   if (!placeOk(CONFIG.placements.find(x => x.id === state.place), state.size)) state.place = "std";
 }
 
-// One ad (the one being built, or a saved one).
-function calcLine(sp) {
+// One ad (the one being built, or a saved one), priced at a frequency from the rate card.
+function calcLine(sp, freq = freqFor(sp.months.size)) {
   const pub = CONFIG.publications.find(p => p.id === sp.pub);
   const size = CONFIG.sizes.find(s => s.id === sp.size);
   const issues = sp.months.size;
   const art = CONFIG.artwork.find(a => a.id === sp.art);
   const zones = CONFIG.zones.filter(z => sp.zones.has(z.id));
-  const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id, sp.pub) || 0 }));
-  const baseIssue = zonePrices.reduce((a, z) => a + z.price, 0);
   const place = CONFIG.placements.find(x => x.id === sp.place);
   const tbd = place.premium || sp.req;       // placement charge is set on the invoice
-  const perIssue = baseIssue;
+  const oneMag = cardPrice(size.id, zones.length, freq.id) || 0;   // per issue, one magazine
+  const perIssue = oneMag * pub.includes.length;
   const gross = perIssue * issues;
-  const bundleOff = gross * (pub.discount || 0);
   const homes = zones.reduce((s, z) => s + zoneHomes(z.id, sp.pub), 0);
-  return { sp, pub, size, issues, art, zones, zonePrices, place, tbd, baseIssue, perIssue, gross, bundleOff, homes,
+  return { sp, pub, size, issues, art, zones, place, tbd, freq, oneMag, perIssue, gross, homes,
            complete: zones.length > 0 && issues > 0 };
 }
 
 // The whole order: saved ads plus the one being built (if it has zones and months).
-// Volume discount counts the different months the order runs in, across all ads.
+// The rate column (3x / 6x / 12 issues) is set by how many different months the order runs in.
 function calcOrder() {
-  const draft = calcLine(state);
-  const lines = [...state.items.map(calcLine), ...(draft.complete ? [draft] : [])];
-  const monthSet = new Set(lines.flatMap(l => [...l.sp.months]));
+  const specs = [...state.items, ...(state.zones.size && state.months.size ? [state] : [])];
+  const monthSet = new Set(specs.flatMap(sp => [...sp.months]));
   const issues = monthSet.size;
-  const discount = CONFIG.volume.filter(v => issues >= v.min).reduce((a, v) => Math.max(a, v.discount), 0);
+  const freq = freqFor(issues);
+  const lines = specs.map(sp => calcLine(sp, freq));
   const gross = lines.reduce((a, l) => a + l.gross, 0);
-  const bundleOff = lines.reduce((a, l) => a + l.bundleOff, 0);
-  const termOff = (gross - bundleOff) * discount;
-  return { lines, draft, monthSet, issues, discount, gross, bundleOff, termOff, total: gross - bundleOff - termOff,
-           tbd: lines.some(l => l.tbd) };
+  return { lines, monthSet, issues, freq, gross, total: gross, tbd: lines.some(l => l.tbd) };
 }
 
 /* ===========================================================
    Render
    =========================================================== */
 function render() {
-  const c = calcLine(state), o = calcOrder();
+  const o = calcOrder(), c = calcLine(state, o.freq);
 
   // publications
   const pubEl = $("#pubOpts"); pubEl.innerHTML = "";
   CONFIG.publications.forEach(p => pubEl.append(optButton({
     pressed: state.pub === p.id,
-    html: `<b>${p.name}</b><small>${p.desc}</small>${p.tag ? `<span class="tag">${p.tag}</span>` : ""}`,
+    html: `<b>${p.name}</b><small>${p.desc}</small>`,
     onClick: () => { state.pub = p.id; pruneZones(); pruneMonths(); render(); },
   })));
 
@@ -745,7 +789,7 @@ function render() {
   const sizeEl = $("#sizeOpts"); sizeEl.innerHTML = "";
   CONFIG.sizes.forEach(s => sizeEl.append(optButton({
     pressed: state.size === s.id,
-    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">${isFinite(sizeFrom(s.id)) ? `From ${money(sizeFrom(s.id))} / zone / issue` : "Not available"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
+    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.note || s.trim}</small><div class="price">${sizeFrom(s.id) != null ? `From ${money(sizeFrom(s.id))} / issue` : "Call for pricing"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
     onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
   })));
   $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
@@ -758,7 +802,7 @@ function render() {
       pressed: state.zones.has(z.id),
       html: blocked
         ? `<b>${z.name}</b><small>${blocked}</small>`
-        : `<b>${esc(z.name)}</b>${z.areas ? `<small>${esc(z.areas)}</small>` : ""}<small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : "&nbsp;"}</small><div class="price">${money(rate(z.id, state.size))} / issue</div>`,
+        : `<b>${esc(z.name)}</b>${z.areas ? `<small>${esc(z.areas)}</small>` : ""}<small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : "&nbsp;"}</small>`,
       onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); state.zoneNotice = ""; pruneMonths(); render(); },
     });
     if (blocked) b.disabled = true;
@@ -766,7 +810,13 @@ function render() {
   });
   $("#zoneNote").classList.toggle("hidden", !state.zoneNotice);
   $("#zoneNote").textContent = state.zoneNotice || "";
-  $("#zoneSub").textContent = `Choose the zones you want to reach. Each zone is its own mailing. Prices shown are for a ${c.size.name}${c.pub.mult > 1 ? " in both magazines" : ""}.`;
+  $("#zoneSub").textContent = "Choose the zones you want to reach. The more zones you book, the lower the price per zone.";
+  const nz = state.zones.size, mags = c.pub.includes.length;
+  const ladder = [1, 2, 3].map(k => [k, cardPrice(state.size, k, c.freq.id)]).filter(([, v]) => v != null);
+  $("#zonePrice").innerHTML = (nz
+      ? `<b>${nz} zone${nz > 1 ? "s" : ""}: ${money(c.perIssue)} per issue</b>${mags > 1 ? " in both magazines" : ""}${nz > CONFIG.zoneBlock ? ` (includes ${Math.round(CONFIG.extraZonesDiscount * 100)}% off for more than ${CONFIG.zoneBlock} zones)` : ""}. `
+      : "") +
+    `${c.size.name}, ${c.freq.name}: ` + ladder.map(([k, v]) => `${k} zone${k > 1 ? "s" : ""} ${money(v * mags)}`).join(" · ") + ".";
   $("#allZones").textContent = CONFIG.zones.filter(z => !zoneBlock(z.id)).every(z => state.zones.has(z.id)) ? "Clear all" : "Select all";
 
   // issues
@@ -800,10 +850,12 @@ function render() {
   const slots = slotsOf(state);
   pn.classList.toggle("hidden", !slots.length && !state.notice);
   pn.textContent = state.notice || `${slots.map(slotName).join(" / ")} is one advertiser per zone, per issue. Months already booked in your zones show as taken. We'll confirm every month before you're invoiced.`;
-  const next = CONFIG.volume.find(v => v.min > o.issues);
-  const across = state.items.length ? " across your order" : "";
-  $("#tierNote").innerHTML = (o.discount ? `<b>${Math.round(o.discount * 100)}% off</b> for ${o.issues} issues${across}. ` : "") +
-    (next ? `Add ${next.min - o.issues} more issue${next.min - o.issues > 1 ? "s" : ""} to save ${Math.round(next.discount * 100)}%.` : "You're getting our best rate.");
+  const next = CONFIG.frequencies.find(f => f.min > o.issues);
+  const nextPrice = next && !c.size.flat && c.zones.length ? cardPrice(state.size, c.zones.length, next.id) * c.pub.includes.length : null;
+  $("#tierNote").innerHTML = c.size.flat
+    ? `${c.size.name} is the same price per issue at any frequency.`
+    : `<b>${o.freq.name}</b> for ${o.issues} issue${o.issues === 1 ? "" : "s"}${state.items.length ? " across your order" : ""}. ` +
+      (next ? `Book ${next.min - o.issues} more to get the ${next.name}${nextPrice ? ` (${money(nextPrice)} per issue)` : ""}.` : "You're getting our best rate.");
 
   // placement
   const plEl = $("#placeOpts"); plEl.innerHTML = "";
@@ -852,13 +904,11 @@ function render() {
       ${l.sp.req ? `<small>Placement request: charge TBD on invoice</small>` : ""}
       ${cur && editing ? "" : `<div class="tools"><button type="button" data-edit="${i}">Edit</button><button type="button" class="rm" data-rm="${i}">Remove</button></div>`}
     </div>`;
-  $("#sumLines").innerHTML = state.items.map((it, i) => lineHtml(calcLine(it), i, false)).join("") +
+  $("#sumLines").innerHTML = state.items.map((it, i) => lineHtml(calcLine(it, o.freq), i, false)).join("") +
     (c.complete ? lineHtml(c, n, true)
       : `<div class="line${n ? " cur" : ""}"><div class="line-h"><span>${n ? `Ad ${n + 1} · ` : ""}${c.size.name}</span></div><small>${c.zones.length ? "Pick at least one month to add this ad." : "Pick at least one zone to add this ad."}</small></div>`);
   const rows = [];
-  if (o.lines.length > 1) rows.push(["Ads subtotal", money(o.gross)]);
-  if (o.bundleOff) rows.push(["Both-magazine savings", "−" + money(o.bundleOff)]);
-  if (o.termOff) rows.push([`${o.issues}-issue savings (${Math.round(o.discount * 100)}%)`, "−" + money(o.termOff)]);
+  if (o.lines.length) rows.push(["Rate", `${o.freq.name} (${o.issues} issue${o.issues === 1 ? "" : "s"})`]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("#sumTotal").textContent = money(o.total);
   $("#sumPer").textContent = o.tbd ? "Plus placement charge, TBD on invoice." : "";
@@ -889,7 +939,7 @@ function validSpec(raw) {
   if (!CONFIG.placements.some(x => x.id === raw.place) || !CONFIG.artwork.some(x => x.id === raw.art)) return null;
   return {
     pub: raw.pub, size: raw.size, art: raw.art, place: raw.place, req: !!raw.req, reqText: String(raw.reqText || "").slice(0, 300),
-    zones: new Set((raw.zones || []).filter(z => CONFIG.zones.some(x => x.id === z) && rate(z, raw.size, raw.pub) != null)),
+    zones: new Set((raw.zones || []).filter(z => CONFIG.zones.some(x => x.id === z) && zoneMails(z, raw.pub))),
     months: new Set((raw.months || []).filter(k => monthByKey[k])),
   };
 }
@@ -969,7 +1019,7 @@ function buildOrder(form) {
         size: l.size.name,
         trim: l.size.trim,
         zones: l.zones.map(z => z.id),
-        zonePricesPerIssue: Object.fromEntries(l.zonePrices.map(z => [z.id, z.price])),
+        rate: l.size.flat ? "flat" : l.freq.id,
         months: MONTHS.filter(m => l.sp.months.has(m.key)).map(m => m.key),
         issues: l.issues,
         placement: l.place.name,
@@ -981,9 +1031,7 @@ function buildOrder(form) {
       })),
       pricing: {
         subtotal: Math.round(o.gross),
-        bothMagazineSavings: Math.round(o.bundleOff),
-        volumeSavings: Math.round(o.termOff),
-        volumeDiscountPct: Math.round(o.discount * 100),
+        rateTier: o.freq.id,
         issuesCounted: o.issues,
         placementChargeTBD: o.tbd,
         total: Math.round(o.total),
@@ -1003,18 +1051,16 @@ function receiptRows(o, order) {
     r.push(
       ["Magazine", l.pub.name],
       ["Ad size", `${l.size.name} (${l.size.trim})`],
-      ["Zones", l.zonePrices.map(z => `${z.id} ${money(z.price)}`).join(", ")],
+      ["Zones", `${l.zones.map(z => z.id).join(", ")} (${l.zones.length} zone${l.zones.length > 1 ? "s" : ""})`],
       ["Issues", `${l.issues}: ${monthList(l.sp.months)}`],
       ["Placement", l.place.name + (l.place.premium ? " (upgrade charge TBD on invoice)" : "")],
       ...(ad.placementRequest ? [["Placement request", `${ad.placementRequest} (charge TBD on invoice)`]] : []),
       ["Artwork", l.art.name],
-      ["Per issue", money(l.perIssue)],
+      ["Per issue", `${money(l.perIssue)}${l.size.flat ? "" : ` (${l.freq.name})`}`],
       ...(many ? [["Ad subtotal", money(l.gross)]] : []),
     );
   });
   if (many) r.push(["§", "Order"], ["Ads subtotal", money(o.gross)]);
-  if (o.bundleOff) r.push(["Both-magazine savings", "−" + money(o.bundleOff)]);
-  if (o.termOff) r.push([`${o.issues}-issue savings`, "−" + money(o.termOff)]);
   return r;
 }
 

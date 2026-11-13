@@ -6,26 +6,35 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
-## Staff portal: updating rates and sold covers
-Staff update everything at **`/staff/`** (for example `https://hamstari.github.io/adcheckout/staff/`). It isn't linked from the checkout and is hidden from search engines.
+## Pricing (2026 rate card)
+Prices come from the rate card in `rates.csv`: **per issue, per magazine**, by ad size, number of zones (1, 2 or 3) and frequency (3x, 6x, 12 issues).
 
-- **Rates:** a grid per magazine. Edit prices and homes, rename zones (the name is what customers see), untick **Mails here** if a magazine doesn't mail a zone, leave a price empty if a size isn't sold there, and add or remove zones.
-- **Sold covers:** add a booking (month, magazine, cover, zone, advertiser). It shows as **Taken** on the checkout. Delete it if cancelled. Double bookings are blocked.
-- **Save & publish** writes `rates.csv` and `sold.csv` in this repo. GitHub Pages then updates the live checkout within a couple of minutes. If two people save at once, the second gets a message to reload, instead of overwriting the first person's changes.
+- **Frequency:** the rate column is set by how many different months the whole order runs in: 1–5 → 3x rate, 6–11 → 6x rate, 12+ → 12-issue rate. One or two issues are allowed at the 3x rate.
+- **More than 3 zones:** the 3-zone price plus the price of the remaining zones, minus 15% (7 zones = 3 + 3 + 1, minus 15%). Set in `CONFIG.zoneBlock` / `CONFIG.extraZonesDiscount`.
+- **Front Cover, Back Cover, 2-Page Full Spread:** one price per issue at any frequency, by number of zones (the card's 100K / 200K / 300K columns). The same more-than-3-zones rule is applied to them.
+- **Both magazines:** each magazine is priced from the card and the two are added. There is no bundle discount.
+- **Premium positions** (right-hand read, first ten pages, page 3, inside covers, centerfold): no amount is added; the checkout says "Upgrade charge TBD on invoice".
+- Not used from the card: the half-zone / Charlotte County table and the 50K premium column.
 
-**Connecting the portal (one time, administrator):** until it's connected, the portal runs in demo mode, where you can edit but not save. To connect it:
-1. On GitHub, go to Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token.
-2. Under Repository access, choose **Only select repositories → adcheckout**. Under Permissions, set **Contents: Read and write**.
-3. In the portal, click **Connect to save** and paste the key. Tick "Remember on this computer" so staff only do this once per computer.
+## Staff portal: updating the rate card, zones and sold spots
+Staff update everything at **`/staff/`** (for example `https://hamstari.github.io/adcheckout/staff/`). It isn't linked from the checkout and is hidden from search engines, but the page and the three CSV files are public.
 
-The key can change files in this repo, so only give it to trusted staff. Set an expiry and replace it when someone leaves. The portal saves to `main` (set in `SETTINGS` at the top of `staff/index.html`), which is the branch GitHub Pages publishes.
+- **Rate card:** the grid from the rate sheet. Edit any price.
+- **Zones:** code, name, areas covered, homes, and which magazines mail there. Add or remove zones.
+- **Sold spots:** one row per booked cover or one-per-zone position (front/back cover, inside covers, page 3, centerfold) with month, magazine and zone. It shows as **Taken** on the checkout. Double bookings are blocked.
+- **Save & publish** writes `rates.csv`, `zones.csv` and `sold.csv` to `main`; the site redeploys in a couple of minutes. If two people save at once, the second is told to reload.
 
-Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
+**Connecting the portal (one time, administrator):** until it's connected, the portal runs in demo mode (edit but not save).
+1. On GitHub: Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token.
+2. Repository access: **Only select repositories → adcheckout**. Permissions: **Contents: Read and write**.
+3. In the portal, click **Connect to save** and paste the key.
+
+The key can change any file in this repo, so give it only to trusted staff, set an expiry, and replace it when someone leaves.
 
 ## Several ads in one order
 An order can hold more than one ad. After building an ad, **+ Add another ad** saves it to the order summary and starts the next one, with its own size, zones, months, placement and artwork. That's how a customer books different sizes in different months (for example a Full Page in Dec–Feb and a Half Page in Mar–May). Saved ads can be edited or removed from the summary.
 
-- The volume discount counts the different months the whole order runs in, across all ads.
+- The frequency rate (3x / 6x / 12 issues) is set by the different months the whole order runs in, across all ads.
 - A cover already in the order can't be booked twice for the same zone and month.
 - The order data sent on submit has an `ads` array (one entry per ad) and order-level `pricing`.
 
@@ -44,7 +53,7 @@ Step 5 of the checkout offers Standard placement (included), **Right-hand read**
 When either is chosen, the summary, confirmation and order show the total "plus placement charge TBD", and the order data has `placementChargeTBD: true`. Premium positions aren't tracked as sold the way covers are, so staff confirm them for each issue.
 
 ## Issues and premium covers
-Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
+Customers can pick any months over the next 12, not only consecutive ones. The number of months booked sets the frequency rate (see Pricing).
 
 Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed under **Sold covers** in the staff portal show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
 
@@ -59,7 +68,7 @@ When a customer presses **Request ad space**:
 The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices, zones, homes:** replace the placeholder numbers in the staff portal.
+- **Prices:** the 2026 rate card is loaded. **Zone names, areas, homes and which zones each magazine mails** are still placeholders; set them in the staff portal.
 - **Sold covers:** delete the example bookings in the staff portal and add real ones.
 - **Staff portal:** create the access key (see above).
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
@@ -83,12 +92,12 @@ The checkout scrolls inside the box. On desktop the summary and total stay pinne
 **On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code). The box is 900px tall on desktop and 560px on phones, and the checkout scrolls inside it.
 
 ## Publishing on your site
-The checkout is three plain files with no build step: `index.html`, `rates.csv` and `sold.csv`.
+The checkout is four plain files with no build step: `index.html`, `rates.csv`, `zones.csv` and `sold.csv`.
 
-**Option 1: put it in a folder on your site.** If your host lets you upload files (cPanel, FTP, WordPress file manager), create a folder such as `best-deals-ads` and upload `index.html`, `rates.csv` and `sold.csv`. The checkout is then at `bestdealsnetworks.com/best-deals-ads/`. You can publish it the same way the Best Deals Direct page is published.
+**Option 1: put it in a folder on your site.** If your host lets you upload files (cPanel, FTP, WordPress file manager), create a folder such as `best-deals-ads` and upload `index.html`, `rates.csv`, `zones.csv` and `sold.csv`. The checkout is then at `bestdealsnetworks.com/best-deals-ads/`. You can publish it the same way the Best Deals Direct page is published.
 
 **Option 2: host it free, then embed it.** For site builders (Squarespace, Wix, WordPress.com, etc.):
-1. Go to https://app.netlify.com/drop and drag in a folder containing `index.html`, `rates.csv` and `sold.csv`. You get a link like `https://something.netlify.app`. (Optional: in Netlify, rename the site or connect `ads.bestdealsnetworks.com`.)
+1. Go to https://app.netlify.com/drop and drag in a folder containing `index.html`, `rates.csv`, `zones.csv` and `sold.csv`. You get a link like `https://something.netlify.app`. (Optional: in Netlify, rename the site or connect `ads.bestdealsnetworks.com`.)
 2. On your site, add a page and a Code / Embed / Custom HTML block. Paste the contents of `embed.html` into it and replace `https://YOUR-HOSTED-URL/index.html` with your Netlify link. The frame resizes itself to fit each step, so there's no inner scrollbar.
 
 **Going live:** in `index.html`, set `demo: false` (this starts sending orders) and set `orderEndpoint`. Rate changes are made in the staff portal and don't touch `index.html`.
