@@ -422,18 +422,18 @@ function optButton({ pressed, html, onClick, label }) {
    Rates spreadsheet
    =========================================================== */
 // Only used when rates.csv can't be fetched (e.g. the page is opened straight from disk).
-const FALLBACK_RATES_CSV = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page,Notes
-BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315,PLACEHOLDER - replace with real rate
-BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285,PLACEHOLDER - replace with real rate
-BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360,PLACEHOLDER - replace with real rate
-BDB,Z4,Zone 4,20000,1195,955,875,715,420,250,PLACEHOLDER - replace with real rate
-BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315,PLACEHOLDER - replace with real rate
-BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345,PLACEHOLDER - replace with real rate
-BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270,PLACEHOLDER - replace with real rate
-EHI,Z1,Zone 1,18000,1195,955,875,715,420,250,PLACEHOLDER - replace with real rate
-EHI,Z2,Zone 2,18000,1120,895,820,670,395,235,PLACEHOLDER - replace with real rate
-EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285,PLACEHOLDER - replace with real rate
-EHI,Z5,Zone 5,18000,1045,835,765,625,370,220,PLACEHOLDER - replace with real rate`;
+const FALLBACK_RATES_CSV = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page
+BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315
+BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285
+BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360
+BDB,Z4,Zone 4,20000,1195,955,875,715,420,250
+BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315
+BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345
+BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270
+EHI,Z1,Zone 1,18000,1195,955,875,715,420,250
+EHI,Z2,Zone 2,18000,1120,895,820,670,395,235
+EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285
+EHI,Z5,Zone 5,18000,1045,835,765,625,370,220`;
 
 function parseCSV(text) {
   const rows = []; let row = [], cell = "", q = false;
@@ -477,12 +477,12 @@ function loadRates(text) {
   CONFIG.rates = rates; CONFIG.zones = zones;
 }
 
-const FALLBACK_SOLD_CSV = `Magazine,Ad size,Zone,Month,Advertiser,Notes
-BDB,Back Cover,Z1,Jan 2027,Example Roofing,"PLACEHOLDER - example booking, delete"
-BDB,Back Cover,Z1,Feb 2027,Example Roofing,"PLACEHOLDER - example booking, delete"
-BDB,Back Cover,Z3,Mar 2027,Example AC,"PLACEHOLDER - example booking, delete"
-BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers,"PLACEHOLDER - example booking, delete"
-EHI,Back Cover,Z1,Apr 2027,Example Windows,"PLACEHOLDER - example booking, delete"`;
+const FALLBACK_SOLD_CSV = `Magazine,Ad size,Zone,Month,Advertiser
+BDB,Back Cover,Z1,Jan 2027,Example Roofing
+BDB,Back Cover,Z1,Feb 2027,Example Roofing
+BDB,Back Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+EHI,Back Cover,Z1,Apr 2027,Example Windows`;
 
 // "2027-01", "Jan 2027", "January 2027", "Jan-27" (Excel), "1/2027", "1/1/2027", "1/1/27" → "2027-01"
 function monthKey(v) {

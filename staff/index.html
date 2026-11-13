@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ad Rates Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #161616; --ink: #1f1f1f; --teal: #59abad; --teal-d: #2e7f81; --tint: #eaf5f5;
+    --bg: #f7f7f7; --card: #fff; --line: #e2e2e2; --muted: #5f5f5f; --red: #b3261e; --gold: #e9b14c;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 14.5px/1.55 "Montserrat", system-ui, sans-serif; }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  h1, h2, h3 { margin: 0; font-weight: 600; }
+
+  header { background: var(--black); color: #fff; padding: 18px var(--gutter); position: relative; }
+  header::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg, #87cbe4 0 20%, #2f5a82 20% 40%, #347142 40% 60%, #e9b14c 60% 80%, #c83536 80% 100%); }
+  .hrow { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .eyebrow { color: var(--teal); letter-spacing: .22em; font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  header h1 { font-size: 22px; }
+  .hrow .spacer { flex: 1; }
+  .conn { font-size: 12.5px; color: #cfcfcf; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); display: inline-block; }
+  .dot.ok { background: #4cc38a; }
+  header a { color: #fff; font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; border: 1px solid #555; padding: 7px 12px; border-radius: 2px; }
+  header a:hover { border-color: #fff; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 24px var(--gutter) 120px; }
+  .banner { background: #fff7e6; border: 1px solid #f1d39a; border-radius: 6px; padding: 12px 16px; margin-bottom: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .banner b { font-weight: 700; }
+  .banner .spacer { flex: 1; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: clamp(16px, 2.5vw, 24px); margin-bottom: 18px; }
+  .phead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .phead h2 { font-size: 19px; }
+  .phead .spacer { flex: 1; }
+  .sub { color: var(--muted); margin: 2px 0 14px; font-size: 13.5px; }
+
+  .tabs { display: flex; gap: 6px; margin: 6px 0 14px; flex-wrap: wrap; }
+  .tab { border: 1.5px solid var(--line); background: #fff; padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--ink); }
+  .tab[aria-selected="true"] { background: var(--teal); border-color: var(--teal); color: var(--black); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  /* keep zone code + name visible when the grid scrolls sideways */
+  #ratesTable th:nth-child(1), #ratesTable td:nth-child(1) { position: sticky; left: 0; z-index: 2; background: #fff; width: 72px; min-width: 72px; }
+  #ratesTable th:nth-child(2), #ratesTable td:nth-child(2) { position: sticky; left: 72px; z-index: 2; background: #fff; box-shadow: 1px 0 0 var(--line); }
+  #ratesTable th:nth-child(1), #ratesTable th:nth-child(2) { background: #fafafa; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+  th { background: #fafafa; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  tr.off td:not(.keep) { opacity: .45; }
+  td input[type="text"], td input[type="number"], td input[type="month"], td select {
+    width: 100%; padding: 7px 8px; border: 1.5px solid var(--line); border-radius: 4px; background: #fff; color: var(--ink); min-width: 70px; }
+  td input.money, td input.num { text-align: right; }
+  td input:focus, td select:focus { outline: 2px solid var(--teal); outline-offset: 0; border-color: var(--teal); }
+  td input.bad { border-color: var(--red); background: #fdf0ef; }
+  td input.changed, td select.changed { background: #fffbea; }
+  .moneycell { position: relative; }
+  .moneycell::before { content: "$"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+  .moneycell input { padding-left: 18px; }
+  .switch { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; white-space: nowrap; cursor: pointer; }
+  .switch input { width: 16px; height: 16px; accent-color: var(--teal-d); }
+  .x { background: none; border: 0; color: var(--muted); font-size: 18px; line-height: 1; padding: 4px 8px; border-radius: 4px; }
+  .x:hover { color: var(--red); background: #fdf0ef; }
+
+  .btn { border: 2px solid var(--black); background: var(--black); color: #fff; font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 10px 16px; border-radius: 2px; }
+  .btn:hover:not(:disabled) { background: #333; border-color: #333; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: #fff; color: var(--black); }
+  .btn.ghost:hover:not(:disabled) { background: var(--black); color: #fff; }
+  .btn.small { padding: 7px 12px; font-size: 11px; }
+  .btn.teal { background: var(--teal); border-color: var(--teal); color: var(--black); }
+
+  .savebar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(0,0,0,.07); z-index: 20; }
+  @media (max-width: 640px) {
+    .savebar .in { gap: 8px; padding-top: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+    .status { flex-basis: 100%; font-size: 12.5px; min-width: 0; }
+    .savebar .btn { flex: 1; padding: 10px 8px; letter-spacing: .08em; font-size: 11px; }
+    main { padding-bottom: 150px; }
+  }
+  .savebar .in { max-width: 1180px; margin: 0 auto; padding: 12px var(--gutter); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .status { font-size: 13.5px; color: var(--muted); flex: 1; min-width: 200px; }
+  .status.err { color: var(--red); font-weight: 600; }
+  .status.ok { color: #1e7b4f; font-weight: 600; }
+
+  dialog { border: 0; border-radius: 8px; padding: 0; width: min(560px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  .dlg { padding: 24px; }
+  .dlg h3 { font-size: 18px; margin-bottom: 8px; }
+  .dlg p, .dlg li { color: var(--muted); font-size: 13.5px; }
+  .dlg ol { padding-left: 18px; }
+  .dlg label { display: block; font-weight: 600; font-size: 13px; margin-top: 12px; }
+  .dlg input[type="password"], .dlg input[type="text"] { width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 4px; margin-top: 6px; }
+  .dlg .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .dlg .check { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+  details { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  details summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .empty { padding: 18px; color: var(--muted); text-align: center; }
+  .hidden { display: none !important; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: #eee; color: var(--muted); }
+  .pill.past { background: #f1f1f1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div>
+      <div class="eyebrow">Best Deals Networks · Staff</div>
+      <h1>Ad Rates Portal</h1>
+    </div>
+    <div class="spacer"></div>
+    <div class="conn"><span class="dot" id="connDot"></span><span id="connText">Demo mode</span></div>
+    <a href="../" target="_blank" rel="noopener">View checkout ↗</a>
+  </div>
+</header>
+
+<main>
+  <div class="banner" id="demoBanner">
+    <div><b>Demo mode.</b> You can try every edit here, but nothing is saved until the portal is connected.</div>
+    <div class="spacer"></div>
+    <button class="btn small teal" id="connectBtn" type="button">Connect to save</button>
+  </div>
+
+  <!-- RATES -->
+  <section class="panel">
+    <div class="phead">
+      <h2>Rates</h2>
+      <div class="spacer"></div>
+      <button class="btn small ghost" id="addZone" type="button">+ Add zone</button>
+    </div>
+    <p class="sub">Price per issue for each zone and ad size. The zone name is what customers see. Untick <b>Mails here</b> if the magazine doesn't mail that zone. Leave a price empty if that size isn't sold there.</p>
+    <div class="tabs" role="tablist" id="pubTabs"></div>
+    <div class="tablewrap"><table id="ratesTable"></table></div>
+  </section>
+
+  <!-- SOLD COVERS -->
+  <section class="panel">
+    <div class="phead">
+      <h2>Sold covers</h2>
+      <div class="spacer"></div>
+      <label class="switch"><input type="checkbox" id="showPast"> Show past months</label>
+      <button class="btn small ghost" id="addSold" type="button">+ Add booking</button>
+    </div>
+    <p class="sub">Back and inside covers are one advertiser per zone per month. A booking here shows as <b>Taken</b> on the checkout. Delete a row if the booking is cancelled.</p>
+    <div class="tablewrap"><table id="soldTable"></table></div>
+  </section>
+</main>
+
+<div class="savebar">
+  <div class="in">
+    <div class="status" id="status">Loading…</div>
+    <button class="btn ghost" id="discardBtn" type="button" disabled>Discard changes</button>
+    <button class="btn" id="saveBtn" type="button" disabled>Save &amp; publish</button>
+  </div>
+</div>
+
+<dialog id="connectDlg">
+  <form class="dlg" method="dialog" id="connectForm">
+    <h3>Connect the portal</h3>
+    <p>Saving publishes your changes to the live checkout. Paste the access key your administrator gave you. You only need to do this once on each computer.</p>
+    <label>Access key
+      <input type="password" id="tokenInput" autocomplete="off" placeholder="github_pat_…" required>
+    </label>
+    <label class="check"><input type="checkbox" id="rememberInput" checked> Remember on this computer</label>
+    <details>
+      <summary>Administrator: how to create an access key</summary>
+      <ol>
+        <li>Sign in to GitHub as the owner of the <code id="repoName"></code> repository.</li>
+        <li>Go to <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>.</li>
+        <li>Name it "Ad rates portal", pick an expiration, and under <b>Repository access</b> choose <b>Only select repositories</b> → this repository.</li>
+        <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+        <li>Generate it and give the key to staff who should be able to update rates.</li>
+      </ol>
+      <div class="grid3">
+        <label>Owner<input type="text" id="ownerInput"></label>
+        <label>Repository<input type="text" id="repoInput"></label>
+        <label>Branch<input type="text" id="branchInput"></label>
+      </div>
+    </details>
+    <div class="status err" id="connectErr" style="margin-top:12px"></div>
+    <div class="row">
+      <button class="btn ghost" value="cancel" type="button" id="cancelConnect">Cancel</button>
+      <button class="btn" id="doConnect" type="submit">Connect</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ===========================================================
+   SETTINGS: where the checkout's files live on GitHub.
+   Branch must be the one GitHub Pages publishes.
+   =========================================================== */
+const SETTINGS = {
+  owner: "hamstari",
+  repo: "adcheckout",
+  branch: "claude/best-deals-networks-ennhbf",
+  ratesPath: "rates.csv",
+  soldPath: "sold.csv",
+};
+
+const SIZES = [
+  { id: "bc",  name: "Back Cover",         premium: true },
+  { id: "ifc", name: "Inside Front Cover", premium: true },
+  { id: "ibc", name: "Inside Back Cover",  premium: true },
+  { id: "fp",  name: "Full Page" },
+  { id: "hp",  name: "Half Page" },
+  { id: "qp",  name: "Quarter Page" },
+];
+const PUBS = [
+  { id: "bdb", code: "BDB", name: "Best Deals Book" },
+  { id: "ehi", code: "EHI", name: "Exclusively Home Improvements" },
+];
+const PUB_ALIASES = { bdb: "bdb", bestdealsbook: "bdb", ehi: "ehi", exclusivelyhomeimprovements: "ehi" };
+
+/* ---------- small helpers ---------- */
+const $ = (s) => document.querySelector(s);
+const norm = (v) => String(v || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+const num = (v) => { const n = parseFloat(String(v ?? "").replace(/[$,\s]/g, "")); return isFinite(n) ? n : null; };
+const esc = (v) => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim()));
+}
+const csvCell = (v) => { v = String(v ?? ""); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+const toCSV = (rows) => rows.map(r => r.map(csvCell).join(",")).join("\n") + "\n";
+
+function monthKey(v) {
+  v = String(v || "").trim(); let m;
+  const MON = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  if ((m = v.match(/^([A-Za-z]{3,})[-\s.']+(\d{2})$/)) && MON.includes(m[1].slice(0, 3).toLowerCase()))
+    return `20${m[2]}-${String(MON.indexOf(m[1].slice(0, 3).toLowerCase()) + 1).padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{2})$/))) return `20${m[2]}-${m[1].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{4})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  const d = new Date("1 " + v);
+  return isNaN(d) ? null : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+const monthLabel = (k) => { const [y, m] = k.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleString("en-US", { month: "short", year: "numeric" }); };
+const thisMonth = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; })();
+
+/* ---------- data model ----------
+   zones: [{ id, name }]
+   rates: { bdb: { Z1: { homes, bc, ifc, ... } }, ehi: {...} }   (missing zone = doesn't mail there)
+   sold:  [{ pub, size, zone, month, advertiser }]
+*/
+let data = null, saved = null, activePub = "bdb";
+
+function parseRates(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  const zones = [], rates = { bdb: {}, ehi: {} };
+  rows.forEach(r => {
+    const pub = PUB_ALIASES[norm(r[col.magazine])], zone = (r[col.zone] || "").trim();
+    if (!pub || !zone) return;
+    const e = { homes: num(r[col.homes]) };
+    SIZES.forEach(s => e[s.id] = norm(s.name) in col ? num(r[col[norm(s.name)]]) : null);
+    rates[pub][zone] = e;
+    if (!zones.some(z => z.id === zone)) zones.push({ id: zone, name: (r[col.zonename] || "").trim() || zone });
+  });
+  return { zones, rates };
+}
+function parseSold(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  const sizeCol = col.adsize ?? col.size;
+  return rows.map(r => {
+    const sv = norm(r[sizeCol]);
+    return {
+      pub: PUB_ALIASES[norm(r[col.magazine])] || "bdb",
+      size: (SIZES.find(s => norm(s.name) === sv || s.id === sv) || SIZES[0]).id,
+      zone: (r[col.zone] || "").trim(),
+      month: monthKey(r[col.month]) || "",
+      advertiser: col.advertiser != null ? (r[col.advertiser] || "").trim() : "",
+    };
+  });
+}
+function ratesCSV(d) {
+  const rows = [["Magazine", "Zone", "Zone name", "Homes", ...SIZES.map(s => s.name)]];
+  PUBS.forEach(p => d.zones.forEach(z => {
+    const e = d.rates[p.id][z.id]; if (!e) return;
+    rows.push([p.code, z.id, z.name, e.homes ?? "", ...SIZES.map(s => e[s.id] ?? "")]);
+  }));
+  return toCSV(rows);
+}
+function soldCSV(d) {
+  const rows = [["Magazine", "Ad size", "Zone", "Month", "Advertiser"]];
+  [...d.sold].sort((a, b) => (a.month || "").localeCompare(b.month || "") || a.zone.localeCompare(b.zone))
+    .forEach(b => rows.push([PUBS.find(p => p.id === b.pub).code, SIZES.find(s => s.id === b.size).name, b.zone, b.month ? monthLabel(b.month) : "", b.advertiser]));
+  return toCSV(rows);
+}
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const dirty = () => saved && (ratesCSV(data) !== ratesCSV(saved) || soldCSV(data) !== soldCSV(saved));
+
+/* ---------- GitHub storage ---------- */
+const cfg = () => ({
+  owner: store.get("bda.owner") || SETTINGS.owner,
+  repo: store.get("bda.repo") || SETTINGS.repo,
+  branch: store.get("bda.branch") || SETTINGS.branch,
+});
+let token = store.get("bda.token") || (() => { try { return sessionStorage.getItem("bda.token"); } catch { return null; } })() || "";
+const shas = {};
+
+const b64encode = (str) => { const bytes = new TextEncoder().encode(str); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b)); return btoa(bin); };
+const b64decode = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), c => c.charCodeAt(0)));
+
+async function gh(path, opts = {}) {
+  const { owner, repo } = cfg();
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}${path}`, {
+    ...opts,
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "X-GitHub-Api-Version": "2022-11-28", ...(opts.headers || {}) },
+  });
+  if (!res.ok) {
+    const err = new Error(res.status === 401 ? "The access key isn't valid (or has expired)."
+      : res.status === 403 ? "The access key doesn't have permission to change this repository."
+      : res.status === 404 ? "Couldn't find the repository, branch or file. Check the settings."
+      : res.status === 409 || res.status === 422 ? "Someone else saved changes in the meantime. Reload the page to get the latest, then redo your edits."
+      : `GitHub error ${res.status}`);
+    err.status = res.status; throw err;
+  }
+  return res.json();
+}
+async function ghRead(path) {
+  const j = await gh(`/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(cfg().branch)}`);
+  shas[path] = j.sha;
+  return b64decode(j.content);
+}
+async function ghWrite(path, text, message) {
+  const j = await gh(`/contents/${encodeURIComponent(path)}`, {
+    method: "PUT",
+    body: JSON.stringify({ message, content: b64encode(text), sha: shas[path], branch: cfg().branch }),
+  });
+  shas[path] = j.content.sha;
+}
+
+/* ---------- load ---------- */
+async function load() {
+  setStatus("Loading…");
+  let ratesText, soldText;
+  if (token) {
+    try {
+      [ratesText, soldText] = await Promise.all([ghRead(SETTINGS.ratesPath), ghRead(SETTINGS.soldPath)]);
+      setConnected(true);
+    } catch (e) {
+      setConnected(false);
+      setStatus("Couldn't connect: " + e.message + " Showing the published files in demo mode.", "err");
+    }
+  }
+  if (ratesText == null) {
+    const get = async (p) => { const r = await fetch("../" + p, { cache: "no-store" }); if (!r.ok) throw new Error(r.status); return r.text(); };
+    try { [ratesText, soldText] = await Promise.all([get(SETTINGS.ratesPath), get(SETTINGS.soldPath)]); }
+    catch { ratesText = FALLBACK_RATES; soldText = FALLBACK_SOLD; }
+  }
+  data = { ...parseRates(ratesText), sold: parseSold(soldText) };
+  saved = clone(data);
+  render();
+  if (!$("#status").classList.contains("err")) setStatus(token && connected ? "Up to date." : "Demo mode: edits aren't saved.");
+}
+
+/* ---------- render ---------- */
+function render() {
+  // tabs
+  $("#pubTabs").innerHTML = PUBS.map(p => `<button class="tab" role="tab" aria-selected="${p.id === activePub}" data-pub="${p.id}" type="button">${p.name}</button>`).join("");
+
+  // rates table
+  const R = data.rates[activePub], S = saved.rates[activePub];
+  const ch = (z, f) => { const a = (R[z] || {})[f], b = (S[z] || {})[f]; return (!!R[z] !== !!S[z]) || a !== b ? " changed" : ""; };
+  $("#ratesTable").innerHTML = `
+    <thead><tr><th>Zone</th><th>Zone name</th><th>Mails here</th><th>Homes</th>${SIZES.map(s => `<th title="${s.name}">${(s.name.startsWith("Inside ") ? s.name.replace("Inside ", "Inside<br>").replace(" Cover", "") : s.name)}</th>`).join("")}<th></th></tr></thead>
+    <tbody>${data.zones.map((z, i) => {
+      const e = R[z.id];
+      const zch = (saved.zones.find(x => x.id === z.id) || {}).name !== z.name ? " changed" : "";
+      return `<tr class="${e ? "" : "off"}" data-i="${i}">
+        <td class="keep"><input type="text" data-f="id" value="${esc(z.id)}" aria-label="Zone code"></td>
+        <td class="keep" style="min-width:140px"><input type="text" class="${zch}" data-f="name" value="${esc(z.name)}" aria-label="Zone name"></td>
+        <td class="keep"><label class="switch"><input type="checkbox" data-f="mails" ${e ? "checked" : ""}> ${e ? "Yes" : "No"}</label></td>
+        <td style="min-width:86px"><input type="text" inputmode="numeric" class="num${ch(z.id, "homes")}" data-f="homes" value="${e?.homes ?? ""}" ${e ? "" : "disabled"} aria-label="Homes"></td>
+        ${SIZES.map(s => `<td class="moneycell" style="min-width:88px"><input type="text" inputmode="decimal" class="money${ch(z.id, s.id)}" data-f="${s.id}" value="${e?.[s.id] ?? ""}" ${e ? "" : "disabled"} aria-label="${s.name} price"></td>`).join("")}
+        <td class="keep"><button class="x" data-del="${i}" title="Remove zone from both magazines" type="button">×</button></td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="${SIZES.length + 5}" class="empty">No zones yet. Add one.</td></tr>`}</tbody>`;
+
+  // sold table
+  const showPast = $("#showPast").checked;
+  const rows = data.sold.map((b, i) => ({ b, i })).filter(({ b }) => showPast || !b.month || b.month >= thisMonth)
+    .sort((x, y) => (x.b.month || "9999").localeCompare(y.b.month || "9999"));
+  const hidden = data.sold.length - rows.length;
+  const zoneOpts = (sel) => data.zones.map(z => `<option value="${esc(z.id)}" ${z.id === sel ? "selected" : ""}>${esc(z.id)}${z.name && z.name !== z.id ? " · " + esc(z.name) : ""}</option>`).join("")
+    + (sel && !data.zones.some(z => z.id === sel) ? `<option value="${esc(sel)}" selected>${esc(sel)} (removed zone)</option>` : "");
+  $("#soldTable").innerHTML = `
+    <thead><tr><th>Month</th><th>Magazine</th><th>Ad size</th><th>Zone</th><th>Advertiser (staff only)</th><th></th></tr></thead>
+    <tbody>${rows.map(({ b, i }) => `<tr data-s="${i}">
+      <td style="width:170px"><input type="month" data-f="month" value="${b.month}" aria-label="Month"> ${b.month && b.month < thisMonth ? '<span class="pill past">Past</span>' : ""}</td>
+      <td style="min-width:110px"><select data-f="pub" aria-label="Magazine">${PUBS.map(p => `<option value="${p.id}" ${p.id === b.pub ? "selected" : ""}>${p.code === "BDB" ? "BDB · Best Deals Book" : "EHI · Excl. Home Impr."}</option>`).join("")}</select></td>
+      <td><select data-f="size" aria-label="Ad size">${SIZES.filter(s => s.premium).map(s => `<option value="${s.id}" ${s.id === b.size ? "selected" : ""}>${s.name}</option>`).join("")}</select></td>
+      <td><select data-f="zone" aria-label="Zone">${zoneOpts(b.zone)}</select></td>
+      <td style="min-width:180px"><input type="text" data-f="advertiser" value="${esc(b.advertiser)}" placeholder="Business name" aria-label="Advertiser"></td>
+      <td><button class="x" data-dels="${i}" title="Delete booking" type="button">×</button></td>
+    </tr>`).join("") || `<tr><td colspan="6" class="empty">No ${hidden ? "upcoming " : ""}bookings.${hidden ? ` ${hidden} past booking${hidden > 1 ? "s" : ""} hidden.` : ""}</td></tr>`}</tbody>`;
+
+  refreshBar();
+}
+
+function validate() {
+  const problems = [];
+  const ids = data.zones.map(z => z.id.trim());
+  if (ids.some(id => !id)) problems.push("Every zone needs a code (e.g. Z8).");
+  if (new Set(ids).size !== ids.length) problems.push("Two zones have the same code.");
+  data.sold.forEach(b => { if (!b.month) problems.push("A sold cover is missing its month."); });
+  const seen = new Set();
+  data.sold.forEach(b => { const k = [b.pub, b.size, b.zone, b.month].join("|"); if (b.month && seen.has(k)) problems.push(`${SIZES.find(s => s.id === b.size).name} in ${b.zone} for ${monthLabel(b.month)} is booked twice.`); seen.add(k); });
+  return [...new Set(problems)];
+}
+
+let connected = false;
+function setConnected(ok) {
+  connected = ok;
+  $("#connDot").classList.toggle("ok", ok);
+  $("#connText").textContent = ok ? `Connected · saves to ${cfg().repo}` : "Demo mode";
+  $("#demoBanner").classList.toggle("hidden", ok);
+}
+function setStatus(text, kind = "") { const s = $("#status"); s.textContent = text; s.className = "status" + (kind ? " " + kind : ""); }
+function refreshBar() {
+  const d = dirty(), problems = validate();
+  $("#discardBtn").disabled = !d;
+  $("#saveBtn").disabled = connected ? (!d || problems.length > 0) : false;
+  $("#saveBtn").textContent = connected ? "Save & publish" : "Connect to save";
+  if (problems.length) setStatus(problems[0], "err");
+  else if (d) setStatus(connected ? "You have unsaved changes." : "Unsaved changes. Connect the portal to save them.");
+  else if (!$("#status").classList.contains("ok")) setStatus(connected ? "Up to date." : "Demo mode: edits aren't saved.");
+}
+
+/* ---------- edits ---------- */
+$("#pubTabs").addEventListener("click", e => { const t = e.target.closest("[data-pub]"); if (t) { activePub = t.dataset.pub; render(); } });
+
+$("#ratesTable").addEventListener("change", e => {
+  const tr = e.target.closest("tr[data-i]"); if (!tr) return;
+  const z = data.zones[+tr.dataset.i], f = e.target.dataset.f, R = data.rates[activePub];
+  if (f === "id") {
+    const old = z.id, nu = e.target.value.trim().toUpperCase();
+    z.id = nu;
+    PUBS.forEach(p => { if (data.rates[p.id][old]) { data.rates[p.id][nu] = data.rates[p.id][old]; delete data.rates[p.id][old]; } });
+    data.sold.forEach(b => { if (b.zone === old) b.zone = nu; });
+  } else if (f === "name") {
+    z.name = e.target.value.trim();
+    e.target.classList.toggle("changed", (saved.zones.find(x => x.id === z.id) || {}).name !== z.name);
+    $("#status").classList.remove("ok"); refreshBar(); return;   // no redraw, so Tab keeps working
+  } else if (f === "mails") {
+    if (e.target.checked) R[z.id] = clone(saved.rates[activePub][z.id] || { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) });
+    else delete R[z.id];
+  } else if (R[z.id]) {
+    const v = e.target.value === "" ? null : num(e.target.value);
+    e.target.classList.toggle("bad", e.target.value !== "" && (v == null || v < 0));
+    R[z.id][f] = v != null && v >= 0 ? Math.round(v) : null;
+    if (R[z.id][f] != null) e.target.value = R[z.id][f];   // "$1,495" → 1495
+    e.target.classList.toggle("changed", (saved.rates[activePub][z.id] || {})[f] !== R[z.id][f]);
+    $("#status").classList.remove("ok"); refreshBar(); return;   // no redraw, so Tab keeps working
+  }
+  $("#status").classList.remove("ok");
+  render();
+});
+$("#ratesTable").addEventListener("click", e => {
+  const i = e.target.dataset.del; if (i == null) return;
+  const z = data.zones[+i];
+  if (!confirm(`Remove ${z.id}${z.name !== z.id ? " (" + z.name + ")" : ""} from both magazines?`)) return;
+  data.zones.splice(+i, 1);
+  PUBS.forEach(p => delete data.rates[p.id][z.id]);
+  render();
+});
+$("#addZone").onclick = () => {
+  let n = data.zones.length + 1; while (data.zones.some(z => z.id === "Z" + n)) n++;
+  const id = "Z" + n;
+  data.zones.push({ id, name: "Zone " + n });
+  data.rates[activePub][id] = { homes: null, ...Object.fromEntries(SIZES.map(s => [s.id, null])) };
+  render();
+  const last = $("#ratesTable tbody tr:last-child [data-f='name']"); last && (last.focus(), last.select());
+};
+
+$("#soldTable").addEventListener("change", e => {
+  const tr = e.target.closest("tr[data-s]"); if (!tr) return;
+  const b = data.sold[+tr.dataset.s]; b[e.target.dataset.f] = e.target.value.trim();
+  $("#status").classList.remove("ok");
+  refreshBar();
+});
+$("#soldTable").addEventListener("click", e => { const i = e.target.dataset.dels; if (i != null) { data.sold.splice(+i, 1); render(); } });
+$("#addSold").onclick = () => {
+  data.sold.push({ pub: activePub, size: "bc", zone: data.zones[0]?.id || "", month: thisMonth, advertiser: "" });
+  render();
+  const tr = $(`#soldTable tr[data-s="${data.sold.length - 1}"]`);
+  if (tr) { tr.scrollIntoView({ block: "center" }); tr.querySelector("[data-f='month']").focus(); }
+};
+$("#showPast").onchange = render;
+
+$("#discardBtn").onclick = () => { if (confirm("Discard all unsaved changes?")) { data = clone(saved); render(); } };
+
+$("#saveBtn").onclick = async () => {
+  if (!connected) { openConnect(); return; }
+  const btn = $("#saveBtn"); btn.disabled = true; setStatus("Saving…");
+  try {
+    const who = store.get("bda.name");
+    const msg = (what) => `Staff portal: update ${what}${who ? " (" + who + ")" : ""}`;
+    if (ratesCSV(data) !== ratesCSV(saved)) await ghWrite(SETTINGS.ratesPath, ratesCSV(data), msg("rates"));
+    if (soldCSV(data) !== soldCSV(saved)) await ghWrite(SETTINGS.soldPath, soldCSV(data), msg("sold covers"));
+    saved = clone(data);
+    render();
+    setStatus("Saved. The checkout updates within a couple of minutes.", "ok");
+  } catch (e) {
+    setStatus("Not saved: " + e.message, "err");
+    btn.disabled = false;
+  }
+};
+
+addEventListener("beforeunload", e => { if (dirty()) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ---------- connect dialog ---------- */
+function openConnect() {
+  const c = cfg();
+  $("#ownerInput").value = c.owner; $("#repoInput").value = c.repo; $("#branchInput").value = c.branch;
+  $("#repoName").textContent = `${c.owner}/${c.repo}`;
+  $("#tokenInput").value = ""; $("#connectErr").textContent = "";
+  $("#connectDlg").showModal();
+}
+$("#connectBtn").onclick = openConnect;
+$("#cancelConnect").onclick = () => $("#connectDlg").close();
+$("#connectForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const t = $("#tokenInput").value.trim(); if (!t) return;
+  ["owner", "repo", "branch"].forEach(k => {
+    const v = $(`#${k}Input`).value.trim();
+    if (v && v !== SETTINGS[k]) store.set("bda." + k, v); else store.del("bda." + k);
+  });
+  const prev = token; token = t;
+  $("#doConnect").disabled = true; $("#connectErr").textContent = "Checking…";
+  try {
+    const pending = dirty() ? clone(data) : null;
+    await Promise.all([ghRead(SETTINGS.ratesPath), ghRead(SETTINGS.soldPath)]);
+    if ($("#rememberInput").checked) store.set("bda.token", t); else { store.del("bda.token"); try { sessionStorage.setItem("bda.token", t); } catch {} }
+    $("#connectDlg").close();
+    setConnected(true);
+    if (pending) { data = pending; render(); setStatus("Connected. Your edits are kept. Click Save & publish."); }
+    else await load();
+  } catch (err) {
+    token = prev;
+    $("#connectErr").textContent = err.message;
+  } finally { $("#doConnect").disabled = false; }
+};
+
+/* Used only if the published files can't be fetched (e.g. opened from disk). */
+const FALLBACK_RATES = `Magazine,Zone,Zone name,Homes,Back Cover,Inside Front Cover,Inside Back Cover,Full Page,Half Page,Quarter Page
+BDB,Z1,Zone 1,20000,1495,1195,1095,895,525,315
+BDB,Z2,Zone 2,20000,1345,1075,985,805,470,285
+BDB,Z3,Zone 3,20000,1720,1375,1260,1030,605,360
+BDB,Z4,Zone 4,20000,1195,955,875,715,420,250
+BDB,Z5,Zone 5,20000,1495,1195,1095,895,525,315
+BDB,Z6,Zone 6,20000,1645,1315,1205,985,580,345
+BDB,Z7,Zone 7,20000,1270,1015,930,760,445,270
+EHI,Z1,Zone 1,18000,1195,955,875,715,420,250
+EHI,Z2,Zone 2,18000,1120,895,820,670,395,235
+EHI,Z3,Zone 3,18000,1345,1075,985,805,470,285
+EHI,Z5,Zone 5,18000,1045,835,765,625,370,220`;
+const FALLBACK_SOLD = `Magazine,Ad size,Zone,Month,Advertiser
+BDB,Back Cover,Z1,Jan 2027,Example Roofing
+BDB,Back Cover,Z1,Feb 2027,Example Roofing
+BDB,Back Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+EHI,Back Cover,Z1,Apr 2027,Example Windows`;
+
+load();
+</script>
+</body>
+</html>

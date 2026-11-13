@@ -6,17 +6,26 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
-## Updating rates and sold covers
-Rates, zones, household counts and sold covers come from two CSV files next to the page: `rates.csv` and `sold.csv`. The team edits them in Excel and re-uploads them. **See [UPDATING-RATES.md](UPDATING-RATES.md)** for the steps and column rules.
+## Staff portal: updating rates and sold covers
+Staff update everything at **`/staff/`** (for example `https://hamstari.github.io/adcheckout/staff/`). It isn't linked from the checkout and is hidden from search engines.
 
-If the files can't be loaded (for example, the page is opened straight from disk), the page uses built-in copies of the demo data.
+- **Rates:** a grid per magazine. Edit prices and homes, rename zones (the name is what customers see), untick **Mails here** if a magazine doesn't mail a zone, leave a price empty if a size isn't sold there, and add or remove zones.
+- **Sold covers:** add a booking (month, magazine, cover, zone, advertiser). It shows as **Taken** on the checkout. Delete it if cancelled. Double bookings are blocked.
+- **Save & publish** writes `rates.csv` and `sold.csv` in this repo. GitHub Pages then updates the live checkout within a couple of minutes. If two people save at once, the second gets a message to reload, instead of overwriting the first person's changes.
+
+**Connecting the portal (one time, administrator):** until it's connected, the portal runs in demo mode, where you can edit but not save. To connect it:
+1. On GitHub, go to Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token.
+2. Under Repository access, choose **Only select repositories → adcheckout**. Under Permissions, set **Contents: Read and write**.
+3. In the portal, click **Connect to save** and paste the key. Tick "Remember on this computer" so staff only do this once per computer.
+
+The key can change files in this repo, so only give it to trusted staff. Set an expiry and replace it when someone leaves. The branch the portal saves to is set in `SETTINGS` at the top of `staff/index.html`, and must be the branch GitHub Pages publishes.
 
 Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
 
-Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed in `sold.csv` show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
+Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed under **Sold covers** in the staff portal show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
 
 ## Demo mode
 `CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. A yellow banner tells visitors it's a demo. Set `demo: false` once the order destination, prices and inventory are real.
@@ -29,8 +38,9 @@ When a customer presses **Request ad space**:
 The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices, zones, homes:** replace the demo numbers in `rates.csv`.
-- **Sold covers:** replace the example rows in `sold.csv` with real bookings.
+- **Prices, zones, homes:** replace the placeholder numbers in the staff portal.
+- **Sold covers:** delete the example bookings in the staff portal and add real ones.
+- **Staff portal:** create the access key (see above).
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
 
@@ -40,7 +50,7 @@ This repo is public, so GitHub can host the checkout for free:
 2. Under **Build and deployment**, set Source to **Deploy from a branch**, pick the branch (for example `main` once this is merged) and folder **/ (root)**, then **Save**.
 3. After about a minute it's live at **https://hamstari.github.io/adcheckout/**.
 
-To update rates, edit `rates.csv` / `sold.csv` on GitHub (open the file → pencil icon, or Add file → Upload files), then **Commit changes**. The site updates within about a minute.
+Rates and sold covers are updated from the staff portal (see above).
 
 **Optional: your own address.** In Settings → Pages → Custom domain, enter `ads.bestdealsnetworks.com`. Then in Wix go to Domains → your domain → Manage DNS records, add a **CNAME** with host `ads` pointing to `hamstari.github.io`, and tick **Enforce HTTPS** in GitHub once it's available.
 
@@ -63,4 +73,4 @@ The checkout is three plain files with no build step: `index.html`, `rates.csv` 
 1. Go to https://app.netlify.com/drop and drag in a folder containing `index.html`, `rates.csv` and `sold.csv`. You get a link like `https://something.netlify.app`. (Optional: in Netlify, rename the site or connect `ads.bestdealsnetworks.com`.)
 2. On your site, add a page and a Code / Embed / Custom HTML block. Paste the contents of `embed.html` into it and replace `https://YOUR-HOSTED-URL/index.html` with your Netlify link. The frame resizes itself to fit each step, so there's no inner scrollbar.
 
-**Going live:** in `index.html`, set `demo: false` (this removes the yellow banner and starts sending orders) and set `orderEndpoint`. Rate changes only need `rates.csv` / `sold.csv` re-uploaded, not `index.html`.
+**Going live:** in `index.html`, set `demo: false` (this removes the yellow banner and starts sending orders) and set `orderEndpoint`. Rate changes are made in the staff portal and don't touch `index.html`.
