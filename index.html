@@ -100,6 +100,7 @@
   .chip:hover { border-color: var(--teal); }
   .tiers { font-size: 14px; color: var(--muted); margin-top: 14px; }
   .tiers b { color: var(--teal-d); }
+  .demo-bar { background: #f2c94c; color: #3a2e00; text-align: center; font-size: 14px; font-weight: 500; padding: 8px 16px; }
   .hidden { display: none !important; }
   .confirm { text-align: center; padding: 48px 28px; }
   .confirm .big { width: 64px; height: 64px; border-radius: 50%; background: var(--teal); color: var(--ink); display: grid; place-items: center; font-size: 32px; margin: 0 auto 16px; }
@@ -127,11 +128,12 @@
 </head>
 <body>
 
+<div class="demo-bar hidden" id="demoBar">Demo: prices and availability are examples, and nothing you enter is sent or saved.</div>
 <header>
   <div class="wrap">
     <div class="eyebrow">Best Deals Networks</div>
     <h1>Best Deals Ads</h1>
-    <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and run length, then check out. Printing and mailing included.</p>
+    <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and months, then check out. Printing and mailing included.</p>
     <div class="steps" id="steps">
       <span class="on">1 · Build your ad</span>
       <span>2 · Checkout</span>
@@ -277,6 +279,8 @@ const CONFIG = {
   // Where order requests go. Set orderEndpoint to a webhook URL (Zapier, Make,
   // Google Apps Script, your CRM). It receives the order as JSON in a POST.
   // If it's empty, the customer's email app opens with the order pre-filled to salesEmail.
+  // demo: true = nothing is sent anywhere; the flow runs end to end and shows a demo banner.
+  demo: true,
   orderEndpoint: "",
   salesEmail: "advertise@bestdealsbook.com",
   salesPhone: "844-600-8846",
@@ -584,6 +588,11 @@ function orderText(c, order) {
 }
 
 async function sendOrder(c, order) {
+  if (CONFIG.demo) {
+    console.log("Demo mode, order not sent:", order);
+    await new Promise(r => setTimeout(r, 600));
+    return "demo";
+  }
   if (CONFIG.orderEndpoint) {
     // text/plain keeps this a "simple" request, so webhooks without CORS preflight support still accept it.
     const res = await fetch(CONFIG.orderEndpoint, {
@@ -633,11 +642,13 @@ $("#nextBtn").onclick = async () => {
     `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
     `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
     (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
+    (how === "demo" ? " (Demo: no request was actually sent.)" : "") +
     (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
   state.step = 3; render(); window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
+$("#demoBar").classList.toggle("hidden", !CONFIG.demo);
 $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
 

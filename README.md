@@ -11,7 +11,10 @@ Customers can pick any months over the next 12, not only consecutive ones. The v
 
 Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. To mark a cover as sold, add the month to `CONFIG.soldOut` (magazine → size → zone → `"YYYY-MM"`). That month then shows as "Taken in Zx" for anyone who picks that zone. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why. The `soldOut` entries in the file now are examples only.
 
-## Where orders go
+## Demo mode
+`CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. A yellow banner tells visitors it's a demo. Set `demo: false` once the order destination, prices and inventory are real.
+
+## Where orders go (once demo is off)
 When a customer presses **Request ad space**:
 - **If `CONFIG.orderEndpoint` is set** (a Zapier, Make or Google Apps Script webhook, or your CRM), the order is POSTed there as JSON: reference, magazine, size, zones, months, full pricing breakdown and customer details. From there it can create a Notion row, send an email, or start the invoice. If the POST fails, the customer sees an error with the phone number and can try again.
 - **If it's empty**, the customer's email app opens with the order pre-filled to `CONFIG.salesEmail` (advertise@bestdealsbook.com), and they have to press send. This is a stopgap; set a webhook before launch.
