@@ -67,6 +67,7 @@
 
   /* Summary */
   aside { position: sticky; top: 16px; }
+  .embedded aside { position: static; }
   .sum h2 { font-size: 24px; margin-bottom: 12px; }
   .sum dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 15px; }
   .sum dt { color: var(--muted); }
@@ -768,7 +769,7 @@ async function sendOrder(c, order) {
 
 let sending = false;
 $("#nextBtn").onclick = async () => {
-  if (state.step === 1) { state.step = 2; render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (state.step === 1) { state.step = 2; render(); toTop(); return; }
   if (sending) return;
   const form = $("#checkoutForm");
   if (!form.checkValidity()) {
@@ -796,19 +797,36 @@ $("#nextBtn").onclick = async () => {
     `<dt class="tot">Total</dt><dd class="tot">${money(c.total)}</dd>`;
   $("#refNo").textContent = order.ref;
   $("#confirmText").textContent =
-    `${c.size.name} in ${c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
+    `${c.size.name} in ${c.pub.id === "both" ? "both magazines" : c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.issues} issue${c.issues > 1 ? "s" : ""} (${monthList(state.months)}). ` +
     `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
     `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
     (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.") +
     (how === "demo" ? " (Demo: no request was actually sent.)" : "") +
     (how === "email" ? ` Your email app should have opened with this order. Press send so it reaches us at ${CONFIG.salesEmail}.` : "");
-  state.step = 3; render(); window.scrollTo({ top: 0, behavior: "smooth" });
+  state.step = 3; render(); toTop();
 };
 
 $("#backBtn").onclick = () => { state.step = 1; render(); };
 $("#demoBar").classList.toggle("hidden", !CONFIG.demo);
 $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => { $("#checkoutForm").reset(); state.step = 1; render(); };
+
+/* ===========================================================
+   Embedding: when this page sits in an <iframe> on your site, tell the
+   parent page how tall it is (so there's no inner scrollbar) and when to
+   scroll back to the top. See embed.html for the snippet.
+   =========================================================== */
+const embedded = window.parent !== window;
+function toTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (embedded) window.parent.postMessage({ type: "bda-scrolltop" }, "*");
+}
+if (embedded) {
+  document.documentElement.classList.add("embedded");
+  const post = () => window.parent.postMessage({ type: "bda-height", height: Math.ceil(document.body.getBoundingClientRect().height) }, "*");
+  new ResizeObserver(post).observe(document.body);
+  addEventListener("load", post);
+}
 
 fetchRates().then(() => {
   if (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z))) {

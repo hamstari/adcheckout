@@ -45,3 +45,14 @@ The confirmation page shows an order summary that the customer can print or save
 - **Google Sheet:** do the one-time setup above.
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
+
+## Publishing on your site
+The checkout is plain files with no build step: `index.html`, plus `rates.csv` and `sold.csv` if you're not using the Google Sheet.
+
+**Option 1: put it in a folder on your site.** If your host lets you upload files (cPanel, FTP, WordPress file manager), create a folder such as `best-deals-ads` and upload `index.html`, `rates.csv` and `sold.csv`. The checkout is then at `bestdealsnetworks.com/best-deals-ads/`. You can publish it the same way the Best Deals Direct page is published.
+
+**Option 2: host it free, then embed it.** For site builders (Squarespace, Wix, WordPress.com, etc.):
+1. Go to https://app.netlify.com/drop and drag in a folder containing `index.html`, `rates.csv` and `sold.csv`. You get a link like `https://something.netlify.app`. (Optional: in Netlify, rename the site or connect `ads.bestdealsnetworks.com`.)
+2. On your site, add a page and a Code / Embed / Custom HTML block. Paste the contents of `embed.html` into it and replace `https://YOUR-HOSTED-URL/index.html` with your Netlify link. The frame resizes itself to fit each step, so there's no inner scrollbar.
+
+**Going live:** in `index.html`, set `demo: false` (this removes the yellow banner and starts sending orders), set `googleSheetUrl`, and set `orderEndpoint`. Re-upload `index.html` after each change.

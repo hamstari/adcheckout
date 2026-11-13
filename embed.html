@@ -1,0 +1,17 @@
+<!--
+  Best Deals Ads: embed snippet.
+  Paste everything below into a Code / Embed / Custom HTML block on your site.
+  Replace the src URL with wherever index.html is hosted.
+-->
+<iframe id="bda-checkout" src="https://YOUR-HOSTED-URL/index.html" title="Best Deals Ads"
+        style="width:100%;border:0;display:block;height:2600px" loading="lazy"></iframe>
+<script>
+  (function () {
+    var f = document.getElementById("bda-checkout");
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.source !== f.contentWindow) return;
+      if (e.data.type === "bda-height") f.style.height = e.data.height + "px";
+      if (e.data.type === "bda-scrolltop") f.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  })();
+</script>
