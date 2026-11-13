@@ -6,6 +6,9 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
+## Pricing
+Each zone has its own rate for each ad size (`CONFIG.rates`, zone → size → price per issue). Zone cards show the price for the selected size, and size cards show the lowest zone price ("From $X"). Ad design is included at no charge. On top of that, booking both magazines saves 10% and the volume discount applies.
+
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
 
@@ -22,7 +25,7 @@ When a customer presses **Request ad space**:
 The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices, sizes, zones:** all in `CONFIG` at the top of the `<script>`. The current values are placeholders.
+- **Prices, sizes, zones:** all in `CONFIG` at the top of the `<script>`; per-zone rates are in `CONFIG.rates`. The current values are placeholders.
 - **Sold covers:** replace the example `CONFIG.soldOut` entries with real bookings.
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).

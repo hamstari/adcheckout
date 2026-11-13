@@ -155,7 +155,7 @@
 
         <div class="panel">
           <div class="panel-h"><div class="num">2</div><h2>Ad size</h2></div>
-          <p class="sub">Prices are per zone, per issue.</p>
+          <p class="sub">Rates vary by zone. You'll see each zone's price in the next step.</p>
           <div class="opts" id="sizeOpts"></div>
           <div class="note" id="specNote"></div>
         </div>
@@ -165,7 +165,7 @@
             <div class="panel-h"><div class="num">3</div><h2>Zones</h2></div>
             <button type="button" class="link" id="allZones">Select all</button>
           </div>
-          <p class="sub">Choose the zones you want to reach. Each zone is its own mailing.</p>
+          <p class="sub" id="zoneSub">Choose the zones you want to reach. Each zone is its own mailing.</p>
           <div class="opts" id="zoneOpts"></div>
         </div>
 
@@ -183,7 +183,7 @@
 
         <div class="panel">
           <div class="panel-h"><div class="num">5</div><h2>Artwork</h2></div>
-          <p class="sub">Send your own print-ready ad, or have our design team build it.</p>
+          <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
           <div class="opts" id="artOpts"></div>
         </div>
       </section>
@@ -290,14 +290,24 @@ const CONFIG = {
     { id: "both", name: "Both magazines", desc: "Run the same ad in Best Deals Book and Exclusively Home Improvements", mult: 2, discount: 0.10, tag: "Save 10%" },
   ],
   sizes: [
-    { id: "bc",  name: "Back Cover",          trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', price: 1495, premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "ifc", name: "Inside Front Cover",  trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', price: 1195, premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "ibc", name: "Inside Back Cover",   trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', price: 1095, premium: true, limit: "One per zone", shape: [34, 44] },
-    { id: "fp",  name: "Full Page",           trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', price: 895,  shape: [34, 44] },
-    { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null, price: 525, shape: [34, 22] },
-    { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null, price: 315, shape: [17, 22] },
+    { id: "bc",  name: "Back Cover",          trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "ifc", name: "Inside Front Cover",  trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "ibc", name: "Inside Back Cover",   trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"',  premium: true, limit: "One per zone", shape: [34, 44] },
+    { id: "fp",  name: "Full Page",           trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', shape: [34, 44] },
+    { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null,  shape: [34, 22] },
+    { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
   ],
   // homes = approx. households mailed per issue (placeholder)
+  // Price per issue for each zone and ad size, per magazine. Zones can each have their own rates.
+  rates: {
+    Z1: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
+    Z2: { bc: 1345, ifc: 1075, ibc:  985, fp:  805, hp:  470, qp:  285 },
+    Z3: { bc: 1720, ifc: 1375, ibc: 1260, fp: 1030, hp:  605, qp:  360 },
+    Z4: { bc: 1195, ifc:  955, ibc:  875, fp:  715, hp:  420, qp:  250 },
+    Z5: { bc: 1495, ifc: 1195, ibc: 1095, fp:  895, hp:  525, qp:  315 },
+    Z6: { bc: 1645, ifc: 1315, ibc: 1205, fp:  985, hp:  580, qp:  345 },
+    Z7: { bc: 1270, ifc: 1015, ibc:  930, fp:  760, hp:  445, qp:  270 },
+  },
   zones: [
     { id: "Z1", name: "Zone 1", homes: 20000 },
     { id: "Z2", name: "Zone 2", homes: 20000 },
@@ -328,8 +338,8 @@ const CONFIG = {
     },
   },
   artwork: [
-    { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi", fee: 0 },
-    { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof", fee: 150 },
+    { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
+    { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
   ],
 };
 
@@ -402,6 +412,9 @@ function optButton({ pressed, html, onClick, label }) {
   return b;
 }
 
+const rate = (zoneId, sizeId) => CONFIG.rates[zoneId][sizeId];
+const sizeFrom = (sizeId) => Math.min(...CONFIG.zones.map(z => rate(z.id, sizeId)));
+
 function calc() {
   const pub = CONFIG.publications.find(p => p.id === state.pub);
   const size = CONFIG.sizes.find(s => s.id === state.size);
@@ -409,13 +422,14 @@ function calc() {
   const discount = CONFIG.volume.filter(v => issues >= v.min).reduce((a, v) => Math.max(a, v.discount), 0);
   const art = CONFIG.artwork.find(a => a.id === state.art);
   const zones = CONFIG.zones.filter(z => state.zones.has(z.id));
-  const perIssue = size.price * zones.length * pub.mult;
+  const zonePrices = zones.map(z => ({ id: z.id, price: rate(z.id, size.id) }));
+  const perIssue = zonePrices.reduce((a, z) => a + z.price, 0) * pub.mult;
   const gross = perIssue * issues;
   const bundleOff = gross * (pub.discount || 0);
   const termOff = (gross - bundleOff) * discount;
-  const total = gross - bundleOff - termOff + art.fee;
+  const total = gross - bundleOff - termOff;
   const homes = zones.reduce((s, z) => s + z.homes, 0) * pub.mult;
-  return { pub, size, issues, discount, art, zones, perIssue, gross, bundleOff, termOff, total, homes };
+  return { pub, size, issues, discount, art, zones, zonePrices, perIssue, gross, bundleOff, termOff, total, homes };
 }
 
 /* ===========================================================
@@ -436,7 +450,7 @@ function render() {
   const sizeEl = $("#sizeOpts"); sizeEl.innerHTML = "";
   CONFIG.sizes.forEach(s => sizeEl.append(optButton({
     pressed: state.size === s.id,
-    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">${money(s.price)} / zone / issue</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
+    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.trim}</small><div class="price">From ${money(sizeFrom(s.id))} / zone / issue</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
     onClick: () => { state.size = s.id; pruneMonths(); render(); },
   })));
   $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
@@ -445,9 +459,10 @@ function render() {
   const zoneEl = $("#zoneOpts"); zoneEl.innerHTML = "";
   CONFIG.zones.forEach(z => zoneEl.append(optButton({
     pressed: state.zones.has(z.id),
-    html: `<b>${z.name}</b><small>About ${z.homes.toLocaleString()} homes</small>`,
+    html: `<b>${z.name}</b><small>About ${z.homes.toLocaleString()} homes</small><div class="price">${money(rate(z.id, state.size) * c.pub.mult)} / issue</div>`,
     onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); pruneMonths(); render(); },
   })));
+  $("#zoneSub").textContent = `Choose the zones you want to reach. Each zone is its own mailing. Prices shown are for a ${c.size.name}${c.pub.mult > 1 ? " in both magazines" : ""}.`;
   $("#allZones").textContent = state.zones.size === CONFIG.zones.length ? "Clear all" : "Select all";
 
   // issues
@@ -486,7 +501,7 @@ function render() {
   const artEl = $("#artOpts"); artEl.innerHTML = "";
   CONFIG.artwork.forEach(a => artEl.append(optButton({
     pressed: state.art === a.id,
-    html: `<b>${a.name}</b><small>${a.desc}</small><div class="price">${a.fee ? "+" + money(a.fee) + " one time" : "Included"}</div>`,
+    html: `<b>${a.name}</b><small>${a.desc}</small><div class="price">Included</div>`,
     onClick: () => { state.art = a.id; render(); },
   })));
 
@@ -501,10 +516,9 @@ function render() {
   ];
   if (c.bundleOff) rows.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
   if (c.termOff) rows.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
-  if (c.art.fee) rows.push(["Ad design", "+" + money(c.art.fee)]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("#sumTotal").textContent = money(c.total);
-  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money((c.total - c.art.fee) / c.issues)} per issue after savings` : "";
+  $("#sumPer").textContent = c.zones.length && c.issues ? `About ${money(c.total / c.issues)} per issue after savings` : "";
 
   // step chrome
   ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
@@ -549,7 +563,7 @@ function buildOrder(form) {
         bothMagazineSavings: Math.round(c.bundleOff),
         volumeSavings: Math.round(c.termOff),
         volumeDiscountPct: Math.round(c.discount * 100),
-        designFee: c.art.fee,
+        zonePricesPerIssue: Object.fromEntries(c.zonePrices.map(z => [z.id, z.price * c.pub.mult])),
         total: Math.round(c.total),
       },
       customer,
@@ -563,14 +577,13 @@ function receiptRows(c, order) {
     ["Business", order.customer.business],
     ["Magazine", c.pub.name],
     ["Ad size", `${c.size.name} (${c.size.trim})`],
-    ["Zones", order.zones.join(", ")],
+    ["Zones", c.zonePrices.map(z => `${z.id} ${money(z.price * c.pub.mult)}`).join(", ")],
     ["Issues", `${c.issues}: ${monthList(state.months)}`],
     ["Artwork", c.art.name],
     ["Per issue", money(c.perIssue)],
   ];
   if (c.bundleOff) r.push(["Both-magazine savings", "−" + money(c.bundleOff)]);
   if (c.termOff) r.push([`${c.issues}-issue savings`, "−" + money(c.termOff)]);
-  if (c.art.fee) r.push(["Ad design", "+" + money(c.art.fee)]);
   return r;
 }
 
