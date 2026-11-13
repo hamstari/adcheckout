@@ -299,13 +299,8 @@ const CONFIG = {
     { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null,  shape: [34, 22] },
     { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
   ],
-  // RATES + SOLD COVERS come from a spreadsheet, not from this file.
-  //
-  // googleSheetUrl: paste the normal link to your Google Sheet (Share → "Anyone with the link" → Viewer).
-  //   The sheet needs two tabs, named exactly "Rates" and "Sold covers" (same columns as rates.csv / sold.csv).
-  //   Edits to the sheet show on the page the next time someone loads it.
-  // If googleSheetUrl is empty, the page reads rates.csv and sold.csv next to this file instead.
-  googleSheetUrl: "",
+  // RATES + SOLD COVERS come from two CSV files next to this page, not from this file.
+  // Edit them in Excel and re-upload; see UPDATING-RATES.md.
   ratesUrl: "rates.csv",
   soldUrl: "sold.csv",
   // How many months ahead customers can book.
@@ -460,10 +455,14 @@ BDB,Back Cover,Z3,Mar 2027,Example AC
 BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
 EHI,Back Cover,Z1,Apr 2027,Example Windows`;
 
-// "2027-01", "Jan 2027", "January 2027", "1/2027", "1/1/2027" → "2027-01"
+// "2027-01", "Jan 2027", "January 2027", "Jan-27" (Excel), "1/2027", "1/1/2027", "1/1/27" → "2027-01"
 function monthKey(v) {
   v = String(v || "").trim();
   let m;
+  const MON = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  if ((m = v.match(/^([A-Za-z]{3,})[-\s.']+(\d{2})$/)) && MON.includes(m[1].slice(0, 3).toLowerCase()))
+    return `20${m[2]}-${String(MON.indexOf(m[1].slice(0, 3).toLowerCase()) + 1).padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{2})$/))) return `20${m[2]}-${m[1].padStart(2, "0")}`;
   if ((m = v.match(/^(\d{4})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2, "0")}`;
   if ((m = v.match(/^(\d{1,2})\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
   if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
@@ -490,13 +489,6 @@ function loadSold(text) {
   CONFIG.soldOut = sold;
 }
 
-// Any Google Sheets link → CSV for one tab, by tab name.
-function googleTabCsv(url, tab) {
-  const id = (String(url).match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/) || [])[1];
-  if (!id) throw new Error("That doesn't look like a Google Sheets link: " + url);
-  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(tab)}`;
-}
-
 async function fetchText(url) {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("HTTP " + res.status);
@@ -504,9 +496,7 @@ async function fetchText(url) {
 }
 
 async function fetchRates() {
-  const g = CONFIG.googleSheetUrl;
-  const ratesSrc = g ? googleTabCsv(g, "Rates") : CONFIG.ratesUrl;
-  const soldSrc = g ? googleTabCsv(g, "Sold covers") : CONFIG.soldUrl;
+  const ratesSrc = CONFIG.ratesUrl, soldSrc = CONFIG.soldUrl;
   const [rates, sold] = await Promise.allSettled([fetchText(ratesSrc), fetchText(soldSrc)]);
   try {
     if (rates.status !== "fulfilled") throw rates.reason;
