@@ -298,11 +298,15 @@ const CONFIG = {
     { id: "hp",  name: "Half Page",           trim: '7.375" × 4.875"',  bleed: null,  shape: [34, 22] },
     { id: "qp",  name: "Quarter Page",        trim: '3.625" × 4.875"',  bleed: null,  shape: [17, 22] },
   ],
-  // RATES: loaded from a spreadsheet (CSV), one row per magazine + zone:
-  //   Magazine, Zone, Zone name, Homes, then one column per ad size (named as in `sizes` above).
-  // Leave a magazine's row out if it doesn't mail that zone; leave a price blank if that size isn't sold there.
-  // ratesUrl: "rates.csv" (the file next to this page), or a Google Sheet "Publish to web → CSV" link.
+  // RATES + SOLD COVERS come from a spreadsheet, not from this file.
+  //
+  // googleSheetUrl: paste the normal link to your Google Sheet (Share → "Anyone with the link" → Viewer).
+  //   The sheet needs two tabs, named exactly "Rates" and "Sold covers" (same columns as rates.csv / sold.csv).
+  //   Edits to the sheet show on the page the next time someone loads it.
+  // If googleSheetUrl is empty, the page reads rates.csv and sold.csv next to this file instead.
+  googleSheetUrl: "",
   ratesUrl: "rates.csv",
+  soldUrl: "sold.csv",
   // How many months ahead customers can book.
   monthsAhead: 12,
   // Volume discount by number of issues booked (highest tier that fits wins).
@@ -312,17 +316,8 @@ const CONFIG = {
     { min: 6,  discount: 0.10 },
     { min: 12, discount: 0.15 },
   ],
-  // Premium spots already sold: magazine → size → zone → ["YYYY-MM", ...].
-  // Those months show as "Taken" for that cover in that zone.
-  soldOut: {
-    bdb: {
-      bc:  { Z1: ["2027-01", "2027-02"], Z3: ["2027-03"] },
-      ifc: { Z2: ["2027-01"] },
-    },
-    ehi: {
-      bc:  { Z1: ["2027-04"] },
-    },
-  },
+  // Filled from the "Sold covers" sheet: magazine → size → zone → ["YYYY-MM", ...].
+  soldOut: {},
   artwork: [
     { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
     { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
@@ -457,14 +452,74 @@ function loadRates(text) {
   CONFIG.rates = rates; CONFIG.zones = zones;
 }
 
+const FALLBACK_SOLD_CSV = `Magazine,Ad size,Zone,Month,Advertiser
+BDB,Back Cover,Z1,Jan 2027,Example Roofing
+BDB,Back Cover,Z1,Feb 2027,Example Roofing
+BDB,Back Cover,Z3,Mar 2027,Example AC
+BDB,Inside Front Cover,Z2,Jan 2027,Example Pavers
+EHI,Back Cover,Z1,Apr 2027,Example Windows`;
+
+// "2027-01", "Jan 2027", "January 2027", "1/2027", "1/1/2027" → "2027-01"
+function monthKey(v) {
+  v = String(v || "").trim();
+  let m;
+  if ((m = v.match(/^(\d{4})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})$/))) return `${m[2]}-${m[1].padStart(2, "0")}`;
+  const d = new Date("1 " + v);
+  if (!isNaN(d)) return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  return null;
+}
+
+function loadSold(text) {
+  const [head, ...rows] = parseCSV(text);
+  const col = Object.fromEntries(head.map((h, i) => [norm(h), i]));
+  const sizeCol = col.adsize ?? col.size;
+  const sold = {};
+  rows.forEach((r, n) => {
+    const pub = PUB_ALIASES[norm(r[col.magazine])];
+    const sv = norm(r[sizeCol]);
+    const size = CONFIG.sizes.find(s => norm(s.name) === sv || s.id === sv);
+    const zone = (r[col.zone] || "").trim();
+    const month = monthKey(r[col.month]);
+    if (!pub || !size || !zone || !month) { console.warn(`Sold covers row ${n + 2} skipped`, r); return; }
+    ((sold[pub] ??= {})[size.id] ??= {})[zone] ??= [];
+    sold[pub][size.id][zone].push(month);
+  });
+  CONFIG.soldOut = sold;
+}
+
+// Any Google Sheets link → CSV for one tab, by tab name.
+function googleTabCsv(url, tab) {
+  const id = (String(url).match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/) || [])[1];
+  if (!id) throw new Error("That doesn't look like a Google Sheets link: " + url);
+  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(tab)}`;
+}
+
+async function fetchText(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.text();
+}
+
 async function fetchRates() {
+  const g = CONFIG.googleSheetUrl;
+  const ratesSrc = g ? googleTabCsv(g, "Rates") : CONFIG.ratesUrl;
+  const soldSrc = g ? googleTabCsv(g, "Sold covers") : CONFIG.soldUrl;
+  const [rates, sold] = await Promise.allSettled([fetchText(ratesSrc), fetchText(soldSrc)]);
   try {
-    const res = await fetch(CONFIG.ratesUrl, { cache: "no-store" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    loadRates(await res.text());
+    if (rates.status !== "fulfilled") throw rates.reason;
+    loadRates(rates.value);
   } catch (e) {
-    console.warn("Couldn't load rates from " + CONFIG.ratesUrl + ", using built-in demo rates.", e);
+    console.warn("Couldn't load rates from " + ratesSrc + ", using built-in demo rates.", e);
     loadRates(FALLBACK_RATES_CSV);
+  }
+  try {
+    if (sold.status !== "fulfilled") throw sold.reason;
+    loadSold(sold.value);
+  } catch (e) {
+    console.warn("Couldn't load sold covers from " + soldSrc + ", using built-in demo list.", e);
+    loadSold(FALLBACK_SOLD_CSV);
   }
 }
 
@@ -759,7 +814,7 @@ fetchRates().then(() => {
   if (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z))) {
     state.zones = new Set([CONFIG.zones[0].id]);
   }
-  pruneZones(); state.zoneNotice = "";
+  pruneZones(); pruneMonths(); state.zoneNotice = ""; state.notice = "";
   render();
 });
 </script>

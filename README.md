@@ -6,31 +6,28 @@ It's a single static page, `index.html`. Open it in a browser; there's no build 
 
 **Flow:** 1 · Build your ad (magazine, ad size, zones, issue months, artwork) → 2 · Checkout (business, billing address, invoice details) → 3 · Confirmation.
 
-## Updating rates
-All prices, zones and household counts live in **`rates.csv`**, a normal spreadsheet with one row per magazine and zone:
+## Updating rates and sold covers (Google Sheet)
+Rates, zones, household counts and sold covers come from a spreadsheet. Nothing is hard-coded in the page.
 
-| Magazine | Zone | Zone name | Homes | Back Cover | Inside Front Cover | Inside Back Cover | Full Page | Half Page | Quarter Page |
-|---|---|---|---|---|---|---|---|---|---|
-| BDB | Z1 | Zone 1 | 20000 | 1495 | 1195 | 1095 | 895 | 525 | 315 |
+**One-time setup**
+1. In Google Drive: New → File upload → `Best Deals Ads - Rates.xlsx`, then open it with Google Sheets (or File → Save as Google Sheets).
+2. Share → General access → **Anyone with the link** → **Viewer**. Copy the link.
+3. Paste the link into `googleSheetUrl` near the top of `CONFIG` in `index.html`.
 
-- **Change a price:** edit the number. `$1,495` and `1495` both work.
-- **Add a zone:** add a row. It shows up on the page automatically, named from "Zone name".
-- **A magazine doesn't mail a zone:** leave that row out.
-- **A size isn't sold in a zone:** leave that cell blank.
-- Magazine can be `BDB` / `Best Deals Book` or `EHI` / `Exclusively Home Improvements`.
+**After that** your team just edits the sheet, and changes show the next time someone loads the checkout.
 
-**Option A, edit the file:** open `rates.csv` in Excel, Google Sheets or Smartsheet, edit it, save it as CSV, and upload it in place of the old one. On GitHub that's: open the file, then the pencil (edit) or Add file → Upload files.
+- **Rates tab:** one row per magazine (BDB / EHI) and zone, with prices per issue for each ad size. Add a row to add a zone ("Zone name" is what customers see). Delete a row if a magazine doesn't mail that zone. Leave a cell blank if a size isn't sold there.
+- **Sold covers tab:** one row per booked Back Cover, Inside Front Cover or Inside Back Cover, with its magazine, zone and month (for example `Jan 2027`). That cover then shows as "Taken" for that month and zone. Delete the row if the booking is cancelled.
+- Don't rename the two tabs or their column headers. The "How to use" tab repeats these steps.
 
-**Option B, live Google Sheet:** paste the sheet in, then use File → Share → Publish to web → choose the tab → **Comma-separated values (.csv)** → Publish. Put that link in `CONFIG.ratesUrl` in `index.html`, once. After that, edits to the sheet show up on the page within about 5 minutes.
+**Without a Google Sheet:** if `googleSheetUrl` is empty, the page reads `rates.csv` and `sold.csv` next to it (same columns). If neither can be loaded (for example, the page is opened straight from disk), it uses built-in copies of the demo data.
 
 Other pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
-
-If the page is opened straight from disk (not from a web server), browsers block it from reading `rates.csv`, so it uses a built-in copy of the demo rates instead.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The volume discount is based on how many issues they book (`CONFIG.volume`).
 
-Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. To mark a cover as sold, add the month to `CONFIG.soldOut` (magazine → size → zone → `"YYYY-MM"`). That month then shows as "Taken in Zx" for anyone who picks that zone. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why. The `soldOut` entries in the file now are examples only.
+Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed on the **Sold covers** tab show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
 
 ## Demo mode
 `CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. A yellow banner tells visitors it's a demo. Set `demo: false` once the order destination, prices and inventory are real.
@@ -43,7 +40,8 @@ When a customer presses **Request ad space**:
 The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices, zones, homes:** replace the demo numbers in `rates.csv`.
-- **Sold covers:** replace the example `CONFIG.soldOut` entries with real bookings.
+- **Prices, zones, homes:** replace the demo numbers on the Rates tab.
+- **Sold covers:** replace the example rows with real bookings.
+- **Google Sheet:** do the one-time setup above.
 - **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
