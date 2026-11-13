@@ -18,7 +18,7 @@ Staff update everything at **`/staff/`** (for example `https://hamstari.github.i
 2. Under Repository access, choose **Only select repositories → adcheckout**. Under Permissions, set **Contents: Read and write**.
 3. In the portal, click **Connect to save** and paste the key. Tick "Remember on this computer" so staff only do this once per computer.
 
-The key can change files in this repo, so only give it to trusted staff. Set an expiry and replace it when someone leaves. The branch the portal saves to is set in `SETTINGS` at the top of `staff/index.html`, and must be the branch GitHub Pages publishes.
+The key can change files in this repo, so only give it to trusted staff. Set an expiry and replace it when someone leaves. The portal saves to `main` (set in `SETTINGS` at the top of `staff/index.html`), which is the branch GitHub Pages publishes.
 
 Pricing rules: "Both magazines" adds the two rates for each zone and takes 10% off. The volume discount applies on top. Ad design is free.
 
@@ -45,12 +45,9 @@ The confirmation page shows an order summary that the customer can print or save
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
 
 ## Publishing with GitHub Pages (free)
-This repo is public, so GitHub can host the checkout for free:
-1. On GitHub, go to the repo's **Settings → Pages**.
-2. Under **Build and deployment**, set Source to **Deploy from a branch**, pick the branch (for example `main` once this is merged) and folder **/ (root)**, then **Save**.
-3. After about a minute it's live at **https://hamstari.github.io/adcheckout/**.
+The workflow in `.github/workflows/jekyll-gh-pages.yml` publishes the `main` branch to **https://hamstari.github.io/adcheckout/** every time `main` changes (Settings → Pages → Source must be **GitHub Actions**). A deploy takes a minute or two.
 
-Rates and sold covers are updated from the staff portal (see above).
+Rates and sold covers are updated from the staff portal (see above), which saves to `main` and so triggers a deploy.
 
 **Optional: your own address.** In Settings → Pages → Custom domain, enter `ads.bestdealsnetworks.com`. Then in Wix go to Domains → your domain → Manage DNS records, add a **CNAME** with host `ads` pointing to `hamstari.github.io`, and tick **Enforce HTTPS** in GitHub once it's available.
 
