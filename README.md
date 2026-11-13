@@ -44,7 +44,13 @@ To update rates, edit `rates.csv` / `sold.csv` on GitHub (open the file → penc
 
 **Optional: your own address.** In Settings → Pages → Custom domain, enter `ads.bestdealsnetworks.com`. Then in Wix go to Domains → your domain → Manage DNS records, add a **CNAME** with host `ads` pointing to `hamstari.github.io`, and tick **Enforce HTTPS** in GitHub once it's available.
 
-**On Wix:** link to the page from a button or menu item (simplest). Or use Add Elements → Embed Code → **Embed a Site**, paste the URL, and make the box tall (about 3,500px on desktop). Wix embeds have a fixed height, so the auto-resizing in `embed.html` doesn't work there.
+**On Wix (keeps visitors on your site):**
+1. In the Wix Editor, open the page (for example "Advertise"), then **Add Elements (+) → Embed Code → Embed a Site**.
+2. Click **Change Website Address**, paste `https://hamstari.github.io/adcheckout/` (or `https://ads.bestdealsnetworks.com`), and **Update**.
+3. Stretch the box to full width. Make it about **900px tall on desktop**.
+4. Switch to the **mobile editor** and set the box to about **500–550px tall**, so it fits on a phone screen with the total bar visible.
+
+The checkout scrolls inside the box. On desktop the summary and total stay pinned, and on phones a bar with the total and the Continue button stays at the bottom of the box. Visitors never leave bestdealsnetworks.com.
 
 ## Publishing on your site
 The checkout is three plain files with no build step: `index.html`, `rates.csv` and `sold.csv`.

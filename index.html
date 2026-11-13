@@ -67,7 +67,6 @@
 
   /* Summary */
   aside { position: sticky; top: 16px; }
-  .embedded aside { position: static; }
   .sum h2 { font-size: 24px; margin-bottom: 12px; }
   .sum dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 15px; }
   .sum dt { color: var(--muted); }
@@ -78,6 +77,20 @@
   .per { color: var(--muted); font-size: 14px; text-align: right; }
   .btn { width: 100%; border: 0; border-radius: 999px; padding: 14px 20px; background: var(--deep); color: #fff; font-weight: 700; font-size: 16px; margin-top: 18px; }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* Phone: total + Continue pinned to the bottom (also inside a fixed-height embed box) */
+  .mbar { display: none; }
+  @media (max-width: 900px) {
+    .mbar { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--card);
+            border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(0,0,0,.08); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+    .mbar-row { display: flex; align-items: center; gap: 12px; }
+    .mbar small { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+    .mbar strong { font-family: "DM Serif Display", serif; font-weight: 400; font-size: 26px; line-height: 1.1; }
+    .mbar .btn { width: auto; flex: 1; margin: 0; padding: 12px 16px; font-size: 15px; }
+    .mbar .err { margin: 0 0 6px; min-height: 0; }
+    .mbar .err:empty { display: none; }
+    body.has-mbar { padding-bottom: 96px; }
+  }
   .btn.ghost { background: transparent; color: var(--deep); border: 2px solid var(--deep); margin-top: 10px; }
   .err { color: #a3352b; font-size: 14px; margin-top: 10px; min-height: 1em; }
 
@@ -269,6 +282,14 @@
     </aside>
   </div>
 </main>
+
+<div class="mbar" id="mbar" aria-hidden="true">
+  <div class="err" id="mErr"></div>
+  <div class="mbar-row">
+    <div><small>Total</small><strong id="mTotal">$0</strong></div>
+    <button class="btn" id="mNext" type="button" tabindex="-1">Continue</button>
+  </div>
+</div>
 
 <footer>Questions? Call <a href="tel:8446008846">844-600-8846</a></footer>
 
@@ -817,6 +838,23 @@ if (embedded) {
   new ResizeObserver(post).observe(document.body);
   addEventListener("load", post);
 }
+
+// Phone bar mirrors the summary button, total and error message.
+(function () {
+  const next = $("#nextBtn"), err = $("#err"), total = $("#sumTotal"), mbar = $("#mbar");
+  const sync = () => {
+    $("#mNext").textContent = next.textContent;
+    $("#mNext").disabled = next.disabled;
+    $("#mTotal").textContent = total.textContent;
+    $("#mErr").innerHTML = err.innerHTML;
+    const show = state.step !== 3;
+    mbar.style.visibility = show ? "visible" : "hidden";
+    document.body.classList.toggle("has-mbar", show);
+  };
+  new MutationObserver(sync).observe(document.querySelector("aside"), { subtree: true, childList: true, characterData: true, attributes: true });
+  new MutationObserver(sync).observe($("#step3"), { attributes: true });
+  $("#mNext").onclick = () => next.click();
+})();
 
 fetchRates().then(() => {
   if (!state.zones.size || [...state.zones].some(z => !CONFIG.zones.some(x => x.id === z))) {
