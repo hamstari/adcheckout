@@ -31,6 +31,14 @@ Staff update everything at **`/staff/`** (for example `https://hamstari.github.i
 
 The key can change any file in this repo, so give it only to trusted staff, set an expiry, and replace it when someone leaves.
 
+## Package flow
+The checkout is framed as building a package:
+- **Your package** panel at the top lists every ad with its price, with Edit and Remove, and an "Add another ad size" button. With one ad it shows a three-step "how it works" instead. It stays visible on the details step as the review.
+- **Ad sizes** are grouped (standard sizes; covers and spreads) and each card shows the per-issue price for the zones already picked.
+- The builder ends with a panel summarising the ad and two buttons: **Save and add another ad size** and **Review package**.
+- **Package estimate** (side panel) shows each ad as price per issue × issues, the rate tier, a month-by-month view of what runs and what each month costs, and a note that nothing is paid now.
+- Ads keep their number when edited.
+
 ## Several ads in one order
 An order can hold more than one ad. After building an ad, **+ Add another ad** saves it to the order summary and starts the next one, with its own size, zones, months, placement and artwork. That's how a customer books different sizes in different months (for example a Full Page in Dec–Feb and a Half Page in Mar–May). Saved ads can be edited or removed from the summary.
 

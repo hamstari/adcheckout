@@ -90,9 +90,42 @@
   .line .tools button { background: none; border: 0; padding: 0; color: var(--teal-d); font-weight: 700; font-size: 12.5px; }
   .line .tools button.rm { color: #b3261e; }
   .line.cur { border-left: 3px solid var(--teal); padding-left: 10px; }
-  .line .badge { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--tint); color: var(--teal-d); border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-weight: 700; vertical-align: 1px; }
-  .addmore { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-  .addmore .btn { width: auto; margin: 0; }
+  /* Package panel + finish panel */
+  .pkg { border-top: 3px solid var(--teal); }
+  .pkg-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  .pkg-h strong { font-size: 20px; color: var(--black); white-space: nowrap; }
+  .how { list-style: none; counter-reset: how; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); font-size: 13.5px; color: var(--muted); }
+  .how li { counter-increment: how; padding-left: 34px; position: relative; }
+  .how li::before { content: counter(how); position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--black); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .how b { display: block; color: var(--ink); font-weight: 600; }
+  @media (max-width: 700px) { .how { grid-template-columns: 1fr; } }
+  .prow { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+  .prow:first-child { border-top: 0; padding-top: 2px; }
+  .prow b { font-size: 14.5px; color: var(--black); }
+  .prow .amt { font-weight: 700; color: var(--black); text-align: right; white-space: nowrap; }
+  .prow small { grid-column: 1 / -1; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+  .prow .tools { grid-column: 1 / -1; display: flex; gap: 14px; margin-top: 4px; }
+  .prow .tools button { background: none; border: 0; padding: 0; color: var(--teal-d); font-weight: 700; font-size: 12.5px; }
+  .prow .tools button.rm { color: #b3261e; }
+  .prow.cur { background: var(--tint); margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 4px; border-top-color: transparent; }
+  .prow .badge, .line .badge { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--teal); color: var(--black); border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-weight: 700; vertical-align: 1px; }
+  #pkgAdd { width: auto; margin-top: 14px; padding: 10px 16px; }
+  .finish { border: 2px solid var(--black); }
+  .fin-line { font-size: 17px; font-weight: 600; color: var(--black); margin: 6px 0 2px; }
+  .fin-line span { color: var(--muted); font-weight: 400; font-size: 14px; display: block; margin-top: 2px; }
+  .fin-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .fin-btns .btn { margin: 0; }
+  @media (max-width: 560px) { .fin-btns { grid-template-columns: 1fr; } }
+  .grp-label { grid-column: 1 / -1; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-top: 6px; }
+  .grp-label:first-child { margin-top: 0; }
+  .opt .price small { display: inline; color: var(--muted); font-weight: 500; font-size: 12.5px; }
+  .bymonth { margin-top: 14px; font-size: 13.5px; }
+  .bymonth summary { cursor: pointer; font-weight: 700; color: var(--teal-d); }
+  .bymonth dl { margin: 10px 0 0; display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; }
+  .bymonth dt { font-weight: 600; white-space: nowrap; }
+  .bymonth dd { margin: 0; color: var(--muted); }
+  .bymonth dd.a { color: var(--black); font-weight: 600; text-align: right; white-space: nowrap; }
+  .nopay { color: var(--muted); font-size: 12.5px; margin: 14px 0 0; }
   .receipt dt.hd { grid-column: 1 / -1; background: #f4f4f4; color: var(--black); font-weight: 700; }
   #sumList:empty + hr { display: none; }
   .sum hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
@@ -205,10 +238,10 @@
   <div class="wrap">
     <div class="eyebrow">Best Deals Networks</div>
     <h1>Best Deals Ads</h1>
-    <p>Put your business in front of high-income Florida homeowners. Pick your magazine, ad size, zones and months, then check out. Printing and mailing included.</p>
+    <p>Build your advertising package: pick an ad size, your zones and the months it runs. Add more ad sizes if you want, then send your request. No payment now.</p>
     <div class="steps" id="steps">
-      <span class="on">1 · Build<i class="xs-hide" style="font-style:normal"> your ad</i></span>
-      <span>2 · Checkout</span>
+      <span class="on">1 · <i class="xs-hide" style="font-style:normal">Your </i>package</span>
+      <span>2 · <i class="xs-hide" style="font-style:normal">Your </i>details</span>
       <span>3 · Confirmation</span>
     </div>
   </div>
@@ -218,8 +251,18 @@
   <div class="wrap grid">
     <div>
       <!-- STEP 1 -->
+      <div class="panel pkg" id="pkg">
+        <div class="pkg-h"><h2>Your package</h2><strong id="pkgTotal"></strong></div>
+        <ol class="how" id="pkgHow">
+          <li><b>Build an ad.</b> Choose a size, zones and months below.</li>
+          <li><b>Add more if you like.</b> A different size, other zones or other months.</li>
+          <li><b>Review and send.</b> We confirm, then send the agreement and invoice.</li>
+        </ol>
+        <div id="pkgLines"></div>
+        <button class="btn ghost" id="pkgAdd" type="button">+ Add another ad size</button>
+      </div>
+
       <section id="step1">
-        <div class="note hidden" id="adBanner" style="margin:0 0 20px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal)"></div>
         <div class="panel">
           <div class="panel-h"><div class="num">1</div><h2>Magazine</h2></div>
           <p class="sub">Both magazines mail monthly to targeted Florida neighborhoods.</p>
@@ -228,7 +271,7 @@
 
         <div class="panel">
           <div class="panel-h"><div class="num">2</div><h2>Ad size</h2></div>
-          <p class="sub">"From" prices are per issue for one zone at the 12-issue rate. Your price updates as you pick zones and months.</p>
+          <p class="sub">Prices are per issue for the zones you've picked, and update as you change zones and months.</p>
           <div class="opts" id="sizeOpts"></div>
           <div class="note" id="specNote"></div>
         </div>
@@ -273,13 +316,15 @@
           <div class="opts" id="artOpts"></div>
         </div>
 
-        <div class="panel addmore">
-          <div>
-            <b>Need a different size in other months, or a second ad?</b>
-            <div class="sub" style="margin:2px 0 0">Save this ad and build another. Each ad has its own size, zones, months and placement.</div>
-            <div class="err" id="addErr" role="alert" style="min-height:0"></div>
+        <div class="panel finish">
+          <div class="eyebrow" style="color:var(--teal-d)" id="finEyebrow">This ad</div>
+          <div class="fin-line" id="finLine"></div>
+          <div class="err" id="addErr" role="alert" style="min-height:0"></div>
+          <div class="fin-btns">
+            <button class="btn ghost" id="addAd" type="button">+ Save and add another ad size</button>
+            <button class="btn" id="finNext" type="button">Review package</button>
           </div>
-          <button class="btn ghost" id="addAd" type="button">+ Add another ad</button>
+          <p class="sub" style="margin:14px 0 0">Want a Full Page some months and a Half Page in others? Save this ad, then build the next one. Each ad has its own size, zones, months and placement.</p>
         </div>
       </section>
 
@@ -356,14 +401,16 @@
 
     <aside>
       <div class="panel sum" id="summary">
-        <h2>Your order</h2>
+        <h2>Package estimate</h2>
         <div id="sumLines"></div>
         <dl id="sumList"></dl>
         <hr>
-        <div class="total"><span>Total</span><strong id="sumTotal">$0</strong></div>
+        <div class="total"><span>Estimated total</span><strong id="sumTotal">$0</strong></div>
         <div class="per" id="sumPer"></div>
-        <button class="btn" id="nextBtn" type="button">Continue to checkout</button>
-        <button class="btn ghost hidden" id="backBtn" type="button">Back to your order</button>
+        <details class="bymonth" id="byMonth"><summary>Month by month</summary><dl id="monthRows"></dl></details>
+        <p class="nopay">No payment now. After we confirm, you'll get the agreement by DocuSign, then your invoice.</p>
+        <button class="btn" id="nextBtn" type="button">Review package</button>
+        <button class="btn ghost hidden" id="backBtn" type="button">Back to your package</button>
         <div class="err" id="err" role="alert"></div>
       </div>
     </aside>
@@ -484,6 +531,7 @@ const DEADLINE = (() => {
 const monthByKey = Object.fromEntries(MONTHS.map(m => [m.key, m]));
 const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), months: new Set(MONTHS.slice(0, 3).map(m => m.key)), art: "own", place: "std", req: false, reqText: "", step: 1, notice: "", zoneNotice: "",
   items: [],   // ads already saved to this order; the fields above are the ad being built
+  pos: 0,      // where the ad being built sits among the saved ads, so numbering stays put while editing
 };
 const SPEC_KEYS = ["pub", "size", "zones", "months", "art", "place", "req", "reqText"];
 const snapshot = () => ({ ...Object.fromEntries(SPEC_KEYS.map(k => [k, state[k]])), zones: new Set(state.zones), months: new Set(state.months) });
@@ -537,7 +585,12 @@ function monthList(keys) {
   return ms.map(m => `${m.short} ’${String(m.year).slice(2)}`).join(", ");
 }
 
-function adIcon([w, h]) {
+function adIcon([w, h], spread) {
+  if (spread) return `<svg width="48" height="52" viewBox="0 0 48 52" aria-hidden="true">
+    <rect x="2" y="8" width="21" height="34" rx="2" fill="#eaf5f5" stroke="#59abad" stroke-width="2"/>
+    <rect x="25" y="8" width="21" height="34" rx="2" fill="#eaf5f5" stroke="#59abad" stroke-width="2"/>
+    <rect x="6" y="13" width="13" height="4" rx="1" fill="#59abad"/><rect x="29" y="13" width="13" height="4" rx="1" fill="#59abad"/>
+  </svg>`;
   return `<svg width="48" height="52" viewBox="0 0 48 52" aria-hidden="true">
     <rect x="4" y="2" width="36" height="46" rx="3" fill="none" stroke="#cfe3e3" stroke-width="2" stroke-dasharray="3 3"/>
     <rect x="5" y="${3 + 44 - h}" width="${w}" height="${h}" rx="2" fill="#eaf5f5" stroke="#59abad" stroke-width="2"/>
@@ -767,14 +820,27 @@ function calcLine(sp, freq = freqFor(sp.months.size)) {
            complete: zones.length > 0 && issues > 0 };
 }
 
+// What runs in each month and what that month costs.
+function monthSchedule(o) {
+  const many = o.lines.length > 1;
+  return MONTHS.filter(m => o.monthSet.has(m.key)).map(m => {
+    const run = o.lines.map((l, i) => ({ l, i })).filter(x => x.l.sp.months.has(m.key));
+    return { key: m.key, label: `${m.short} ${m.year}`, long: m.long,
+             what: run.map(x => (many ? `Ad ${x.l.no} ` : "") + x.l.size.name).join(" + "),
+             amount: run.reduce((a, x) => a + x.l.perIssue, 0) };
+  });
+}
+
 // The whole order: saved ads plus the one being built (if it has zones and months).
 // The rate column (3x / 6x / 12 issues) is set by how many different months the order runs in.
 function calcOrder() {
-  const specs = [...state.items, ...(state.zones.size && state.months.size ? [state] : [])];
+  state.pos = Math.min(Math.max(state.pos, 0), state.items.length);
+  const disp = [...state.items]; disp.splice(state.pos, 0, state);            // display order, ad being built included
+  const specs = disp.filter(sp => sp !== state || (state.zones.size && state.months.size));
   const monthSet = new Set(specs.flatMap(sp => [...sp.months]));
   const issues = monthSet.size;
   const freq = freqFor(issues);
-  const lines = specs.map(sp => calcLine(sp, freq));
+  const lines = specs.map(sp => Object.assign(calcLine(sp, freq), { no: disp.indexOf(sp) + 1, cur: sp === state }));
   const gross = lines.reduce((a, l) => a + l.gross, 0);
   return { lines, monthSet, issues, freq, gross, total: gross, tbd: lines.some(l => l.tbd) };
 }
@@ -793,13 +859,23 @@ function render() {
     onClick: () => { state.pub = p.id; pruneZones(); pruneMonths(); render(); },
   })));
 
-  // sizes
+  // sizes, grouped; once zones are picked each card shows the price for those zones
   const sizeEl = $("#sizeOpts"); sizeEl.innerHTML = "";
-  CONFIG.sizes.forEach(s => sizeEl.append(optButton({
-    pressed: state.size === s.id,
-    html: `${adIcon(s.shape)}<b>${s.name}</b><small>${s.note || s.trim}</small><div class="price">${sizeFrom(s.id) != null ? `From ${money(sizeFrom(s.id))} / issue` : "Call for pricing"}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
-    onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
-  })));
+  const nzs = state.zones.size, magsN = c.pub.includes.length;
+  [["Standard sizes", ["fp", "hp", "qp"]], ["Covers and spreads", ["fc", "bc", "sp"]]].forEach(([label, ids]) => {
+    const h = document.createElement("div"); h.className = "grp-label"; h.textContent = label; sizeEl.append(h);
+    CONFIG.sizes.filter(s => ids.includes(s.id)).forEach(s => {
+      const now = nzs ? cardPrice(s.id, nzs, o.freq.id) : null;
+      const price = now != null
+        ? `${money(now * magsN)} / issue <small>· ${nzs} zone${nzs > 1 ? "s" : ""}${s.flat ? "" : ", " + o.freq.name}</small>`
+        : sizeFrom(s.id) != null ? `From ${money(sizeFrom(s.id))} / issue` : "Call for pricing";
+      sizeEl.append(optButton({
+        pressed: state.size === s.id,
+        html: `${adIcon(s.shape, s.id === "sp")}<b>${s.name}</b><small>${s.note || s.trim}</small><div class="price">${price}</div>${s.premium ? `<span class="tag">Premium · ${s.limit}</span>` : ""}`,
+        onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
+      }));
+    });
+  });
   $("#specNote").innerHTML = `✓ <b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
 
   // zones
@@ -871,7 +947,7 @@ function render() {
     const ok = placeOk(pl, state.size);
     const b = optButton({
       pressed: state.place === pl.id,
-      html: `<b>${pl.name}</b><small>${ok ? pl.desc : (pl.sizes.length === 1 ? "Full Page ads only" : "Not available for cover positions")}</small>` +
+      html: `<b>${pl.name}</b><small>${ok ? pl.desc : (c.size.premium ? "Not available for cover positions" : `${pl.sizes.filter(id => !["hp", "qp"].includes(id) || pl.sizes.length > 2).map(id => CONFIG.sizes.find(x => x.id === id).name).join(" or ")} ads only`)}</small>` +
         (ok ? `<div class="price">${pl.premium ? "Upgrade charge TBD on invoice" : "Included"}</div>` : "") +
         (ok && pl.limit ? `<span class="tag">${pl.limit}</span>` : ""),
       onClick: () => { state.place = pl.id; pruneMonths(); render(); },
@@ -900,29 +976,43 @@ function render() {
     onClick: () => { state.art = a.id; render(); },
   })));
 
-  // summary
+  // package panel, estimate and finish panel
   const n = state.items.length;
   const editing = state.step === 1;
-  const lineHtml = (l, i, cur) => `<div class="line${cur && n && editing ? " cur" : ""}">
-      <div class="line-h"><span>${n ? `Ad ${i + 1} · ` : ""}${l.size.name}${cur && n && editing ? '<span class="badge">Editing</span>' : ""}</span><span>${money(l.gross)}</span></div>
-      <small>${l.pub.name}</small>
-      <small>${l.zones.map(z => z.id).join(", ")} · ~${l.homes.toLocaleString()} homes / issue</small>
-      <small>${l.issues} issue${l.issues > 1 ? "s" : ""}: ${monthList(l.sp.months)} · ${money(l.perIssue)} each</small>
-      ${l.place.premium ? `<small>${l.place.name}: upgrade charge TBD on invoice</small>` : ""}
-      ${l.sp.req ? `<small>Placement request: charge TBD on invoice</small>` : ""}
-      ${cur && editing ? "" : `<div class="tools"><button type="button" data-edit="${i}">Edit</button><button type="button" class="rm" data-rm="${i}">Remove</button></div>`}
-    </div>`;
-  $("#sumLines").innerHTML = state.items.map((it, i) => lineHtml(calcLine(it, o.freq), i, false)).join("") +
-    (c.complete ? lineHtml(c, n, true)
-      : `<div class="line${n ? " cur" : ""}"><div class="line-h"><span>${n ? `Ad ${n + 1} · ` : ""}${c.size.name}</span></div><small>${c.zones.length ? "Pick at least one month to add this ad." : "Pick at least one zone to add this ad."}</small></div>`);
+  const each = (l) => `${money(l.perIssue)} / issue × ${l.issues} issue${l.issues > 1 ? "s" : ""}`;
+  const tbdNote = (l) => (l.place.premium ? `<small>${l.place.name}: upgrade charge TBD on invoice</small>` : "") + (l.sp.req ? `<small>Placement request: charge TBD on invoice</small>` : "");
+  const tools = (i) => `<div class="tools"><button type="button" data-edit="${i}">Edit</button><button type="button" class="rm" data-rm="${i}">Remove</button></div>`;
+  const all = o.lines.map(l => ({ l, i: l.no - 1, cur: l.cur }));
+
+  $("#sumLines").innerHTML = all.map(({ l, i, cur }) => `<div class="line${cur && n && editing ? " cur" : ""}">
+      <div class="line-h"><span>${all.length > 1 || n ? `Ad ${i + 1} · ` : ""}${l.size.name}</span><span>${money(l.gross)}</span></div>
+      <small>${l.pub.name} · ${l.zones.map(z => z.id).join(", ")}</small>
+      <small>${monthList(l.sp.months)}</small>
+      <small>${each(l)}</small>${tbdNote(l)}
+    </div>`).join("") || `<div class="line"><small>${c.zones.length ? "Pick at least one month to price this ad." : "Pick at least one zone to price this ad."}</small></div>`;
   const rows = [];
   if (o.lines.length) rows.push(["Rate", `${o.freq.name} (${o.issues} issue${o.issues === 1 ? "" : "s"})`]);
   $("#sumList").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("#sumTotal").textContent = money(o.total);
   $("#sumPer").textContent = o.tbd ? "Plus placement charge, TBD on invoice." : "";
-  const ban = $("#adBanner");
-  ban.classList.toggle("hidden", !n);
-  ban.textContent = n ? `Ad ${n + 1} of your order. ${n === 1 ? "Ad 1 is" : `Ads 1–${n} are`} saved in your order summary.` : "";
+  const sched = monthSchedule(o);
+  $("#byMonth").classList.toggle("hidden", sched.length < 2);
+  $("#monthRows").innerHTML = sched.map(r => `<dt>${r.label}</dt><dd>${esc(r.what)}</dd><dd class="a">${money(r.amount)}</dd>`).join("");
+
+  $("#pkg").classList.toggle("hidden", state.step === 3);
+  $("#pkgHow").classList.toggle("hidden", !(editing && n === 0));
+  $("#pkgAdd").classList.toggle("hidden", !(editing && n > 0));
+  $("#pkgTotal").textContent = all.length && (n || !editing) ? money(o.total) : "";
+  $("#pkgLines").innerHTML = (n || !editing) ? all.map(({ l, i, cur }) => `<div class="prow${cur && editing ? " cur" : ""}">
+      <b>Ad ${i + 1} · ${l.size.name}${cur && editing ? '<span class="badge">Editing below</span>' : ""}</b><span class="amt">${money(l.gross)}</span>
+      <small>${l.pub.name} · ${l.zones.length} zone${l.zones.length > 1 ? "s" : ""} (${l.zones.map(z => z.id).join(", ")}) · ${monthList(l.sp.months)} · ${each(l)}</small>${tbdNote(l)}
+      ${cur && editing ? "" : tools(i)}
+    </div>`).join("") + (editing && !c.complete ? `<div class="prow cur"><b>Ad ${state.pos + 1} · ${c.size.name}<span class="badge">Building below</span></b><span class="amt"></span><small>${c.zones.length ? "Pick the months it runs to add it to your package." : "Pick at least one zone."}</small></div>` : "") : "";
+
+  $("#finEyebrow").textContent = n ? `Ad ${state.pos + 1} of your package` : "Your ad";
+  $("#finLine").innerHTML = c.complete
+    ? `${c.size.name} · ${money(c.gross)}<span>${c.pub.name} · ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""} · ${monthList(state.months)} · ${each(c)}</span>`
+    : `${c.size.name}<span>${c.zones.length ? "Pick at least one month in step 4 to finish this ad." : "Pick at least one zone in step 3 to finish this ad."}</span>`;
 
   // step chrome
   ["#step1", "#step2", "#step3"].forEach((id, i) => $(id).classList.toggle("hidden", state.step !== i + 1));
@@ -931,7 +1021,7 @@ function render() {
   document.querySelector(".grid").classList.toggle("done", state.step === 3);
   $("#backBtn").classList.toggle("hidden", state.step !== 2);
   saveSession();
-  if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Continue to checkout" : "Request ad space";
+  if (!sending) $("#nextBtn").textContent = state.step === 1 ? "Review package" : "Send my request";
   $("#nextBtn").disabled = o.lines.length === 0;
   $("#err").textContent = o.lines.length ? "" : c.zones.length === 0 ? "Choose at least one zone." : "Choose at least one issue.";
 }
@@ -955,7 +1045,7 @@ function saveSession() {
   if (state.step === 3) return;
   try {
     const form = Object.fromEntries(new FormData($("#checkoutForm"))); delete form.website;
-    sessionStorage.setItem(SAVE_KEY, JSON.stringify({ draft: packSpec(snapshot()), items: state.items.map(packSpec), step: state.step, form }));
+    sessionStorage.setItem(SAVE_KEY, JSON.stringify({ draft: packSpec(snapshot()), items: state.items.map(packSpec), pos: state.pos, step: state.step, form }));
   } catch {}
 }
 function clearSession() { try { sessionStorage.removeItem(SAVE_KEY); } catch {} }
@@ -963,6 +1053,7 @@ function restoreSession() {
   let raw; try { raw = JSON.parse(sessionStorage.getItem(SAVE_KEY) || "null"); } catch { return false; }
   const draft = validSpec(raw && raw.draft); if (!draft) return false;
   state.items = (raw.items || []).map(validSpec).filter(sp => sp && sp.zones.size && sp.months.size);
+  state.pos = Number.isInteger(raw.pos) ? raw.pos : state.items.length;
   loadSpec(draft); $("#reqText").value = state.reqText;
   Object.entries(raw.form || {}).forEach(([k, v]) => { const el = $("#checkoutForm").elements[k]; if (el && k !== "website") el.value = v; });
   state.step = raw.step === 2 && calcOrder().lines.length ? 2 : 1;
@@ -988,28 +1079,38 @@ $("#addAd").onclick = () => {
   const c = calcLine(state);
   if (!c.complete) { $("#addErr").textContent = "Finish this ad first: it needs at least one zone and one month."; return; }
   $("#addErr").textContent = "";
-  state.items.push(snapshot());
+  state.items.splice(state.pos, 0, snapshot()); state.pos = state.items.length;
   // Start the next ad: keep magazine, zones and artwork choice; clear the rest.
   state.months = new Set(); state.place = "std"; state.req = false; state.reqText = ""; $("#reqText").value = "";
   state.notice = ""; state.zoneNotice = "";
   render(); toTop();
 };
-$("#sumLines").addEventListener("click", (e) => {
+$("#pkgAdd").onclick = () => $("#addAd").click();
+$("#finNext").onclick = () => {
+  if (!calcOrder().lines.length) { $("#addErr").textContent = "Finish this ad first: it needs at least one zone and one month."; return; }
+  $("#addErr").textContent = ""; $("#nextBtn").click();
+};
+document.addEventListener("click", (e) => {
   const ed = e.target.dataset.edit, rm = e.target.dataset.rm;
-  if (rm != null && +rm === state.items.length) {          // removing the ad being built
-    if (state.items.length) loadSpec(state.items.pop()); else state.months = new Set();
+  // Indexes on the buttons are display positions; the ad being built sits at state.pos.
+  const d = rm != null ? +rm : ed != null ? +ed : null;
+  if (d == null) return;
+  const draft = d === state.pos, j = d < state.pos ? d : d - 1;   // j = index in state.items
+  if (rm != null && draft) {                                   // removing the ad being built
+    if (state.items.length) { const k = Math.max(0, state.pos - 1); loadSpec(state.items.splice(k, 1)[0]); state.pos = k; }
+    else state.months = new Set();
     $("#reqText").value = state.reqText; state.notice = "";
     if (!calcOrder().lines.length) state.step = 1;
   }
-  else if (rm != null) { state.items.splice(+rm, 1); pruneMonths(); state.notice = ""; }
-  else if (ed != null && +ed === state.items.length) { state.step = 1; toTop(); }
-  else if (ed != null) {
-    const keep = calcLine(state).complete ? [snapshot()] : [];
-    const [it] = state.items.splice(+ed, 1, ...keep);
-    loadSpec(it); $("#reqText").value = state.reqText; state.notice = ""; state.zoneNotice = "";
-    if (state.step !== 1) state.step = 1;
-    toTop();
-  } else return;
+  else if (rm != null) { state.items.splice(j, 1); if (j < state.pos) state.pos--; pruneMonths(); state.notice = ""; }
+  else if (draft) { state.step = 1; toTop(); }
+  else {
+    let k = j;
+    if (calcLine(state).complete) { state.items.splice(state.pos, 0, snapshot()); k = d; }   // put the current ad back in its slot
+    const [it] = state.items.splice(k, 1);
+    loadSpec(it); state.pos = k; $("#reqText").value = state.reqText; state.notice = ""; state.zoneNotice = "";
+    state.step = 1; toTop();
+  }
   render();
 });
 
@@ -1055,7 +1156,7 @@ function receiptRows(o, order) {
   const r = [["Reference", order.ref], ["Business", order.customer.business]];
   o.lines.forEach((l, i) => {
     const ad = order.ads[i];
-    if (many) r.push(["§", `Ad ${i + 1} · ${l.size.name}`]);
+    if (many) r.push(["§", `Ad ${l.no} · ${l.size.name}`]);
     r.push(
       ["Magazine", l.pub.name],
       ["Ad size", `${l.size.name} (${l.size.trim})`],
@@ -1068,7 +1169,9 @@ function receiptRows(o, order) {
       ...(many ? [["Ad subtotal", money(l.gross)]] : []),
     );
   });
-  if (many) r.push(["§", "Order"], ["Ads subtotal", money(o.gross)]);
+  const sched = monthSchedule(o);
+  if (sched.length > 1) r.push(["§", "Month by month"], ...sched.map(x => [x.long, `${x.what} · ${money(x.amount)}`]));
+  if (many) r.push(["§", "Package"], ["Ads subtotal", money(o.gross)]);
   return r;
 }
 
@@ -1108,7 +1211,10 @@ async function sendOrder(o, order) {
 
 let sending = false;
 $("#nextBtn").onclick = async () => {
-  if (state.step === 1) { state.step = 2; render(); toTop(); return; }
+  if (state.step === 1) {
+    if (!calcLine(state).complete) state.pos = state.items.length;   // an unfinished ad goes last, so numbering has no gap
+    state.step = 2; render(); toTop(); return;
+  }
   if (sending) return;
   const form = $("#checkoutForm");
   if (!form.checkValidity()) {
@@ -1160,7 +1266,7 @@ $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => {
   clearSession();
   $("#checkoutForm").reset(); $("#reqText").value = "";
-  Object.assign(state, { items: [], size: "fp", place: "std", req: false, reqText: "", months: new Set(), step: 1, notice: "", zoneNotice: "" });
+  Object.assign(state, { items: [], pos: 0, size: "fp", place: "std", req: false, reqText: "", months: new Set(), step: 1, notice: "", zoneNotice: "" });
   pruneZones(); state.zoneNotice = "";
   MONTHS.filter(m => !monthBlocked(m.key)).slice(0, 3).forEach(m => state.months.add(m.key));
   render(); toTop();
