@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advertise With Us — Build Your Ad &amp; Get Instant Pricing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14213d; --ink-2:#3d4a66; --muted:#6b7488; --line:#e3ddd2;
+    --paper:#faf7f2; --card:#ffffff; --accent:#e4572e; --accent-soft:#fdebe5;
+    --good:#1f8a5b; --good-soft:#e3f4ec; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.45}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;letter-spacing:-.01em}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+
+  header.hero{padding:40px 0 28px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .hero h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:10px 0 12px;max-width:760px}
+  .hero p{color:var(--ink-2);max-width:620px;margin:0;font-size:17px}
+  .steps-mini{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;color:var(--muted);font-size:14px}
+  .steps-mini span b{color:var(--ink)}
+
+  .layout{display:grid;grid-template-columns:1fr 370px;gap:32px;padding:32px 0 120px;align-items:start}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+
+  section.step{margin-bottom:38px}
+  .step-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;transform:translateY(-3px)}
+  .step h2{font-size:24px}
+  .step .sub{color:var(--muted);margin:0 0 16px 42px;font-size:14.5px}
+
+  /* sizes */
+  .sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+  .size{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:14px 14px 12px;text-align:left;transition:border-color .15s, box-shadow .15s, transform .15s}
+  .size:hover{border-color:#c9c0b0;transform:translateY(-1px)}
+  .size[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .size svg{display:block;width:100%;height:74px;margin-bottom:10px}
+  .size .nm{font-weight:700;font-size:15px}
+  .size .pr{color:var(--muted);font-size:13px;margin-top:2px}
+  .size .pr b{color:var(--ink)}
+  .badge{position:absolute;top:10px;right:10px;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:#fff;padding:3px 7px;border-radius:999px}
+  .badge.hot{background:var(--accent)}
+
+  /* locations */
+  .loc-tools{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px 0;font-size:14px;color:var(--muted)}
+  .linkbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:4px 0}
+  .locs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .loc{display:flex;gap:12px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;transition:border-color .15s, box-shadow .15s}
+  .loc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .check{flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid #c9c0b0;display:grid;place-items:center;background:#fff}
+  .loc[aria-pressed="true"] .check{background:var(--accent);border-color:var(--accent)}
+  .loc[aria-pressed="true"] .check::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .loc .nm{font-weight:600}
+  .loc .meta{font-size:12.5px;color:var(--muted)}
+  .loc .lp{margin-left:auto;font-weight:600;font-size:14px;white-space:nowrap}
+
+  /* months */
+  .months{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media (max-width:520px){.months{grid-template-columns:repeat(2,1fr)}}
+  .mo{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
+  .mo[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .mo .big{font-family:Fraunces,serif;font-size:28px;font-weight:700;line-height:1}
+  .mo .lbl{font-size:13px;color:var(--muted)}
+  .mo .save{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;color:var(--good);background:var(--good-soft);padding:2px 8px;border-radius:999px}
+  .mo .save.none{color:var(--muted);background:#f0ece4}
+
+  /* design addon */
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:520px){.opts{grid-template-columns:1fr}}
+  .opt{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left}
+  .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .opt .nm{font-weight:700}
+  .opt .meta{font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* summary */
+  aside.summary{position:sticky;top:20px;background:var(--ink);color:#fff;border-radius:18px;padding:22px;box-shadow:0 18px 40px -20px rgba(20,33,61,.55)}
+  @media (max-width:900px){aside.summary{position:static}}
+  .summary h3{font-size:20px;margin-bottom:4px}
+  .summary .choice{color:#b9c2d6;font-size:14px;margin-bottom:16px}
+  .rows{border-top:1px solid rgba(255,255,255,.14);padding-top:12px;font-size:14px}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:#d6dcea}
+  .row.sm{font-size:13px;color:#9aa5bd;padding:2px 0 2px 10px}
+  .row.disc{color:#7fe0b0}
+  .total{border-top:1px solid rgba(255,255,255,.14);margin-top:10px;padding-top:14px}
+  .total .lab{font-size:13px;color:#b9c2d6;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .total .amt{font-family:Fraunces,serif;font-size:42px;font-weight:700;line-height:1.05}
+  .total .per{color:#b9c2d6;font-size:14px}
+  .savepill{display:inline-block;margin-top:10px;background:rgba(127,224,176,.15);color:#7fe0b0;font-weight:700;font-size:13px;padding:5px 10px;border-radius:999px}
+  .cta{display:block;width:100%;margin-top:18px;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:15px;font-weight:700;font-size:16px;transition:filter .15s}
+  .cta:hover{filter:brightness(1.07)}
+  .cta:disabled{background:#56607a;color:#aab3c7;cursor:not-allowed}
+  .fine{font-size:12px;color:#8d98b1;margin-top:12px}
+  .empty{color:#b9c2d6;font-size:14px;padding:8px 0}
+
+  /* mobile sticky bar */
+  .mbar{display:none;position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:12px 18px calc(12px + env(safe-area-inset-bottom));z-index:20;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -10px 30px -10px rgba(0,0,0,.35)}
+  .mbar .t{font-family:Fraunces,serif;font-size:24px;font-weight:700;line-height:1}
+  .mbar .s{font-size:12px;color:#b9c2d6}
+  .mbar button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700}
+  @media (max-width:900px){.mbar{display:flex}}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(20,33,61,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
+  .scrim.open{display:flex}
+  .modal{background:var(--card);border-radius:18px;max-width:560px;width:100%;padding:24px;position:relative}
+  .modal.wide{max-width:760px}
+  .modal h3{font-size:24px;margin-bottom:4px}
+  .modal .sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:0;background:#f0ece4;font-size:18px;line-height:1}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:520px){.fgrid{grid-template-columns:1fr}}
+  label.f{display:block;font-size:13px;font-weight:600;color:var(--ink-2)}
+  label.f.full{grid-column:1/-1}
+  .f input,.f select,.f textarea{display:block;width:100%;margin-top:5px;font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  .f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--accent)}
+  .err{color:#c0392b;font-size:13px;margin-top:10px;min-height:18px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .btn{border:0;border-radius:10px;padding:12px 16px;font-weight:700;background:var(--accent);color:#fff}
+  .btn.ghost{background:#f0ece4;color:var(--ink)}
+  .quote{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:pre-wrap;max-height:300px;overflow:auto}
+  .ok{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  .ok .dot{width:40px;height:40px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center;font-size:22px;font-weight:700;flex:none}
+
+  table.rates{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:18px}
+  table.rates th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line)}
+  table.rates td{padding:5px 6px;border-bottom:1px solid #f0ece4}
+  table.rates input{width:100%;font:inherit;font-size:14px;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px}
+  .ed-h{font-family:Inter,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:8px 0 6px}
+
+  footer{border-top:1px solid var(--line);padding:22px 0 100px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Advertise in Your Local Home Magazine</div>
+    <h1>Build your ad, see your price, and reserve your spot — no sales call needed.</h1>
+    <p>Pick an ad size, choose the areas you want to reach, and decide how many months to run. Your price updates instantly, with savings for longer runs and more locations.</p>
+    <div class="steps-mini"><span><b>1</b> Ad size</span><span><b>2</b> Locations</span><span><b>3</b> Months</span><span><b>4</b> Artwork</span><span><b>5</b> Reserve</span></div>
+  </div>
+</header>
+
+<main class="wrap layout">
+  <div>
+    <section class="step">
+      <div class="step-head"><div class="num">1</div><h2>Choose your ad size</h2></div>
+      <p class="sub">Prices shown are per location, per month, before discounts.</p>
+      <div class="sizes" id="sizes"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><div class="num">2</div><h2>Pick your locations</h2></div>
+      <p class="sub" id="locSub">Each location is a separate mailed edition. Add 3+ for a multi-area discount.</p>
+      <div class="loc-tools"><span id="locCount">0 selected</span><button class="linkbtn" id="allLocs">Select all</button></div>
+      <div class="locs" id="locs"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><div class="num">3</div><h2>How many months?</h2></div>
+      <p class="sub">Longer runs build recognition — and cost less per month.</p>
+      <div class="months" id="months"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><div class="num">4</div><h2>Your artwork</h2></div>
+      <p class="sub">Already have an ad? Great. If not, our design team can create one.</p>
+      <div class="opts" id="opts"></div>
+    </section>
+  </div>
+
+  <aside class="summary" id="summary" aria-live="polite"></aside>
+</main>
+
+<div class="wrap"><footer>
+  <span>All rates, locations and circulation figures are sample placeholders.</span>
+  <button class="linkbtn" id="openRates">Staff: edit rates</button>
+</footer></div>
+
+<div class="mbar" id="mbar">
+  <div><div class="t" id="mTotal">$0</div><div class="s" id="mSub">Select a size & location</div></div>
+  <button id="mGo">Review &amp; reserve</button>
+</div>
+
+<!-- Reserve modal -->
+<div class="scrim" id="reserveScrim" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+  <div class="modal" id="reserveModal"></div>
+</div>
+
+<!-- Rates editor -->
+<div class="scrim" id="ratesScrim" role="dialog" aria-modal="true" aria-labelledby="ratesTitle">
+  <div class="modal wide">
+    <button class="x" data-close="ratesScrim" aria-label="Close">×</button>
+    <h3 id="ratesTitle">Edit rates</h3>
+    <p class="sub">Changes save in this browser only. Use “Copy rates” to send them to whoever maintains the page so they can be made permanent for every visitor.</p>
+    <div id="ratesBody"></div>
+    <div class="btnrow">
+      <button class="btn" id="saveRates">Save rates</button>
+      <button class="btn ghost" id="copyRates">Copy rates</button>
+      <button class="btn ghost" id="resetRates">Reset to defaults</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   RATE CARD — all placeholder values. Edit here to make permanent.
+   base = price per location, per month, before discounts.
+   mult = location price multiplier (bigger / pricier markets > 1).
+   ============================================================ */
+const DEFAULT_RATES = {
+  contactEmail: "sales@yourmagazine.com",
+  contactPhone: "(555) 555-0100",
+  sizes: [
+    { id:"front",  name:"Front Cover",     base:2400, badge:"1 per edition", hot:true },
+    { id:"back",   name:"Back Cover",      base:1950, badge:"1 per edition" },
+    { id:"spread", name:"2-Page Spread",   base:2800 },
+    { id:"full",   name:"Full Page",       base:1400, badge:"Popular" },
+    { id:"half",   name:"Half Page",       base:800 },
+    { id:"quarter",name:"Quarter Page",    base:450 }
+  ],
+  locations: [
+    { id:"srq",  name:"Sarasota",           homes:30000, mult:1.00 },
+    { id:"man",  name:"Manatee / Bradenton",homes:22000, mult:0.85 },
+    { id:"tpa",  name:"Tampa",              homes:40000, mult:1.25 },
+    { id:"pin",  name:"St. Pete / Clearwater", homes:32000, mult:1.10 },
+    { id:"ftm",  name:"Fort Myers / Naples",homes:35000, mult:1.15 },
+    { id:"mia",  name:"Miami-Dade",         homes:50000, mult:1.40 }
+  ],
+  terms: [ { months:1, disc:0 }, { months:3, disc:5 }, { months:6, disc:10 }, { months:12, disc:15 } ],
+  multiLocation: [ { min:3, disc:5 }, { min:5, disc:10 } ],
+  designFee: 150
+};
+
+const STORE_KEY = "adCheckoutRates.v1";
+let RATES = loadRates();
+const state = { size:"full", locs:new Set(["srq"]), months:3, design:"have" };
+
+function loadRates(){
+  try{ const s = localStorage.getItem(STORE_KEY); if(s) return JSON.parse(s); }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_RATES));
+}
+const $ = s => document.querySelector(s);
+const money = n => "$" + Math.round(n).toLocaleString("en-US");
+const round5 = n => Math.round(n/5)*5;
+const sizeById = id => RATES.sizes.find(s=>s.id===id);
+const locPrice = (size, loc) => round5(size.base * loc.mult);
+
+/* ---------- page-footprint diagrams ---------- */
+function diagram(id){
+  const W=44,H=58,y=8, L=22, R=L+W;     // two pages side by side
+  const pg = (x,fill)=>`<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="2" fill="${fill?'var(--accent)':'#fff'}" stroke="#c9c0b0" stroke-width="1.2"/>`;
+  const area = (x,yy,w,h)=>`<rect x="${x}" y="${yy}" width="${w}" height="${h}" rx="1.5" fill="var(--accent)"/>`;
+  const lines = x=>[0,1,2,3].map(i=>`<rect x="${x+6}" y="${y+10+i*9}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`).join("");
+  let g="";
+  if(id==="front") g = pg(L+W/2,true)+`<rect x="${L+W/2+6}" y="${y+5}" width="${W-12}" height="6" rx="1" fill="#fff" opacity=".9"/>`;
+  else if(id==="back") g = pg(L+W/2,true);
+  else if(id==="spread") g = pg(L,true)+pg(R,true);
+  else if(id==="full") g = pg(L,false)+lines(L)+pg(R,true);
+  else if(id==="half") g = pg(L,false)+lines(L)+pg(R,false)+area(R+3,y+H/2+1.5,W-6,H/2-4.5)+`<rect x="${R+6}" y="${y+8}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/><rect x="${R+6}" y="${y+16}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`;
+  else g = pg(L,false)+lines(L)+pg(R,false)+area(R+W/2+1.5,y+H/2+1.5,W/2-4.5,H/2-4.5)+`<rect x="${R+6}" y="${y+8}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/><rect x="${R+6}" y="${y+16}" width="${W-12}" height="3" rx="1.5" fill="#e8e2d6"/>`;
+  return `<svg viewBox="0 0 132 74" aria-hidden="true">${g}</svg>`;
+}
+
+/* ---------- pricing ---------- */
+function quote(){
+  const size = sizeById(state.size);
+  const locs = RATES.locations.filter(l=>state.locs.has(l.id));
+  const lines = locs.map(l=>({ loc:l, monthly:locPrice(size,l) }));
+  const monthlyList = lines.reduce((a,b)=>a+b.monthly,0);
+  const term = RATES.terms.find(t=>t.months===state.months) || {disc:0};
+  const multi = [...RATES.multiLocation].sort((a,b)=>b.min-a.min).find(m=>locs.length>=m.min) || {disc:0, min:0};
+  const afterTerm = monthlyList*(1-term.disc/100);
+  const monthly = afterTerm*(1-multi.disc/100);
+  const media = monthly*state.months;
+  const design = state.design==="need" ? Number(RATES.designFee)||0 : 0;
+  const listTotal = monthlyList*state.months;
+  return { size, locs, lines, monthlyList, term, multi,
+    termSave:(monthlyList-afterTerm)*state.months, multiSave:(afterTerm-monthly)*state.months,
+    monthly, media, design, total:media+design, saved:listTotal-media,
+    homes: locs.reduce((a,l)=>a+Number(l.homes||0),0) };
+}
+
+/* ---------- render ---------- */
+function renderSizes(){
+  const minMult = Math.min(...RATES.locations.map(l=>l.mult));
+  $("#sizes").innerHTML = RATES.sizes.map(s=>`
+    <button class="size" aria-pressed="${state.size===s.id}" data-size="${s.id}">
+      ${s.badge?`<span class="badge ${s.hot?'hot':''}">${s.badge}</span>`:""}
+      ${diagram(s.id)}
+      <div class="nm">${s.name}</div>
+      <div class="pr">from <b>${money(round5(s.base*minMult))}</b>/mo</div>
+    </button>`).join("");
+}
+function renderLocs(){
+  const size = sizeById(state.size);
+  $("#locs").innerHTML = RATES.locations.map(l=>`
+    <button class="loc" aria-pressed="${state.locs.has(l.id)}" data-loc="${l.id}">
+      <span class="check"></span>
+      <span><div class="nm">${l.name}</div><div class="meta">~${Number(l.homes).toLocaleString()} homes</div></span>
+      <span class="lp">${money(locPrice(size,l))}<span style="color:var(--muted);font-weight:500">/mo</span></span>
+    </button>`).join("");
+  const n = state.locs.size;
+  $("#locCount").textContent = `${n} selected`;
+  $("#allLocs").textContent = n===RATES.locations.length ? "Clear all" : "Select all";
+  const tiers = [...RATES.multiLocation].sort((a,b)=>a.min-b.min).map(m=>`${m.min}+ save ${m.disc}%`).join(", ");
+  $("#locSub").textContent = `Each location is a separate mailed edition. Multi-area savings: ${tiers}.`;
+}
+function renderMonths(){
+  $("#months").innerHTML = RATES.terms.map(t=>`
+    <button class="mo" aria-pressed="${state.months===t.months}" data-mo="${t.months}">
+      <div class="big">${t.months}</div><div class="lbl">month${t.months>1?"s":""}</div>
+      <span class="save ${t.disc?'':'none'}">${t.disc?`Save ${t.disc}%`:"Standard"}</span>
+    </button>`).join("");
+}
+function renderOpts(){
+  const o = [
+    {id:"have", nm:"I have my artwork", meta:"Upload print-ready files after you reserve."},
+    {id:"need", nm:"Design it for me", meta:`One-time ${money(RATES.designFee)} — includes 2 rounds of edits.`}
+  ];
+  $("#opts").innerHTML = o.map(x=>`<button class="opt" aria-pressed="${state.design===x.id}" data-opt="${x.id}"><div class="nm">${x.nm}</div><div class="meta">${x.meta}</div></button>`).join("");
+}
+function renderSummary(){
+  const q = quote(), ok = q.locs.length>0;
+  let h = `<h3>Your ad</h3><div class="choice">${q.size.name} · ${state.months} month${state.months>1?"s":""} · ${q.locs.length} location${q.locs.length===1?"":"s"}</div>`;
+  if(!ok){ h += `<div class="empty">Select at least one location to see your price.</div>`; }
+  else{
+    h += `<div class="rows">` +
+      q.lines.map(l=>`<div class="row sm"><span>${l.loc.name}</span><span>${money(l.monthly)}/mo</span></div>`).join("") +
+      `<div class="row"><span>Ad space (${state.months} × ${money(q.monthlyList)})</span><span>${money(q.monthlyList*state.months)}</span></div>` +
+      (q.term.disc?`<div class="row disc"><span>${state.months}-month discount (${q.term.disc}%)</span><span>−${money(q.termSave)}</span></div>`:"") +
+      (q.multi.disc?`<div class="row disc"><span>Multi-location discount (${q.multi.disc}%)</span><span>−${money(q.multiSave)}</span></div>`:"") +
+      (q.design?`<div class="row"><span>Ad design (one-time)</span><span>${money(q.design)}</span></div>`:"") +
+      `</div>
+      <div class="total"><div class="lab">Total for ${state.months} month${state.months>1?"s":""}</div>
+      <div class="amt">${money(q.total)}</div>
+      <div class="per">${money(q.monthly)}/month · reaches ~${q.homes.toLocaleString()} homes each month</div>
+      ${q.saved>0?`<span class="savepill">You save ${money(q.saved)}</span>`:""}</div>`;
+  }
+  h += `<button class="cta" id="reserveBtn" ${ok?"":"disabled"}>Reserve this ad</button>
+        <div class="fine">No payment today. We'll confirm availability and send your agreement.</div>`;
+  $("#summary").innerHTML = h;
+  $("#reserveBtn").onclick = openReserve;
+  $("#mTotal").textContent = ok?money(q.total):"$0";
+  $("#mSub").textContent = ok?`${q.size.name} · ${state.months} mo · ${q.locs.length} loc`:"Select a location";
+}
+function renderAll(){ renderSizes(); renderLocs(); renderMonths(); renderOpts(); renderSummary(); }
+
+/* ---------- interactions ---------- */
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-size],[data-loc],[data-mo],[data-opt],[data-close]");
+  if(!t) return;
+  if(t.dataset.size){ state.size=t.dataset.size; renderSizes(); renderLocs(); renderSummary(); }
+  else if(t.dataset.loc){ const id=t.dataset.loc; state.locs.has(id)?state.locs.delete(id):state.locs.add(id); renderLocs(); renderSummary(); }
+  else if(t.dataset.mo){ state.months=Number(t.dataset.mo); renderMonths(); renderSummary(); }
+  else if(t.dataset.opt){ state.design=t.dataset.opt; renderOpts(); renderSummary(); }
+  else if(t.dataset.close){ $("#"+t.dataset.close).classList.remove("open"); }
+});
+$("#allLocs").onclick = ()=>{
+  if(state.locs.size===RATES.locations.length) state.locs.clear();
+  else RATES.locations.forEach(l=>state.locs.add(l.id));
+  renderLocs(); renderSummary();
+};
+$("#mGo").onclick = ()=>{ if(state.locs.size) openReserve(); else $("#locs").scrollIntoView({behavior:"smooth",block:"center"}); };
+document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{ if(e.target===s) s.classList.remove("open"); }));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".scrim.open").forEach(s=>s.classList.remove("open")); });
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1800); }
+async function copy(text, msg){
+  try{ await navigator.clipboard.writeText(text); toast(msg||"Copied"); }
+  catch(e){ toast("Couldn't copy — select the text and copy it manually"); }
+}
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- reserve flow ---------- */
+function nextMonths(){
+  const out=[], d=new Date(); d.setDate(1);
+  for(let i=1;i<=6;i++){ const m=new Date(d.getFullYear(), d.getMonth()+i, 1); out.push(m.toLocaleString("en-US",{month:"long",year:"numeric"})); }
+  return out;
+}
+function openReserve(){
+  const q = quote();
+  $("#reserveModal").innerHTML = `
+    <button class="x" data-close="reserveScrim" aria-label="Close">×</button>
+    <h3 id="resTitle">Reserve your ad</h3>
+    <p class="sub">${q.size.name} · ${state.months} months · ${q.locs.map(l=>l.name).join(", ")} — <b>${money(q.total)}</b></p>
+    <form id="resForm" novalidate>
+      <div class="fgrid">
+        <label class="f">Your name<input name="name" autocomplete="name" required></label>
+        <label class="f">Business name<input name="biz" autocomplete="organization" required></label>
+        <label class="f">Phone<input name="phone" type="tel" autocomplete="tel" required></label>
+        <label class="f">Email<input name="email" type="email" autocomplete="email" required></label>
+        <label class="f">Type of business<input name="type" placeholder="e.g. Roofing, HVAC, Pools"></label>
+        <label class="f">Start with the<select name="start">${nextMonths().map(m=>`<option>${m}</option>`).join("")}</select></label>
+        <label class="f full">Anything we should know?<textarea name="notes" rows="3" placeholder="Offers to feature, preferred placement, questions…"></textarea></label>
+      </div>
+      <div class="err" id="resErr"></div>
+      <div class="btnrow"><button class="btn" type="submit">Reserve my spot</button><button class="btn ghost" type="button" data-close="reserveScrim">Keep editing</button></div>
+    </form>`;
+  $("#reserveScrim").classList.add("open");
+  $("#resForm").addEventListener("submit", submitReserve);
+  setTimeout(()=>$("#resForm [name=name]").focus(),50);
+}
+function submitReserve(e){
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target).entries());
+  const missing = ["name","biz","phone","email"].filter(k=>!String(f[k]||"").trim());
+  if(missing.length){ $("#resErr").textContent="Please fill in your name, business, phone and email."; return; }
+  if(!/^\S+@\S+\.\S+$/.test(f.email)){ $("#resErr").textContent="Please check your email address."; return; }
+  const q = quote();
+  const id = "Q-" + Date.now().toString(36).toUpperCase().slice(-6);
+  const txt =
+`AD RESERVATION REQUEST — ${id}
+Date: ${new Date().toLocaleDateString("en-US")}
+
+CONTACT
+${f.name} — ${f.biz}${f.type?` (${f.type})`:""}
+${f.phone} · ${f.email}
+
+AD
+Size: ${q.size.name}
+Run: ${state.months} month${state.months>1?"s":""}, starting ${f.start}
+Artwork: ${state.design==="need"?"Design requested":"Customer supplies artwork"}
+
+LOCATIONS
+${q.lines.map(l=>`- ${l.loc.name}: ${money(l.monthly)}/mo (~${Number(l.loc.homes).toLocaleString()} homes)`).join("\n")}
+
+PRICING
+Ad space: ${money(q.monthlyList*state.months)}
+${q.term.disc?`${state.months}-month discount (${q.term.disc}%): -${money(q.termSave)}\n`:""}${q.multi.disc?`Multi-location discount (${q.multi.disc}%): -${money(q.multiSave)}\n`:""}${q.design?`Ad design: ${money(q.design)}\n`:""}TOTAL: ${money(q.total)}  (${money(q.monthly)}/month)
+${f.notes?`\nNOTES\n${f.notes}\n`:""}`;
+  const mail = `mailto:${RATES.contactEmail}?subject=${encodeURIComponent("Ad reservation "+id+" — "+f.biz)}&body=${encodeURIComponent(txt)}`;
+  $("#reserveModal").innerHTML = `
+    <button class="x" data-close="reserveScrim" aria-label="Close">×</button>
+    <div class="ok"><div class="dot">✓</div><div><h3 id="resTitle">Your quote is ready</h3><div style="color:var(--muted);font-size:14px">Reference ${id} · ${money(q.total)}</div></div></div>
+    <p class="sub">Send it to us to lock in your spot. Email <b>${esc(RATES.contactEmail)}</b> or call <b>${esc(RATES.contactPhone)}</b> and mention reference ${id}.</p>
+    <div class="quote">${esc(txt)}</div>
+    <div class="btnrow">
+      <a class="btn" href="${mail}" style="text-decoration:none">Email this quote</a>
+      <button class="btn ghost" id="copyQuote">Copy quote</button>
+    </div>`;
+  $("#copyQuote").onclick = ()=>copy(txt,"Quote copied");
+}
+
+/* ---------- staff rate editor ---------- */
+function openRates(){
+  const r = RATES;
+  $("#ratesBody").innerHTML = `
+    <div class="ed-h">Ad sizes — base price per location / month</div>
+    <table class="rates"><tr><th>Size</th><th style="width:140px">Base $</th><th style="width:150px">Badge</th></tr>
+      ${r.sizes.map((s,i)=>`<tr><td><input data-k="sizes.${i}.name" value="${esc(s.name)}"></td><td><input type="number" data-k="sizes.${i}.base" value="${s.base}"></td><td><input data-k="sizes.${i}.badge" value="${esc(s.badge||"")}"></td></tr>`).join("")}
+    </table>
+    <div class="ed-h">Locations</div>
+    <table class="rates"><tr><th>Name</th><th style="width:120px">Homes</th><th style="width:110px">Price ×</th></tr>
+      ${r.locations.map((l,i)=>`<tr><td><input data-k="locations.${i}.name" value="${esc(l.name)}"></td><td><input type="number" data-k="locations.${i}.homes" value="${l.homes}"></td><td><input type="number" step="0.05" data-k="locations.${i}.mult" value="${l.mult}"></td></tr>`).join("")}
+    </table>
+    <div class="ed-h">Discounts</div>
+    <table class="rates"><tr><th>Run length (months)</th><th style="width:140px">Discount %</th></tr>
+      ${r.terms.map((t,i)=>`<tr><td><input type="number" data-k="terms.${i}.months" value="${t.months}"></td><td><input type="number" data-k="terms.${i}.disc" value="${t.disc}"></td></tr>`).join("")}
+    </table>
+    <table class="rates"><tr><th>Minimum locations</th><th style="width:140px">Discount %</th></tr>
+      ${r.multiLocation.map((m,i)=>`<tr><td><input type="number" data-k="multiLocation.${i}.min" value="${m.min}"></td><td><input type="number" data-k="multiLocation.${i}.disc" value="${m.disc}"></td></tr>`).join("")}
+    </table>
+    <div class="ed-h">Other</div>
+    <div class="fgrid">
+      <label class="f">Design fee ($)<input type="number" data-k="designFee" value="${r.designFee}"></label>
+      <label class="f">Sales email<input data-k="contactEmail" value="${esc(r.contactEmail)}"></label>
+      <label class="f">Sales phone<input data-k="contactPhone" value="${esc(r.contactPhone)}"></label>
+    </div>`;
+  $("#ratesScrim").classList.add("open");
+}
+function collectRates(){
+  const r = JSON.parse(JSON.stringify(RATES));
+  document.querySelectorAll("#ratesBody [data-k]").forEach(inp=>{
+    const path = inp.dataset.k.split("."); let o = r;
+    while(path.length>1) o = o[path.shift()];
+    o[path[0]] = inp.type==="number" ? Number(inp.value) : inp.value;
+  });
+  r.terms.sort((a,b)=>a.months-b.months);
+  return r;
+}
+$("#openRates").onclick = openRates;
+$("#saveRates").onclick = ()=>{
+  RATES = collectRates();
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(RATES)); toast("Rates saved in this browser"); }
+  catch(e){ toast("Applied for this visit (browser storage unavailable)"); }
+  if(!RATES.terms.some(t=>t.months===state.months)) state.months = RATES.terms[0].months;
+  $("#ratesScrim").classList.remove("open"); renderAll();
+};
+$("#copyRates").onclick = ()=>copy(JSON.stringify(collectRates(),null,2),"Rates copied");
+$("#resetRates").onclick = ()=>{
+  RATES = JSON.parse(JSON.stringify(DEFAULT_RATES));
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  openRates(); renderAll(); toast("Reset to default rates");
+};
+
+renderAll();
+</script>
+</body>
+</html>
