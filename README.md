@@ -52,6 +52,8 @@ To update rates, edit `rates.csv` / `sold.csv` on GitHub (open the file → penc
 
 The checkout scrolls inside the box. On desktop the summary and total stay pinned, and on phones a bar with the total and the Continue button stays at the bottom of the box. Visitors never leave bestdealsnetworks.com.
 
+**On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code). The box is 900px tall on desktop and 560px on phones, and the checkout scrolls inside it.
+
 ## Publishing on your site
 The checkout is three plain files with no build step: `index.html`, `rates.csv` and `sold.csv`.
 
