@@ -190,15 +190,16 @@
           </div>
 
           <div class="panel">
-            <div class="panel-h"><div class="num">3</div><h2>Payment</h2></div>
-            <p class="sub">No card is charged on this page. We confirm your space, then send a secure payment link.</p>
-            <div class="opts" id="payOpts"></div>
+            <div class="panel-h"><div class="num">3</div><h2>Invoice</h2></div>
+            <p class="sub">No payment is taken here. We confirm your placement, then email you an invoice.</p>
+            <div class="note" style="margin-top:0">✓ Your invoice goes to the email above. Add a different billing email below if it should go elsewhere.</div>
+            <label style="margin-top:16px">Billing email (optional)<input name="billingEmail" type="email" autocomplete="email" placeholder="accounts@yourbusiness.com"></label>
             <label style="margin-top:16px">Notes for our team (optional)
               <textarea name="notes" rows="3" placeholder="Offer, coupon, tracking number, placement requests…"></textarea>
             </label>
             <label class="check" style="margin-top:16px">
               <input type="checkbox" name="terms" required>
-              <span>I agree to the advertising terms. Space is reserved once payment is received. Artwork is due by the deadline for the first issue.</span>
+              <span>I agree to the advertising terms. Space is reserved once your invoice is paid. Artwork is due by the deadline for the first issue.</span>
             </label>
           </div>
         </form>
@@ -272,10 +273,6 @@ const CONFIG = {
     { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi", fee: 0 },
     { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof", fee: 150 },
   ],
-  payment: [
-    { id: "card",    name: "Card or ACH", desc: "We email a secure payment link" },
-    { id: "invoice", name: "Invoice me",  desc: "For existing advertisers" },
-  ],
 };
 
 /* ===========================================================
@@ -283,7 +280,7 @@ const CONFIG = {
    =========================================================== */
 const $ = (s) => document.querySelector(s);
 const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
-const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), term: 3, start: null, art: "own", pay: "card", step: 1 };
+const state = { pub: "bdb", size: "fp", zones: new Set(["Z1"]), term: 3, start: null, art: "own", step: 1 };
 
 function issueOptions() {
   const out = [], d = new Date();
@@ -375,14 +372,6 @@ function render() {
     onClick: () => { state.art = a.id; render(); },
   })));
 
-  // payment
-  const payEl = $("#payOpts"); payEl.innerHTML = "";
-  CONFIG.payment.forEach(p => payEl.append(optButton({
-    pressed: state.pay === p.id,
-    html: `<b>${p.name}</b><small>${p.desc}</small>`,
-    onClick: () => { state.pay = p.id; render(); },
-  })));
-
   // summary
   const rows = [
     ["Magazine", c.pub.name],
@@ -436,18 +425,18 @@ $("#nextBtn").onclick = () => {
     ref: "BDA-" + Date.now().toString(36).toUpperCase().slice(-6),
     createdAt: new Date().toISOString(),
     magazine: c.pub.name, size: c.size.name, zones: c.zones.map(z => z.id),
-    issues: c.term.months, firstIssue: state.start, artwork: c.art.name, payment: state.pay,
+    issues: c.term.months, firstIssue: state.start, artwork: c.art.name,
     total: Math.round(c.total),
     customer: Object.fromEntries(new FormData(form)),
   };
-  // TODO: POST `order` to the order backend / CRM / payment provider.
+  // TODO: POST `order` to the order backend / CRM / invoicing system.
   console.log("Order request", order);
 
   $("#refNo").textContent = order.ref;
   $("#confirmText").textContent =
     `${c.size.name} in ${c.pub.name}, ${c.zones.length} zone${c.zones.length > 1 ? "s" : ""}, ${c.term.name} starting ${state.start}. ` +
-    `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement` +
-    (state.pay === "card" ? " and send your secure payment link." : " and your invoice.") +
+    `Total ${money(c.total)}. We'll email ${order.customer.email} within one business day to confirm placement, ` +
+    `and send your invoice to ${order.customer.billingEmail || order.customer.email}.` +
     (state.art === "own" ? " Reply to that email with your print-ready artwork." : " Our design team will reach out about your ad.");
   state.step = 3; render(); window.scrollTo({ top: 0, behavior: "smooth" });
 };
