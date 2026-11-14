@@ -1,9 +1,11 @@
 <!--
-  Best Deals Ads: GoDaddy fallback embed (fixed-height box that scrolls inside).
-  Use only if godaddy-embed.html gets cut off.
+  Best Deals Ads: GoDaddy fallback embed, for when GoDaddy won't let the frame resize itself.
+  A fixed-height box; the form scrolls inside it. Nothing is pinned inside the form,
+  so no field, error or button is ever covered.
+  In GoDaddy's HTML section set "Forced Height" to 760 (it must be at least the tallest height below).
 -->
 <style>
-  .bda-frame { width: 100%; height: 900px; border: 0; display: block; }
-  @media (max-width: 767px) { .bda-frame { height: 640px; } }
+  .bda-frame { width: 100%; height: 740px; border: 0; display: block; }
+  @media (max-width: 767px) { .bda-frame { height: 600px; } }
 </style>
-<iframe class="bda-frame" src="https://hamstari.github.io/adcheckout/" title="Best Deals Ads" loading="lazy"></iframe>
+<iframe class="bda-frame" src="https://hamstari.github.io/adcheckout/" title="Best Deals Ads ad request form"></iframe>

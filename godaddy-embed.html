@@ -1,24 +1,26 @@
 <!--
-  Best Deals Ads: GoDaddy Website Builder embed (full height, no cut-off).
-  In GoDaddy: Edit Website → open the page → click the HTML section (or Add Section → "HTML")
-  → replace everything in the Custom Code box with the code below
-  → leave "Forced Height" EMPTY → Done → Publish.
+  Best Deals Ads: GoDaddy Website Builder embed (frame resizes to fit the form).
+  In GoDaddy: Edit Website → open the page → HTML section (Add Section → "HTML")
+  → replace everything in Custom Code with the code below → leave "Forced Height" EMPTY → Done → Publish.
 
-  The frame grows to the full height of the checkout, so the page scrolls normally on phones.
-  If the bottom is still cut off after publishing, use godaddy-embed-fixed.html instead.
+  The script sizes the frame to the form whenever a step or expandable section changes.
+  If the published page cuts the form off or leaves a gap, GoDaddy's own wrapper isn't
+  following the resize: use godaddy-embed-fixed.html instead.
 -->
-<iframe id="bda-checkout" src="https://hamstari.github.io/adcheckout/" title="Best Deals Ads" scrolling="no"
-        style="width:100%;border:0;display:block;height:900px;overflow:hidden"></iframe>
+<iframe id="bda-checkout" src="https://hamstari.github.io/adcheckout/" title="Best Deals Ads ad request form" scrolling="no"
+        style="width:100%;border:0;display:block;height:1400px;overflow:hidden"></iframe>
 <script>
   (function () {
     var f = document.getElementById("bda-checkout");
+    var ORIGIN = new URL(f.src, location.href).origin;           // only trust messages from the checkout's own address
     window.addEventListener("message", function (e) {
-      if (!e.data || e.source !== f.contentWindow) return;
+      if (e.origin !== ORIGIN || e.source !== f.contentWindow || !e.data) return;
       if (e.data.type === "bda-height") {
-        f.style.height = e.data.height + "px";                       // grow or shrink to fit: no inner scrolling
-        e.source.postMessage({ type: "bda-auto" }, "*");             // tell the checkout the frame fits it
+        var h = Number(e.data.height);
+        if (h >= 200 && h <= 30000) f.style.height = Math.ceil(h) + "px";   // fit the content: no inner scrolling, no empty space
       }
       if (e.data.type === "bda-scrolltop") f.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+    f.addEventListener("load", function () { f.contentWindow.postMessage({ type: "bda-ping" }, ORIGIN); });
   })();
 </script>
