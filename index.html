@@ -77,6 +77,7 @@
   .opts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   .opts.wide { grid-template-columns: 1fr; }
   .opt { text-align: left; background: #fff; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px 16px; color: var(--ink); position: relative; min-width: 0; }
+  .opt { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }   /* content starts at the top in every card of a row */
   .opt:hover:not(:disabled) { border-color: var(--teal); }
   .opt b { display: block; font-size: 15px; font-weight: 600; padding-right: 0; }
   .opt small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
@@ -91,6 +92,8 @@
   .opt:disabled { background: #f4f4f4; color: #8a8a8a; cursor: not-allowed; border-style: dashed; }
   .opt:disabled b { text-decoration: line-through; text-decoration-thickness: 1px; }
   .opt:disabled small.why { color: var(--red); font-weight: 600; }
+  /* Ad dimensions: small, in the card's top-right corner */
+  .opt .spec { position: absolute; top: 12px; right: 12px; font-size: 11px; color: var(--muted); white-space: nowrap; }
   .grp-label { grid-column: 1 / -1; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-top: 6px; }
   .grp-label:first-child { margin-top: 0; }
   .months { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
@@ -107,6 +110,7 @@
     #sizeOpts .opt { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; align-items: start; }
     #sizeOpts .opt svg { grid-row: 1 / span 3; width: 40px; height: 44px; margin: 0; }
     #sizeOpts .opt > :not(svg) { grid-column: 2; }
+    #sizeOpts .opt b { padding-right: 92px; }
     #sizeOpts .opt .tag { justify-self: start; }
     .opt { padding: 12px 14px; }
   }
@@ -887,7 +891,7 @@ function render() {
         : sizeFrom(s.id) != null ? `From ${money(sizeFrom(s.id))} per issue` : "Call for pricing";
       sizeEl.append(optButton({
         pressed: state.size === s.id,
-        html: `${adIcon(s.shape, s.id === "sp")}<b>${s.name}</b>${s.note ? `<small>${s.note}</small>` : ""}<div class="price">${price}</div>`,
+        html: `${adIcon(s.shape, s.id === "sp")}<span class="spec">${s.trim}</span><b>${s.name}</b>${s.note ? `<small>${s.note}</small>` : ""}<div class="price">${price}</div>`,
         onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
       }));
     });
