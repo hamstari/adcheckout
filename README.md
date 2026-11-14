@@ -33,7 +33,8 @@ The key can change any file in this repo, so give it only to trusted staff, set 
 
 ## The request form (three steps)
 **1 · Package.** Magazine, ad size, markets, issue months, placement and artwork for one ad at a time.
-- Selected choices carry a "✓ Selected" label as well as color. Unavailable ones are dashed, struck through and say why.
+- Selected choices are shown by the highlight alone (tint and darker border). Unavailable ones are dashed, struck through and say why.
+- Cards carry as little text as possible: no step numbers, no trim dimensions, no repeated "Included" or fee lines.
 - Markets show the zone name from `zones.csv`. When a zone has a real name (not just "Zone 1"), the zone code is shown beside it.
 - Standard placement is always visible. Premium positions and the free-text placement request sit behind **Explore placement upgrades**. A chosen upgrade stays visible under that control and in the estimate. No fee is added; the estimate says "Premium placement fee to be confirmed".
 - **+ Add another ad** (secondary) saves the ad and starts another. Saved ads keep their number and are never changed by editing a different ad.

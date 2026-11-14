@@ -57,12 +57,16 @@
   .grid.done { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
   @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(18px, 3.5vw, 28px); margin-bottom: 16px; }
-  .panel-h { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .panel-h { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .panel-h + .sub { margin-top: -8px; }
   .panel-h .grow { flex: 1; }
   .num { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
   .panel h2 { font-size: 20px; color: var(--black); }
   .sub { color: var(--muted); margin: 4px 0 14px; font-size: 14.5px; }
-  .note { background: var(--tint); border-left: 3px solid var(--teal); border-radius: 4px; padding: 10px 14px; margin-top: 14px; font-size: 14px; }
+  .note { color: var(--muted); margin-top: 12px; font-size: 14px; }
+  .note b { color: var(--ink); }
+  .opts.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 700px) { .opts.three { grid-template-columns: minmax(0, 1fr); } }
   .linkbtn { background: none; border: 0; color: var(--teal-d); font-weight: 700; padding: 0; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
   .adhead { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 10px 16px; align-items: center; flex-wrap: wrap; font-size: 14.5px; }
   .adhead b { font-size: 16px; }
@@ -73,6 +77,7 @@
   .opts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   .opts.wide { grid-template-columns: 1fr; }
   .opt { text-align: left; background: #fff; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px 16px; color: var(--ink); position: relative; min-width: 0; }
+  .opt { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }   /* content starts at the top in every card of a row */
   .opt:hover:not(:disabled) { border-color: var(--teal); }
   .opt b { display: block; font-size: 15px; font-weight: 600; padding-right: 0; }
   .opt small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
@@ -81,21 +86,19 @@
   .opt svg { display: block; margin-bottom: 8px; }
   .code { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 6px; color: var(--muted); vertical-align: 1px; }
   .tag { display: inline-block; background: #f0f0f0; color: var(--ink); font-weight: 700; font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; margin-top: 8px; }
-  /* Selected: color + thicker border + a written label */
-  .opt[aria-pressed="true"] { background: var(--tint); border-color: var(--teal-d); box-shadow: inset 0 0 0 1px var(--teal-d); padding-bottom: 36px; }
-  .opt[aria-pressed="true"]::after { content: "✓ Selected"; position: absolute; left: 16px; bottom: 10px; font-size: 11.5px; font-weight: 700; color: #fff; background: var(--teal-d); border-radius: 999px; padding: 2px 9px; }
+  /* Selected: the highlight alone */
+  .opt[aria-pressed="true"] { background: var(--tint); border-color: var(--teal-d); box-shadow: inset 0 0 0 1px var(--teal-d); }
   /* Unavailable: dashed, grey, with the reason written on the card */
   .opt:disabled { background: #f4f4f4; color: #8a8a8a; cursor: not-allowed; border-style: dashed; }
   .opt:disabled b { text-decoration: line-through; text-decoration-thickness: 1px; }
   .opt:disabled small.why { color: var(--red); font-weight: 600; }
+  /* Ad dimensions: small, in the card's top-right corner */
+  .opt .spec { position: absolute; top: 12px; right: 12px; font-size: 11px; color: var(--muted); white-space: nowrap; }
   .grp-label { grid-column: 1 / -1; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-top: 6px; }
   .grp-label:first-child { margin-top: 0; }
   .months { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
   .months .opt { padding: 10px 12px; }
   .months .opt b { font-size: 14px; }
-  .months .opt[aria-pressed="true"] { padding-bottom: 10px; }
-  .months .opt[aria-pressed="true"]::after { content: none; }
-  .months .opt[aria-pressed="true"] small { color: var(--teal-d); font-weight: 700; }
   /* Phones: tighter cards so each group fits on about one screen */
   @media (max-width: 560px) {
     #zoneOpts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -105,12 +108,11 @@
     .months .opt small { font-size: 11.5px; }
     #sizeOpts, #placeOpts, #artOpts { grid-template-columns: minmax(0, 1fr); }
     #sizeOpts .opt { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; align-items: start; }
-    #sizeOpts .opt svg { grid-row: 1 / span 5; width: 40px; height: 44px; margin: 0; }
+    #sizeOpts .opt svg { grid-row: 1 / span 3; width: 40px; height: 44px; margin: 0; }
     #sizeOpts .opt > :not(svg) { grid-column: 2; }
+    #sizeOpts .opt b { padding-right: 92px; }
     #sizeOpts .opt .tag { justify-self: start; }
     .opt { padding: 12px 14px; }
-    .opt[aria-pressed="true"] { padding-bottom: 34px; }
-    .opt[aria-pressed="true"]::after { left: 14px; }
   }
   .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
   .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
@@ -152,7 +154,6 @@
   .est-total strong { font-size: 30px; font-weight: 700; color: var(--black); line-height: 1.1; }
   .est-total span { color: var(--muted); font-size: 14px; }
   .est-tbd { color: var(--teal-d); font-weight: 600; font-size: 13.5px; margin-top: 4px; }
-  .est-rate { color: var(--muted); font-size: 13px; margin-top: 6px; }
   .bymonth { margin: 4px 0 14px; font-size: 13.5px; }
   .bymonth summary { cursor: pointer; font-weight: 700; color: var(--teal-d); padding: 4px 0; }
   .bymonth dl { margin: 8px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; }
@@ -193,8 +194,6 @@
   /* ---------- Confirmation ---------- */
   .confirm { padding: 0; overflow: hidden; }
   .confirm-top { background: var(--black); color: #fff; text-align: center; padding: 40px clamp(18px, 5vw, 48px) 36px; position: relative; }
-  .confirm-top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
-    background: linear-gradient(90deg, #87cbe4 0 20%, #2f5a82 20% 40%, #347142 40% 60%, #e9b14c 60% 80%, #c83536 80% 100%); }
   .big { width: 56px; height: 56px; border-radius: 50%; background: var(--teal); color: var(--black); display: grid; place-items: center; font-size: 26px; font-weight: 700; margin: 0 auto 16px; }
   .preview .big { background: #e9b14c; }
   .confirm h2 { font-size: clamp(22px, 4.5vw, 30px); color: #fff; line-height: 1.2; }
@@ -226,7 +225,7 @@
     body { background: #fff; }
     header .steps, .lede, aside, footer, .actions, #step1, #step2 { display: none !important; }
     header { padding: 16px 0; background: #fff; color: var(--ink); }
-    header::after, .confirm-top::after { display: none; }
+    header::after { display: none; }
     main { margin-top: 0; padding: 0; }
     .panel { border: 0; }
     .confirm-top, .receipt .tot { background: #fff !important; color: var(--ink) !important; }
@@ -242,7 +241,7 @@
   <div class="wrap">
     <div class="eyebrow">Best Deals Networks</div>
     <h1>Best Deals Ads</h1>
-    <p class="lede">Request ad space in Best Deals Book and Exclusively Home Improvements. Build your package, add your details and send. No payment today.</p>
+    <p class="lede">Request ad space. No payment today.</p>
     <ol class="steps" id="steps" aria-label="Progress">
       <li><span class="sn">1</span>Package</li>
       <li><span class="sn">2</span>Details</li>
@@ -259,29 +258,25 @@
         <div class="adhead hidden" id="adHead"></div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">1</div><h2>Magazine</h2></div>
-          <p class="sub">Both magazines mail monthly to targeted Florida neighborhoods.</p>
-          <div class="opts wide" id="pubOpts"></div>
+          <div class="panel-h"><h2>Magazine</h2></div>
+          <div class="opts three" id="pubOpts"></div>
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">2</div><h2>Ad size</h2></div>
-          <p class="sub">Prices are per issue for the markets you've picked.</p>
+          <div class="panel-h"><h2>Ad size</h2></div>
           <div class="opts" id="sizeOpts"></div>
-          <div class="note" id="specNote"></div>
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">3</div><h2 class="grow">Markets</h2><button type="button" class="linkbtn" id="allZones">Select all</button></div>
-          <p class="sub">Choose where your ad mails. The more markets you book, the lower the price per market.</p>
+          <div class="panel-h"><h2 class="grow">Markets</h2><button type="button" class="linkbtn" id="allZones">Select all</button></div>
           <div class="opts" id="zoneOpts"></div>
           <div class="note" id="zonePrice"></div>
           <div class="note hidden" id="zoneNote"></div>
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">4</div><h2 class="grow">Issue months</h2><button type="button" class="linkbtn" id="clearMonths">Clear</button></div>
-          <p class="sub">Pick any months. They don't have to be back to back. <span id="deadlineNote"></span></p>
+          <div class="panel-h"><h2 class="grow">Issue months</h2><button type="button" class="linkbtn" id="clearMonths">Clear</button></div>
+          <p class="sub" id="deadlineNote"></p>
           <div class="quick" id="quickPicks"></div>
           <div class="months" id="monthOpts"></div>
           <div class="note hidden" id="premiumNote"></div>
@@ -289,13 +284,12 @@
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">5</div><h2>Placement</h2></div>
-          <p class="sub">Standard placement is included with every ad.</p>
+          <div class="panel-h"><h2>Placement</h2></div>
           <div class="opts wide" id="stdPlace"></div>
           <button type="button" class="uptoggle" id="upToggle" aria-expanded="false" aria-controls="upBody">Explore placement upgrades</button>
           <div class="note hidden" id="upChosen"></div>
           <div class="upbody hidden" id="upBody">
-            <p class="sub">Premium positions are limited. We confirm availability for every issue, and the fee is confirmed on your invoice.</p>
+            <p class="sub">Subject to availability. The fee is confirmed on your invoice.</p>
             <div class="opts" id="placeOpts"></div>
             <div class="note hidden" id="placeNote"></div>
             <div class="opts wide" style="margin-top:10px" id="reqOpt"></div>
@@ -307,14 +301,12 @@
         </div>
 
         <div class="panel">
-          <div class="panel-h"><div class="num">6</div><h2>Artwork</h2></div>
-          <p class="sub">Send your own print-ready ad, or have our design team build it at no extra cost.</p>
+          <div class="panel-h"><h2>Artwork</h2></div>
           <div class="opts" id="artOpts"></div>
         </div>
 
         <div class="addrow">
           <button class="btn ghost" id="addAd" type="button">+ Add another ad</button>
-          <span class="hint">Save this ad and build another with a different size, markets or months.</span>
         </div>
         <div class="alert" id="addErr" role="alert" style="margin:-8px 0 16px"></div>
       </section>
@@ -330,7 +322,7 @@
                 <div class="field full"><label for="f-business">Business name</label><input id="f-business" name="business" required autocomplete="organization" aria-describedby="e-business"><span class="ferr" id="e-business"></span></div>
                 <div class="field"><label for="f-contact">Contact name</label><input id="f-contact" name="contact" required autocomplete="name" aria-describedby="e-contact"><span class="ferr" id="e-contact"></span></div>
                 <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" aria-describedby="e-phone"><span class="ferr" id="e-phone"></span></div>
-                <div class="field full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" inputmode="email" required autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="e-email h-email"><span class="hint" id="h-email">We send your placement confirmation and agreement here.</span><span class="ferr" id="e-email"></span></div>
+                <div class="field full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" inputmode="email" required autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="e-email"><span class="ferr" id="e-email"></span></div>
                 <div class="field full"><label for="f-category">Service category</label>
                   <select id="f-category" name="category" required aria-describedby="e-category">
                     <option value="">Choose one</option>
@@ -350,7 +342,7 @@
                 <div class="field full"><label for="f-street">Street address</label><input id="f-street" name="street" required autocomplete="billing street-address" aria-describedby="e-street"><span class="ferr" id="e-street"></span></div>
                 <div class="field"><label for="f-city">City</label><input id="f-city" name="city" required autocomplete="billing address-level2" aria-describedby="e-city"><span class="ferr" id="e-city"></span></div>
                 <div class="field"><label for="f-zip">ZIP code</label><input id="f-zip" name="zip" required inputmode="numeric" autocomplete="billing postal-code" maxlength="10" aria-describedby="e-zip"><span class="ferr" id="e-zip"></span></div>
-                <div class="field full"><label for="f-billingEmail">Billing email <i>(optional)</i></label><input id="f-billingEmail" name="billingEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="e-billingEmail h-billingEmail"><span class="hint" id="h-billingEmail">Only if your invoice should go to a different address.</span><span class="ferr" id="e-billingEmail"></span></div>
+                <div class="field full"><label for="f-billingEmail">Billing email <i>(optional)</i></label><input id="f-billingEmail" name="billingEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="e-billingEmail"><span class="ferr" id="e-billingEmail"></span></div>
                 <div class="field full"><label for="f-notes">Notes for our team <i>(optional)</i></label><textarea id="f-notes" name="notes" rows="3" maxlength="1000"></textarea></div>
               </div>
             </fieldset>
@@ -391,7 +383,6 @@
       </div>
       <div class="est-total"><strong id="estTotal">$0</strong><span>estimated total</span></div>
       <div class="est-tbd hidden" id="estTbd">Premium placement fee to be confirmed</div>
-      <div class="est-rate" id="estRate"></div>
       <p class="nopay hidden" id="noPay">No payment today. We’ll confirm your placement, then send your agreement and invoice.</p>
       <div class="alert" id="err" role="alert"></div>
       <button class="btn" id="nextBtn" type="button">Continue to details</button>
@@ -426,7 +417,7 @@ const CONFIG = {
   ],
   // premium: true = one advertiser per zone per issue (tracked as sold). flat: true = same price at any frequency.
   sizes: [
-    { id: "fc",  name: "Front Cover",        note: "Includes the full inside front cover", trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', premium: true, flat: true, limit: "One per zone", shape: [34, 44] },
+    { id: "fc",  name: "Front Cover",        note: "Includes inside front cover", trim: '8.375" × 10.875"', bleed: '8.625" × 11.125"', premium: true, flat: true, limit: "One per zone", shape: [34, 44] },
     { id: "bc",  name: "Back Cover",         trim: '8.375" × 10.875"',  bleed: '8.625" × 11.125"', premium: true, flat: true, limit: "One per zone", shape: [34, 44] },
     { id: "sp",  name: "2-Page Full Spread", trim: '16.75" × 10.875"',  bleed: '17" × 11.125"', flat: true, shape: [34, 44] },
     { id: "fp",  name: "Full Page",          trim: '8.375" × 10.875"',  bleed: '8.625" × 11.125"', shape: [34, 44] },
@@ -460,19 +451,19 @@ const CONFIG = {
   // PREMIUM PLACEMENT. No price is shown or added to the total: the upgrade charge is set on the invoice.
   // sizes = which ad sizes can book it. Covers are already fixed positions, so they're left out.
   placements: [
-    { id: "std",    name: "Standard placement",  desc: "We place your ad for the best fit in the issue", premium: false },
-    { id: "rhr",    name: "Right-hand read",     desc: "On a right-hand page, where readers look first", premium: true, sizes: ["fp", "hp", "qp"] },
-    { id: "front",  name: "First ten pages",     desc: "In the opening pages of the issue",              premium: true, sizes: ["fp", "hp", "qp"] },
-    { id: "p3",     name: "Page 3",              desc: "The first right-hand page readers see",          premium: true, sizes: ["fp"], limit: "One per zone" },
-    { id: "ifc",    name: "Inside front cover",  desc: "The inside of the front cover",                  premium: true, sizes: ["fp"], limit: "One per zone" },
-    { id: "ibc",    name: "Inside back cover",   desc: "The inside of the back cover",                   premium: true, sizes: ["fp"], limit: "One per zone" },
-    { id: "center", name: "Centerfold",          desc: "The center spread, where the magazine falls open", premium: true, sizes: ["fp", "sp"], limit: "One per zone" },
+    { id: "std",    name: "Standard placement",  desc: "Included", premium: false },
+    { id: "rhr",    name: "Right-hand read",     desc: "A right-hand page", premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "front",  name: "First ten pages",     desc: "Near the front",              premium: true, sizes: ["fp", "hp", "qp"] },
+    { id: "p3",     name: "Page 3",              desc: "Full Page only",          premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "ifc",    name: "Inside front cover",  desc: "Full Page only",                  premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "ibc",    name: "Inside back cover",   desc: "Full Page only",                   premium: true, sizes: ["fp"], limit: "One per zone" },
+    { id: "center", name: "Centerfold",          desc: "Full Page or spread", premium: true, sizes: ["fp", "sp"], limit: "One per zone" },
   ],
   // Free-text placement request add-on. No automatic charge: staff confirm it and set any charge on the invoice.
   placementRequest: { name: "Additional placement request", desc: "Ask for a specific spot or neighbor. We'll confirm availability before you're invoiced." },
   artwork: [
-    { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF, CMYK, 300 dpi" },
-    { id: "design", name: "Design it for me",     desc: "Our team designs it and sends you a proof" },
+    { id: "own",    name: "I'll send my artwork", desc: "Print-ready PDF" },
+    { id: "design", name: "Design it for me",     desc: "No extra cost" },
   ],
 };
 
@@ -886,7 +877,7 @@ function render() {
   const pubEl = $("#pubOpts"); pubEl.innerHTML = "";
   CONFIG.publications.forEach(p => pubEl.append(optButton({
     pressed: state.pub === p.id,
-    html: `<b>${p.name}</b><small>${p.desc}</small>`,
+    html: `<b>${p.name}</b>`,
     onClick: () => { state.pub = p.id; pruneZones(); pruneMonths(); render(); },
   })));
 
@@ -896,17 +887,15 @@ function render() {
     const h = document.createElement("div"); h.className = "grp-label"; h.textContent = label; sizeEl.append(h);
     CONFIG.sizes.filter(s => ids.includes(s.id)).forEach(s => {
       const now = nz ? cardPrice(s.id, nz, o.freq.id) : null;
-      const price = now != null
-        ? `${money(now * mags)} per issue <small>· ${plural(nz, "market")}${s.flat ? "" : ", " + o.freq.name}</small>`
+      const price = now != null ? `${money(now * mags)} per issue`
         : sizeFrom(s.id) != null ? `From ${money(sizeFrom(s.id))} per issue` : "Call for pricing";
       sizeEl.append(optButton({
         pressed: state.size === s.id,
-        html: `${adIcon(s.shape, s.id === "sp")}<b>${s.name}</b><small>${s.note || s.trim}</small><div class="price">${price}</div>${s.premium ? `<span class="tag">${s.limit.replace("zone", "market")}</span>` : ""}`,
+        html: `${adIcon(s.shape, s.id === "sp")}<span class="spec">${s.trim}</span><b>${s.name}</b>${s.note ? `<small>${s.note}</small>` : ""}<div class="price">${price}</div>`,
         onClick: () => { state.size = s.id; prunePlace(); pruneZones(); pruneMonths(); render(); },
       }));
     });
   });
-  $("#specNote").innerHTML = `<b>${c.size.name}</b>: trim ${c.size.trim}${c.size.bleed ? `, bleed ${c.size.bleed}` : ", no bleed"}. Full color, printed and mailed with every issue.`;
 
   // 3 · markets
   const zoneEl = $("#zoneOpts"); zoneEl.innerHTML = "";
@@ -919,7 +908,7 @@ function render() {
       label: `${z.name}${named ? ", " + z.id : ""}${blocked ? ", unavailable: " + blocked : ""}`,
       html: blocked
         ? `${title}<small class="why">Unavailable: ${blocked}</small>`
-        : `${title}${z.areas ? `<small>${esc(z.areas)}</small>` : ""}<small>${zoneHomes(z.id) ? `About ${zoneHomes(z.id).toLocaleString()} homes` : ""}</small>`,
+        : `${title}${z.areas ? `<small>${esc(z.areas)}</small>` : ""}<small>${zoneHomes(z.id) ? `${zoneHomes(z.id).toLocaleString()} homes` : ""}</small>`,
       onClick: () => { state.zones.has(z.id) ? state.zones.delete(z.id) : state.zones.add(z.id); state.zoneNotice = ""; pruneMonths(); render(); },
     });
     if (blocked) b.disabled = true;
@@ -927,11 +916,9 @@ function render() {
   });
   $("#zoneNote").classList.toggle("hidden", !state.zoneNotice);
   $("#zoneNote").textContent = state.zoneNotice || "";
-  const ladder = [1, 2, 3].map(k => [k, cardPrice(state.size, k, c.freq.id)]).filter(([, v]) => v != null);
-  $("#zonePrice").innerHTML = (nz
-      ? `<b>${plural(nz, "market")}: ${money(c.perIssue)} per issue</b>${mags > 1 ? " in both magazines" : ""}${nz > CONFIG.zoneBlock ? ` (includes ${Math.round(CONFIG.extraZonesDiscount * 100)}% off for more than ${CONFIG.zoneBlock} markets)` : ""}. `
-      : "Choose at least one market. ") +
-    `${c.size.name}${c.size.flat ? "" : ", " + c.freq.name}: ` + ladder.map(([k, v]) => `${plural(k, "market")} ${money(v * mags)}`).join(" · ") + ".";
+  $("#zonePrice").innerHTML = nz
+    ? `<b>${money(c.perIssue)} per issue</b> for ${plural(nz, "market")}${mags > 1 ? " in both magazines" : ""}${nz > CONFIG.zoneBlock ? `, with ${Math.round(CONFIG.extraZonesDiscount * 100)}% off for booking more than ${CONFIG.zoneBlock}` : ""}.`
+    : "";
   $("#allZones").textContent = CONFIG.zones.filter(z => !zoneBlock(z.id)).every(z => state.zones.has(z.id)) ? "Clear all" : "Select all";
 
   // 4 · issue months
@@ -953,7 +940,7 @@ function render() {
     const b = optButton({
       pressed: state.months.has(m.key),
       label: `${m.long}${why ? ", unavailable: " + why.toLowerCase() : state.months.has(m.key) ? ", selected" : ""}`,
-      html: `<b>${m.short} ${m.year}</b><small${why ? ' class="why"' : ""}>${why || (state.months.has(m.key) ? "✓ Selected" : "Available")}</small>`,
+      html: `<b>${m.short} ${m.year}</b>${why ? `<small class="why">${why}</small>` : ""}`,
       onClick: () => { state.months.has(m.key) ? state.months.delete(m.key) : state.months.add(m.key); state.notice = ""; render(); },
     });
     if (why) b.disabled = true;
@@ -961,20 +948,18 @@ function render() {
   });
   const slots = slotsOf(state), pn = $("#premiumNote");
   pn.classList.toggle("hidden", !slots.length && !state.notice);
-  pn.textContent = state.notice || `${slots.map(slotName).join(" / ")} is one advertiser per market, per issue. Months already booked show as taken. We confirm every month before you're invoiced.`;
+  pn.textContent = state.notice || `${slots.map(slotName).join(" / ")}: one advertiser per market each issue.`;
   const nextF = CONFIG.frequencies.find(f => f.min > o.issues);
   const nextPrice = nextF && !c.size.flat && nz ? cardPrice(state.size, nz, nextF.id) * mags : null;
-  $("#tierNote").innerHTML = c.size.flat
-    ? `${c.size.name} is the same price per issue at any frequency.`
-    : `<b>${o.freq.name}</b> for ${plural(o.issues, "issue")}${n ? " across your package" : ""}. ` +
-      (nextF ? `Book ${nextF.min - o.issues} more to get the ${nextF.name}${nextPrice ? ` (${money(nextPrice)} per issue)` : ""}.` : "You're getting our best rate.");
+  $("#tierNote").innerHTML = c.size.flat || !nextF || !nz ? ""
+    : `Book ${nextF.min - o.issues} more ${nextF.min - o.issues === 1 ? "month" : "months"} for the ${nextF.name}${nextPrice ? `: <b>${money(nextPrice)} per issue</b>` : ""}.`;
 
   // 5 · placement: standard always visible, upgrades behind a control
   const std = CONFIG.placements.find(x => !x.premium);
   const stdEl = $("#stdPlace"); stdEl.innerHTML = "";
   stdEl.append(optButton({
     pressed: state.place === std.id,
-    html: `<b>${std.name}</b><small>${std.desc}</small><div class="price">Included</div>`,
+    html: `<b>${std.name}</b><small>Included</small>`,
     onClick: () => { state.place = std.id; pruneMonths(); render(); },
   }));
   const plEl = $("#placeOpts"); plEl.innerHTML = "";
@@ -986,7 +971,7 @@ function render() {
       pressed: state.place === pl.id,
       label: `${pl.name}${ok ? "" : ", unavailable: " + need}`,
       html: `<b>${pl.name}</b>` + (ok
-        ? `<small>${pl.desc}</small><div class="price">Fee to be confirmed</div>${pl.limit ? `<span class="tag">${pl.limit.replace("zone", "market")}</span>` : ""}`
+        ? `<small>${pl.desc}</small>`
         : `<small class="why">Unavailable: ${need}</small>`),
       onClick: () => { state.place = pl.id; pruneMonths(); render(); },
     });
@@ -998,7 +983,7 @@ function render() {
   const rq = $("#reqOpt"); rq.innerHTML = "";
   rq.append(optButton({
     pressed: state.req,
-    html: `<b>${CONFIG.placementRequest.name}</b><small>${CONFIG.placementRequest.desc}</small><div class="price">Fee to be confirmed</div>`,
+    html: `<b>Other placement request</b><small>Tell us the spot you want.</small>`,
     onClick: () => { state.req = !state.req; render(); if (state.req) $("#reqText").focus(); },
   }));
   $("#reqWrap").classList.toggle("hidden", !state.req);
@@ -1007,13 +992,13 @@ function render() {
   $("#upToggle").textContent = state.upOpen ? "Hide placement upgrades" : "Explore placement upgrades";
   $("#upBody").classList.toggle("hidden", !state.upOpen);
   $("#upChosen").classList.toggle("hidden", !ups.length || state.upOpen);
-  $("#upChosen").textContent = ups.length ? `Upgrade selected: ${ups.join(" + ")}. Fee to be confirmed.` : "";
+  $("#upChosen").innerHTML = ups.length ? `<b>${ups.join(" + ")}</b> · fee to be confirmed` : "";
 
   // 6 · artwork
   const artEl = $("#artOpts"); artEl.innerHTML = "";
   CONFIG.artwork.forEach(a => artEl.append(optButton({
     pressed: state.art === a.id,
-    html: `<b>${a.name}</b><small>${a.desc}</small><div class="price">Included</div>`,
+    html: `<b>${a.name}</b><small>${a.desc}</small>`,
     onClick: () => { state.art = a.id; render(); },
   })));
 
@@ -1029,10 +1014,10 @@ function render() {
     return `<div class="eline${cur && n ? " cur" : ""}">
       <div class="eh"><b>${many ? `Ad ${l.no} · ` : ""}${l.size.name}</b><span>${money(l.gross)}</span></div>
       <small>${l.pub.name}</small>
-      <small>Markets: ${esc(marketsText(l))}</small>
-      <small>Months: ${monthList(l.sp.months)}</small>
+      <small>${esc(marketsText(l))}</small>
+      <small>${monthList(l.sp.months)}</small>
       <small class="calc">${perIssueText(l)}</small>
-      ${upgradesOf(l).map(u => `<small class="up">Upgrade: ${u} · fee to be confirmed</small>`).join("")}
+      ${upgradesOf(l).map(u => `<small class="up">${u} · fee to be confirmed</small>`).join("")}
       <div class="tools">${cur ? (n ? '<span class="badge">Editing now</span>' : "") : `<button type="button" data-edit="${i}">Edit<span class="hp"> ad ${l.no}</span></button>`}${cur && !n ? "" : `<button type="button" class="rm" data-rm="${i}">Remove<span class="hp"> ad ${l.no}</span></button>`}</div>
     </div>`;
   };
@@ -1043,9 +1028,6 @@ function render() {
   $("#monthRows").innerHTML = sched.map(r => `<dt>${r.label}</dt><dd>${esc(r.what)}</dd><dd class="a">${money(r.amount)}</dd>`).join("");
   $("#estTotal").textContent = money(o.total);
   $("#estTbd").classList.toggle("hidden", !o.tbd);
-  $("#estRate").textContent = o.lines.length
-    ? (o.lines.length === 1 ? perIssueText(o.lines[0]) : `${plural(o.lines.length, "ad")} · ${o.freq.name} for ${plural(o.issues, "issue month")}`)
-    : "";
   $("#estimate").classList.toggle("open", state.estOpen);
   $("#estToggle").setAttribute("aria-expanded", String(state.estOpen));
   $("#estToggle").textContent = state.estOpen ? "Hide estimate details" : `Show estimate details (${plural(o.lines.length, "ad")})`;
@@ -1230,7 +1212,7 @@ function receiptRows(o, order, ref) {
     if (many) r.push(["§", `Ad ${i + 1} · ${l.size.name}`]);
     r.push(
       ["Magazine", l.pub.name],
-      ["Ad size", `${l.size.name} (${l.size.trim})`],
+      ["Ad size", l.size.name],
       ["Markets", marketsText(l)],
       ["Issue months", `${l.issues}: ${monthList(l.sp.months)}`],
       ["Placement", l.place.name + (l.place.premium ? " (fee to be confirmed)" : "")],
