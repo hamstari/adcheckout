@@ -31,55 +31,50 @@ Staff update everything at **`/staff/`** (for example `https://hamstari.github.i
 
 The key can change any file in this repo, so give it only to trusted staff, set an expiry, and replace it when someone leaves.
 
-## Package flow
-The checkout is framed as building a package:
-- **Your package** panel at the top lists every ad with its price, with Edit and Remove, and an "Add another ad size" button. With one ad it shows a three-step "how it works" instead. It stays visible on the details step as the review.
-- **Ad sizes** are grouped (standard sizes; covers and spreads) and each card shows the per-issue price for the zones already picked.
-- The builder ends with a panel summarising the ad and two buttons: **Save and add another ad size** and **Review package**.
-- **Package estimate** (side panel) shows each ad as price per issue × issues, the rate tier, a month-by-month view of what runs and what each month costs, and a note that nothing is paid now.
-- Ads keep their number when edited.
+## The request form (three steps)
+**1 · Package.** Magazine, ad size, markets, issue months, placement and artwork for one ad at a time.
+- Selected choices carry a "✓ Selected" label as well as color. Unavailable ones are dashed, struck through and say why.
+- Markets show the zone name from `zones.csv`. When a zone has a real name (not just "Zone 1"), the zone code is shown beside it.
+- Standard placement is always visible. Premium positions and the free-text placement request sit behind **Explore placement upgrades**. A chosen upgrade stays visible under that control and in the estimate. No fee is added; the estimate says "Premium placement fee to be confirmed".
+- **+ Add another ad** (secondary) saves the ad and starts another. Saved ads keep their number and are never changed by editing a different ad.
 
-## Several ads in one order
-An order can hold more than one ad. After building an ad, **+ Add another ad** saves it to the order summary and starts the next one, with its own size, zones, months, placement and artwork. That's how a customer books different sizes in different months (for example a Full Page in Dec–Feb and a Half Page in Mar–May). Saved ads can be edited or removed from the summary.
+**2 · Details.** Two groups: business and contact, then billing (billing email and notes are optional). Labels stay visible, phone/email/ZIP use the right keyboards and autofill, and errors appear under the field they belong to.
 
-- The frequency rate (3x / 6x / 12 issues) is set by the different months the whole order runs in, across all ads.
-- A cover already in the order can't be booked twice for the same zone and month.
-- The order data sent on submit has an `ads` array (one entry per ad) and order-level `pricing`.
+**3 · Confirmation.** Status, next steps (placement confirmation, DocuSign agreement, invoice, artwork) and the request summary.
 
-## Ordering details
-- **Agreement:** there is no terms checkbox. The checkout tells customers they'll get the advertising agreement through DocuSign after placement is confirmed, then the invoice. Sending the DocuSign is a staff step; the page doesn't send it.
-- **Issue deadline:** `CONFIG.issueCloseDay` (placeholder: 10) is the day of the month before an issue mails when booking closes. After that day the issue is no longer offered, and the Issues step shows when the next one closes.
-- **Refresh-safe:** the order and the checkout form are kept in the browser tab (sessionStorage) until the order is sent or a new one is started.
-- **Zone areas:** an optional "Areas covered" value per zone (staff portal → Rates) shows on the zone cards.
-- **Centerfold:** can be marked as sold in the staff portal like a cover; sold months are blocked for that zone.
+**One estimate, one action.** The estimate is the only summary: each ad with size, markets, months, "price per issue × issues", Edit and Remove, an expandable monthly breakdown, and the estimated total. It sits beside the form on desktop and below it on phones, where the ad list is collapsed behind "Show estimate details". Each step has one primary button: **Continue to details**, then **Send ad request**. Nothing is pinned to the screen, so nothing can cover a field, an error or the last button inside an embed.
 
-## Premium placement
-Step 5 of the checkout offers Standard placement (included), **Right-hand read**, **Front of magazine** and **Centerfold** (`CONFIG.placements` in `index.html`). No price is shown or added to the total for these: each says "Upgrade charge TBD on invoice", and staff set the charge when invoicing. Covers can't take a placement upgrade, and Centerfold is Full Page only.
+Entries survive going back, editing the package, a failed send and a page refresh (sessionStorage); they are cleared after a successful send.
 
-**Additional placement request** is a free-text add-on, also marked "Charge TBD on invoice".
-
-When either is chosen, the summary, confirmation and order show the total "plus placement charge TBD", and the order data has `placementChargeTBD: true`. Premium positions aren't tracked as sold the way covers are, so staff confirm them for each issue.
+Other rules that carry over:
+- The frequency rate (3x / 6x / 12 issues) is set by the different months the whole package runs in, across all ads.
+- A cover or one-per-market position already in the package can't be booked twice for the same market and month.
+- **Issue deadline:** `CONFIG.issueCloseDay` (placeholder: 10) is the day of the month before an issue mails when booking closes.
+- **Premium positions** are in `CONFIG.placements`. Covers can't take one; several are Full Page only.
 
 ## Issues and premium covers
 Customers can pick any months over the next 12, not only consecutive ones. The number of months booked sets the frequency rate (see Pricing).
 
 Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone, per issue. Covers listed under **Sold covers** in the staff portal show as "Taken in Zx" for that month. If a customer changes size, zone or magazine and a month they picked is no longer free, that month is removed and they're told why.
 
-## Demo mode
-`CONFIG.demo` is `true` right now. The whole flow works, but nothing is sent: no webhook call and no email. There is no banner on the page; the only sign is a small "This is a demo. No request was sent." line on the confirmation. Set `demo: false` once the order destination, prices and inventory are real.
+## Preview mode and sending requests
+`CONFIG.demo` is `true` right now: **preview mode**. Nothing is sent. The last step's main status is "Preview only — no request sent", with no reference number.
 
-## Where orders go (once demo is off)
-When a customer presses **Request ad space**:
-- **If `CONFIG.orderEndpoint` is set** (a Zapier, Make or Google Apps Script webhook, or your CRM), the order is POSTed there as JSON: reference, magazine, size, zones, months, full pricing breakdown and customer details. From there it can create a Notion row, send an email, or start the invoice. If the POST fails, the customer sees an error with the phone number and can try again.
-- **If it's empty**, the customer's email app opens with the order pre-filled to `CONFIG.salesEmail` (advertise@bestdealsbook.com), and they have to press send. This is a stopgap; set a webhook before launch.
-
-The confirmation page shows an order summary that the customer can print or save as a PDF. A hidden honeypot field drops most spam bots.
+With `demo: false` the form is live:
+- The request is POSTed as JSON (`Content-Type: text/plain`) to `CONFIG.orderEndpoint`: `requestId`, `ads[]`, `pricing`, `customer`.
+- **"Request received" is shown only if the endpoint answers with a 2xx status.** The endpoint must therefore allow cross-origin requests from the form's address (CORS), or the browser reports a failure even if the request arrived.
+- A reference is shown only if the endpoint's JSON reply contains `reference` (or `referenceId`, `ref`, `id`). The form never invents one.
+- `requestId` is the same on a retry, so the receiving system can drop duplicates.
+- While sending, the button is disabled and reads "Sending…"; extra clicks do nothing. Requests time out after 20 seconds.
+- On failure the customer stays on Details with everything intact and a message to try again or call.
+- With `demo: false` and no endpoint, sending fails with a "not connected" message. There is no email fallback any more, because an opened email draft can't be confirmed as sent.
+- A hidden honeypot field drops most spam bots.
 
 ## Before launch
 - **Prices:** the 2026 rate card is loaded. **Zone names, areas, homes and which zones each magazine mails** are still placeholders; set them in the staff portal.
 - **Sold covers:** delete the example bookings in the staff portal and add real ones.
 - **Staff portal:** create the access key (see above).
-- **Order webhook:** set `CONFIG.orderEndpoint`, and confirm that `salesEmail` is the right inbox.
+- **Order endpoint:** set `CONFIG.orderEndpoint` (must allow CORS and ideally return a `reference`), then set `demo: false`.
 - **Payment:** none is taken on the page. Once placement is confirmed, the customer is invoiced (an optional billing email can be entered at checkout).
 
 ## Publishing with GitHub Pages (free)
@@ -97,7 +92,7 @@ Rates and sold covers are updated from the staff portal (see above), which saves
 
 The checkout scrolls inside the box. On desktop the summary and total stay pinned, and on phones a bar with the total and the Continue button stays at the bottom of the box. Visitors never leave bestdealsnetworks.com.
 
-**On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code) and leave **Forced Height** empty. The frame grows to the full height of the checkout, so nothing is cut off and the page scrolls normally, including on phones. If the bottom is cut off after publishing (GoDaddy's own wrapper not growing), use `godaddy-embed-fixed.html`, which is a fixed-height box that scrolls inside.
+**On GoDaddy Website Builder:** paste the contents of `godaddy-embed.html` into an HTML section (Edit Website → Add Section → search "HTML" → Custom Code) and leave **Forced Height** empty. Its script resizes the frame to the form's height whenever a step or expandable section changes, and only accepts messages from the form's own origin. Whether the published page follows depends on GoDaddy: it wraps custom code in its own frame, and that wrapper has to grow too. If the form is cut off or leaves a gap, switch to `godaddy-embed-fixed.html` and set Forced Height to 760: a fixed box (600px on phones) that scrolls inside. Because nothing in the form is pinned, every field and the last button stay reachable in that box.
 
 ## Publishing on your site
 The checkout is four plain files with no build step: `index.html`, `rates.csv`, `zones.csv` and `sold.csv`.
