@@ -1,11 +1,11 @@
 <!--
   Best Deals Ads: GoDaddy fallback embed, for when GoDaddy won't let the frame resize itself.
-  A fixed-height box; the form scrolls inside it. Nothing is pinned inside the form,
-  so no field, error or button is ever covered.
-  In GoDaddy's HTML section set "Forced Height" to 760 (it must be at least the tallest height below).
+  A fixed-height box. With ?fit=frame the form fills the box: on phones it becomes a paged
+  checkout with the action bar at the bottom of the box and the current page scrolling above it.
+  In GoDaddy's HTML section set "Forced Height" to 760 (at least the tallest height below).
 -->
 <style>
   .bda-frame { width: 100%; height: 740px; border: 0; display: block; }
   @media (max-width: 767px) { .bda-frame { height: 600px; } }
 </style>
-<iframe class="bda-frame" src="https://hamstari.github.io/adcheckout/" title="Best Deals Ads ad request form"></iframe>
+<iframe class="bda-frame" src="https://hamstari.github.io/adcheckout/?fit=frame" title="Best Deals Ads ad request form"></iframe>
