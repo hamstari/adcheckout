@@ -31,9 +31,18 @@ Staff update everything at **`/staff/`** (for example `https://hamstari.github.i
 
 The key can change any file in this repo, so give it only to trusted staff, set an expiry, and replace it when someone leaves.
 
+## Design
+The form was redesigned against the Hallmark skill's rule list (the stamp is the first line of the CSS in `index.html`).
+- Every colour and the font come from tokens at `:root`: the site's black, its teal, and Montserrat.
+- A white page with ruled rows, not cards inside cards. The estimate is the one tinted surface, and its total is set large.
+- Labels and buttons are sentence case, with no tracked capitals and no eyebrow line.
+- Selection is the highlight alone: ink border and a teal tint.
+- A slim black bar with the wordmark and phone number; it's hidden when the form is embedded in a host page.
+- Not done: the skill's lint and render pass, because its scripts and reference files weren't available when this was built.
+
 ## The request form (three steps)
 **1 · Package.** Magazine, ad size, markets, issue months, placement and artwork for one ad at a time.
-- Selected choices are shown by the highlight alone (tint and darker border). Unavailable ones are dashed, struck through and say why.
+- Selected choices are shown by the highlight alone (ink border and teal tint). Unavailable ones are dashed, struck through and say why.
 - Cards carry as little text as possible: no step numbers, no trim dimensions, no repeated "Included" or fee lines.
 - Markets show the zone name from `zones.csv`. When a zone has a real name (not just "Zone 1"), the zone code is shown beside it.
 - Standard placement is always visible. Premium positions and the free-text placement request sit behind **Explore placement upgrades**. A chosen upgrade stays visible under that control and in the estimate. No fee is added; the estimate says "Premium placement fee to be confirmed".
