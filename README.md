@@ -40,14 +40,17 @@ The form was redesigned against the Hallmark skill's rule list (the stamp is the
 - A slim black bar with the wordmark and phone number; it's hidden when the form is embedded in a host page.
 - Not done: the skill's lint and render pass, because its scripts and reference files weren't available when this was built.
 
-## Phones: a paged checkout
-At 700px wide or less the form shows one page at a time and fills exactly one screen:
-- **Nine pages:** Magazine, Ad size, Markets, Issue months, Placement, Artwork, Estimate, then Business and contact, then Billing. Confirmation follows.
+## Splash screen
+The first time someone opens the form in a visit, a short intro explains what's about to happen: build your ad, see your price as you go, send your details, then we confirm and send the agreement and invoice. It also says "About 3 minutes", "No payment today" and "Nothing is booked until you sign". **Get started** opens the first page. It isn't shown again in the same browser tab (sessionStorage).
+
+## A paged checkout on every screen
+On phones, tablets and desktop the form shows one page at a time and fills exactly one screen. On wide screens the column is capped at 760px:
+- **Ten pages:** Magazine, Ad size, Markets, Issue months, Placement, Artwork, Estimate, then Your business, Contact and Billing. Confirmation follows.
 - **Layout:** the head, the current page, and an action bar are stacked in a column the height of the screen. A long page scrolls between the head and the bar. The bar is part of the layout, not an overlay, so it never covers a field, an error or a choice.
 - **Action bar:** the running estimated total, "2 of 9", Back, and one primary button (Next, Continue to details, Send ad request). Next is disabled with a reason when a page needs a choice (a market, a month).
 - **Estimate page:** every ad with Edit and Remove, the monthly breakdown, the total, and "Add another ad". Adding an ad starts the next one at Ad size; Edit reopens that ad at page 1.
 - **Details:** each page validates its own fields before moving on. If sending fails, or a field on the other page is wrong, the form shows that page.
-- Desktop and tablets keep everything on one page with the estimate beside the form.
+- **Ad 1:** every package page starts with "Ad 1" (or "Ad 2 of 2" and so on once more ads are saved), so it's clear which ad is being built.
 
 **Embedded on a phone:** with the resizing embed (`godaddy-embed.html`) each page takes its natural height and the host frame follows it. With a fixed-height frame, add `?fit=frame` to the form's address (as `godaddy-embed-fixed.html` does) and the form fills the frame the same way it fills a screen.
 
@@ -59,7 +62,7 @@ At 700px wide or less the form shows one page at a time and fills exactly one sc
 - Standard placement is always visible. Premium positions and the free-text placement request sit behind **Explore placement upgrades**. A chosen upgrade stays visible under that control and in the estimate. No fee is added; the estimate says "Premium placement fee to be confirmed".
 - **+ Add another ad** (secondary) saves the ad and starts another. Saved ads keep their number and are never changed by editing a different ad.
 
-**2 · Details.** Two groups: business and contact, then billing (billing email and notes are optional). Labels stay visible, phone/email/ZIP use the right keyboards and autofill, and errors appear under the field they belong to.
+**2 · Details.** Three pages that mirror the top of the Advertising Agreement: *Your business* (company, DBA, license #, business address, service category, retail yes/no), *Contact* (main contact, phone, mobile, email, sales and marketing manager), and *Billing* ("same as business address" or a separate billing address, billing email, notes). No card details are collected. They're entered in DocuSign. Every request also carries `agreementTabs` (DocuSign prefill) and `smartsheetRow` (Smartsheet columns); see **`integration/README.md`**. Labels stay visible, phone/email/ZIP use the right keyboards and autofill, and errors appear under the field they belong to.
 
 **3 · Confirmation.** Status, next steps (placement confirmation, DocuSign agreement, invoice, artwork) and the request summary.
 
@@ -82,7 +85,7 @@ Back Cover, Inside Front Cover and Inside Back Cover are one advertiser per zone
 `CONFIG.demo` is `true` right now: **preview mode**. Nothing is sent. The last step's main status is "Preview only — no request sent", with no reference number.
 
 With `demo: false` the form is live:
-- The request is POSTed as JSON (`Content-Type: text/plain`) to `CONFIG.orderEndpoint`: `requestId`, `ads[]`, `pricing`, `customer`.
+- The request is POSTed as JSON (`Content-Type: text/plain`) to `CONFIG.orderEndpoint`: `requestId`, `ads[]`, `pricing`, `customer`, `agreementTabs`, `smartsheetRow`.
 - **"Request received" is shown only if the endpoint answers with a 2xx status.** The endpoint must therefore allow cross-origin requests from the form's address (CORS), or the browser reports a failure even if the request arrived.
 - A reference is shown only if the endpoint's JSON reply contains `reference` (or `referenceId`, `ref`, `id`). The form never invents one.
 - `requestId` is the same on a retry, so the receiving system can drop duplicates.
@@ -92,7 +95,8 @@ With `demo: false` the form is live:
 - A hidden honeypot field drops most spam bots.
 
 ## Before launch
-- **Prices:** the 2026 rate card is loaded. **Zone names, areas, homes and which zones each magazine mails** are still placeholders; set them in the staff portal.
+- **Prices:** the 2026 rate card is loaded. Zone names and which zones each magazine mails come from the 2025 agreement. **Homes per zone** are still placeholders. Set them in the staff portal.
+- **DocuSign + Smartsheet:** build the template, sheet and Zap in `integration/README.md`.
 - **Sold covers:** delete the example bookings in the staff portal and add real ones.
 - **Staff portal:** create the access key (see above).
 - **Order endpoint:** set `CONFIG.orderEndpoint` (must allow CORS and ideally return a `reference`), then set `demo: false`.
