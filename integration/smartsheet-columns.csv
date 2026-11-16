@@ -1,0 +1,41 @@
+Column name,Column type,Filled by,Example
+Request ID,Text/Number,Primary column,c559f678-c458-4bd7-a29e-a250dc686744
+Submitted,Date,Checkout,2026-11-16T04:04:58.721Z
+Status,"Dropdown (New request, Agreement sent, Signed, Declined, Scheduled)",Checkout,New request
+Company,Text/Number,Checkout,Example Roofing LLC
+DBA,Text/Number,Checkout,
+License #,Text/Number,Checkout,CCC123456
+Address,Text/Number,Checkout,100 Main St
+City,Text/Number,Checkout,Sarasota
+State,Text/Number,Checkout,FL
+ZIP,Text/Number,Checkout,34236
+Phone,Text/Number,Checkout,941-555-0100
+Mobile,Text/Number,Checkout,
+Email,Contact list,Checkout,pat@example.com
+Main Contact,Text/Number,Checkout,Pat Smith
+Sales Manager,Text/Number,Checkout,
+Marketing Manager,Text/Number,Checkout,
+Service Category,Text/Number,Checkout,Roofing
+Retail,"Dropdown (Yes, No)",Checkout,No
+Magazines,Text/Number,Checkout,"Best Deals Book, Exclusively Home Improvements"
+Ad Sizes,Text/Number,Checkout,Full Page
+Zones,Text/Number,Checkout,"Z1, Z3"
+Ads,Number,Checkout,1
+Term,"Dropdown (3X, 6X, 12X)",Checkout,3X
+Issue Start,Text/Number,Checkout,January 2027
+Issue Months,Text/Number,Checkout,"Jan 2027, Feb 2027, Mar 2027"
+Issues,Number,Checkout,3
+Monthly Total,Currency,Checkout,11198
+Contract Total,Currency,Checkout,33594
+Placement Upgrades,Text/Number,Checkout,
+Placement Fee TBD,"Dropdown (Yes, No)",Checkout,No
+Artwork,Text/Number,Checkout,I'll send my artwork
+Billing Same As Business,"Dropdown (Yes, No)",Checkout,No
+Billing Address,Text/Number,Checkout,PO Box 9
+Billing City,Text/Number,Checkout,Venice
+Billing State,Text/Number,Checkout,FL
+Billing ZIP,Text/Number,Checkout,34285
+Billing Email,Contact list,Checkout,
+Notes,Text (long),Checkout,"Ad 1: Full Page, Both magazines, Z1 Z3, Jan, Feb, Mar 2027, $11,198/issue, artwo"
+DocuSign Envelope ID,Text/Number,"Zapier, from DocuSign",
+DocuSign Status,"Dropdown (sent, delivered, completed, declined, voided)","Zapier, from DocuSign",

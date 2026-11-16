@@ -1,0 +1,73 @@
+Tab label,Tab type,Where on the agreement,Filled by,Example
+Company,Text,Page 4 · Company,Checkout (prefilled),Example Roofing LLC
+DBA,Text,Page 4 · DBA,Checkout (prefilled),
+LicenseNo,Text,Page 4 · LIC#,Checkout (prefilled),CCC123456
+Address,Text,Page 4 · Address,Checkout (prefilled),100 Main St
+City,Text,Page 4 · City,Checkout (prefilled),Sarasota
+State,Text,Page 4 · State,Checkout (prefilled),FL
+Zip,Text,Page 4 · Zip,Checkout (prefilled),34236
+Phone,Text,Page 4 · Phone,Checkout (prefilled),941-555-0100
+Mobile,Text,Page 4 · Mobile,Checkout (prefilled),
+Email,Text,Page 4 · Email,Checkout (prefilled),pat@example.com
+MainContact,Text,Page 4 · Main Contact,Checkout (prefilled),Pat Smith
+SalesManager,Text,Page 4 · Sales Manager,Checkout (prefilled),
+MarketingManager,Text,Page 4 · Marketing Manager,Checkout (prefilled),
+BDB_RatePerZone,Number,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Monthly Rate per Zone",Checkout (prefilled),2799.5
+BDB_AdSize,Text,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Ad Size/CPM",Checkout (prefilled),Full Page
+BDB_Zone1,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 1 box",Checkout (prefilled),true
+BDB_Zone2,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 2 box",Checkout (prefilled),false
+BDB_Zone3,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 3 box",Checkout (prefilled),true
+BDB_Zone5,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 5 box",Checkout (prefilled),false
+BDB_Zone6,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 6 box",Checkout (prefilled),false
+BDB_Zone7,Checkbox,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Zone 7 box",Checkout (prefilled),false
+BDB_TotalPerMonth,Number,"Page 4 · Best Deals Books (Zones 1, 2, 3, 5, 6, 7) · Total per Mo.",Checkout (prefilled),5599
+BDBZ4_RatePerZone,Number,Page 4 · Best Deals Books - Zone 4 · Monthly Rate per Zone,Checkout (prefilled),
+BDBZ4_AdSize,Text,Page 4 · Best Deals Books - Zone 4 · Ad Size/CPM,Checkout (prefilled),
+BDBZ4_Zone4,Checkbox,Page 4 · Best Deals Books - Zone 4 · Zone 4 box,Checkout (prefilled),false
+BDBZ4_TotalPerMonth,Number,Page 4 · Best Deals Books - Zone 4 · Total per Mo.,Checkout (prefilled),
+EHI_RatePerZone,Number,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Monthly Rate per Zone",Checkout (prefilled),2799.5
+EHI_AdSize,Text,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Ad Size/CPM",Checkout (prefilled),Full Page
+EHI_Zone1,Checkbox,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Zone 1 box",Checkout (prefilled),true
+EHI_Zone2,Checkbox,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Zone 2 box",Checkout (prefilled),false
+EHI_Zone3,Checkbox,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Zone 3 box",Checkout (prefilled),true
+EHI_Zone5,Checkbox,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Zone 5 box",Checkout (prefilled),false
+EHI_TotalPerMonth,Number,"Page 4 · Exclusively Home Improvements (Zones 1, 2, 3, 5) · Total per Mo.",Checkout (prefilled),5599
+NextLead360_Rate,Number,Page 4 · NEXT LEAD 360 · Monthly Rate per Zone,Staff (leave empty),
+NextLead360_AdSizeCPM,Text,Page 4 · NEXT LEAD 360 · Ad Size/CPM,Staff (leave empty),
+NextLead360_TotalPerMonth,Number,Page 4 · NEXT LEAD 360 · Total per Mo.,Staff (leave empty),
+Notes,Text,Page 4 · Notes box,Checkout (prefilled),"Ad 1: Full Page, Both magazines, Z1 Z3, Jan, Feb, Mar 2027, $11,198/issue, artwo"
+MonthlyTotal,Number,Page 4 · Monthly Total,Checkout (prefilled),11198
+Term_3X,Checkbox,Page 4 · Publication Term 3X,Checkout (prefilled),true
+Term_6X,Checkbox,Page 4 · Publication Term 6X,Checkout (prefilled),false
+Term_12X,Checkbox,Page 4 · Publication Term 12X,Checkout (prefilled),false
+IssueStartMonth,Text,"Page 4 · Issue Start, MONTH",Checkout (prefilled),JAN
+IssueStartYear,Text,"Page 4 · Issue Start, YEAR",Checkout (prefilled),2027
+Retail,Checkbox,Page 4 · Is this a RETAIL Business,Checkout (prefilled),false
+SelectAllMonths,Checkbox,Page 4 · Select All Months,Checkout (prefilled),false
+BillingSameAsAbove,Checkbox,Page 4 · Billing address same as above,Checkout (prefilled),false
+BillingAddress,Text,Page 4 · Billing Address,Checkout (prefilled),PO Box 9
+BillingCity,Text,Page 4 · Billing City,Checkout (prefilled),Venice
+BillingState,Text,Page 4 · Billing State,Checkout (prefilled),FL
+BillingZip,Text,Page 4 · Billing Zip,Checkout (prefilled),34285
+PrintName,Text,Page 4 · Print Name,Checkout (prefilled),Pat Smith
+Date,Text,Page 4 · Date,Checkout (prefilled),11/15/2026
+Month_JAN,Checkbox,Page 4 · month box JAN,Checkout (prefilled),true
+Month_FEB,Checkbox,Page 4 · month box FEB,Checkout (prefilled),true
+Month_MAR,Checkbox,Page 4 · month box MAR,Checkout (prefilled),true
+Month_APR,Checkbox,Page 4 · month box APR,Checkout (prefilled),false
+Month_MAY,Checkbox,Page 4 · month box MAY,Checkout (prefilled),false
+Month_JUN,Checkbox,Page 4 · month box JUN,Checkout (prefilled),false
+Month_JUL,Checkbox,Page 4 · month box JUL,Checkout (prefilled),false
+Month_AUG,Checkbox,Page 4 · month box AUG,Checkout (prefilled),false
+Month_SEPT,Checkbox,Page 4 · month box SEPT,Checkout (prefilled),false
+Month_OCT,Checkbox,Page 4 · month box OCT,Checkout (prefilled),false
+Month_NOV,Checkbox,Page 4 · month box NOV,Checkout (prefilled),false
+Month_DEC,Checkbox,Page 4 · month box DEC,Checkout (prefilled),false
+PaymentPreference,Radio group: Mastercard / Visa / Amex,Page 4 · Payment Preference,Advertiser in DocuSign,
+CardNumber,"Text (required, masked)",Page 4 · Card #,Advertiser in DocuSign,
+CardExp,Text (required),Page 4 · EXP DATE,Advertiser in DocuSign,
+CardBillingZip,Text (required),Page 4 · Billing ZIP,Advertiser in DocuSign,
+AdvertiserSignature,Signature,"Page 4 · Signature, Accepted by Advertiser",Advertiser in DocuSign,
+DateSigned,Date Signed,Page 4 · Date,Advertiser in DocuSign,
+AdvertiserInitial,Initial,Page 5 · Initial,Advertiser in DocuSign,
+PublisherSignature,Signature (second signer: BDB),"Page 4 · Signature, Accepted by Publisher",Publisher in DocuSign,

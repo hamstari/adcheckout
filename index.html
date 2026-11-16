@@ -181,6 +181,10 @@
   .field label span { font-weight: 400; color: var(--muted); }
   .field input, .field select, .field textarea { display: block; width: 100%; margin-top: 6px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: var(--r-control); background: var(--paper); font-size: 16px; }
   .field.bad input, .field.bad select, .field.bad textarea { border-color: var(--danger); background: var(--danger-wash); }
+  .field.half2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px; }
+  .check { display: flex; gap: 10px; align-items: center; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); flex: none; }
+  .bill-same .billalt { display: none; }
   .ferr { display: block; color: var(--danger); font-size: 14px; font-weight: 600; margin-top: 4px; }
   .ferr:empty { display: none; }
 
@@ -384,14 +388,21 @@
       <section id="step2" class="hidden" aria-label="Details">
         <form id="checkoutForm" novalidate>
           <div class="vh" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
-          <div class="sec" data-page="contact" role="group" aria-labelledby="g-contact">
-            <div class="sec-h"><h2 id="g-contact">Business and contact</h2></div>
+          <!-- These pages mirror the top of the BDB / EHI Advertising Agreement, so each answer can prefill
+               the matching DocuSign field and Smartsheet column (see integration/README.md). -->
+          <div class="sec" data-page="business" role="group" aria-labelledby="g-business">
+            <div class="sec-h"><h2 id="g-business">Your business</h2></div>
             <div class="sec-b fields">
-              <div class="field full"><label for="f-business">Business name</label><input id="f-business" name="business" required autocomplete="organization" aria-describedby="e-business"><span class="ferr" id="e-business"></span></div>
-              <div class="field"><label for="f-contact">Contact name</label><input id="f-contact" name="contact" required autocomplete="name" aria-describedby="e-contact"><span class="ferr" id="e-contact"></span></div>
-              <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" aria-describedby="e-phone"><span class="ferr" id="e-phone"></span></div>
-              <div class="field full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" inputmode="email" required autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="e-email"><span class="ferr" id="e-email"></span></div>
-              <div class="field full"><label for="f-category">Service category</label>
+              <div class="field full"><label for="f-business">Company</label><input id="f-business" name="business" required autocomplete="organization" aria-describedby="e-business"><span class="ferr" id="e-business"></span></div>
+              <div class="field"><label for="f-dba">DBA <span>(if different)</span></label><input id="f-dba" name="dba" autocomplete="off"></div>
+              <div class="field"><label for="f-license">License # <span>(if licensed)</span></label><input id="f-license" name="license" autocomplete="off" autocapitalize="characters"></div>
+              <div class="field full"><label for="f-street">Business address</label><input id="f-street" name="street" required autocomplete="street-address" aria-describedby="e-street"><span class="ferr" id="e-street"></span></div>
+              <div class="field"><label for="f-city">City</label><input id="f-city" name="city" required autocomplete="address-level2" aria-describedby="e-city"><span class="ferr" id="e-city"></span></div>
+              <div class="field half2">
+                <div><label for="f-state">State</label><input id="f-state" name="state" required autocomplete="address-level1" maxlength="2" autocapitalize="characters" value="FL" aria-describedby="e-state"><span class="ferr" id="e-state"></span></div>
+                <div><label for="f-zip">ZIP code</label><input id="f-zip" name="zip" required inputmode="numeric" autocomplete="postal-code" maxlength="10" aria-describedby="e-zip"><span class="ferr" id="e-zip"></span></div>
+              </div>
+              <div class="field"><label for="f-category">Service category</label>
                 <select id="f-category" name="category" required aria-describedby="e-category">
                   <option value="">Choose one</option>
                   <option>Roofing</option><option>HVAC / AC</option><option>Plumbing</option>
@@ -399,17 +410,38 @@
                   <option>Pavers &amp; Pressure Washing</option><option>Pools</option><option>Kitchen &amp; Bath</option>
                   <option>Flooring</option><option>Landscaping</option><option>Other</option>
                 </select><span class="ferr" id="e-category"></span></div>
+              <div class="field"><label for="f-retail">Is this a retail business?</label>
+                <select id="f-retail" name="retail" required aria-describedby="e-retail">
+                  <option value="">Choose one</option><option>No</option><option>Yes</option>
+                </select><span class="ferr" id="e-retail"></span></div>
+            </div>
+          </div>
+
+          <div class="sec" data-page="contact" role="group" aria-labelledby="g-contact">
+            <div class="sec-h"><h2 id="g-contact">Contact</h2></div>
+            <div class="sec-b fields">
+              <div class="field full"><label for="f-contact">Main contact</label><input id="f-contact" name="contact" required autocomplete="name" aria-describedby="e-contact"><span class="ferr" id="e-contact"></span></div>
+              <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" aria-describedby="e-phone"><span class="ferr" id="e-phone"></span></div>
+              <div class="field"><label for="f-mobile">Mobile <span>(optional)</span></label><input id="f-mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel" aria-describedby="e-mobile"><span class="ferr" id="e-mobile"></span></div>
+              <div class="field full"><label for="f-email">Email <span>(your agreement is sent here to sign)</span></label><input id="f-email" name="email" type="email" inputmode="email" required autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="e-email"><span class="ferr" id="e-email"></span></div>
+              <div class="field"><label for="f-salesMgr">Sales manager <span>(optional)</span></label><input id="f-salesMgr" name="salesManager" autocomplete="off"></div>
+              <div class="field"><label for="f-mktMgr">Marketing manager <span>(optional)</span></label><input id="f-mktMgr" name="marketingManager" autocomplete="off"></div>
             </div>
           </div>
 
           <div class="sec" data-page="billing" role="group" aria-labelledby="g-billing">
             <div class="sec-h"><h2 id="g-billing">Billing</h2></div>
             <div class="sec-b fields">
-              <div class="field full"><label for="f-street">Street address</label><input id="f-street" name="street" required autocomplete="billing street-address" aria-describedby="e-street"><span class="ferr" id="e-street"></span></div>
-              <div class="field"><label for="f-city">City</label><input id="f-city" name="city" required autocomplete="billing address-level2" aria-describedby="e-city"><span class="ferr" id="e-city"></span></div>
-              <div class="field"><label for="f-zip">ZIP code</label><input id="f-zip" name="zip" required inputmode="numeric" autocomplete="billing postal-code" maxlength="10" aria-describedby="e-zip"><span class="ferr" id="e-zip"></span></div>
+              <label class="check full"><input type="checkbox" id="f-billSame" name="billSame" checked> Billing address is the same as the business address</label>
+              <div class="field full billalt"><label for="f-billStreet">Billing address</label><input id="f-billStreet" name="billStreet" autocomplete="billing street-address" aria-describedby="e-billStreet"><span class="ferr" id="e-billStreet"></span></div>
+              <div class="field billalt"><label for="f-billCity">City</label><input id="f-billCity" name="billCity" autocomplete="billing address-level2" aria-describedby="e-billCity"><span class="ferr" id="e-billCity"></span></div>
+              <div class="field half2 billalt">
+                <div><label for="f-billState">State</label><input id="f-billState" name="billState" autocomplete="billing address-level1" maxlength="2" autocapitalize="characters" aria-describedby="e-billState"><span class="ferr" id="e-billState"></span></div>
+                <div><label for="f-billZip">ZIP code</label><input id="f-billZip" name="billZip" inputmode="numeric" autocomplete="billing postal-code" maxlength="10" aria-describedby="e-billZip"><span class="ferr" id="e-billZip"></span></div>
+              </div>
               <div class="field full"><label for="f-billingEmail">Billing email <span>(optional)</span></label><input id="f-billingEmail" name="billingEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="e-billingEmail"><span class="ferr" id="e-billingEmail"></span></div>
               <div class="field full"><label for="f-notes">Notes for our team <span>(optional)</span></label><textarea id="f-notes" name="notes" rows="3" maxlength="1000"></textarea></div>
+              <p class="note full">No card details here. You'll choose how to pay and sign securely in DocuSign.</p>
             </div>
           </div>
         </form>
@@ -905,6 +937,7 @@ function saveSession() {
   if (state.step === 3) return;
   try {
     const form = Object.fromEntries(new FormData($("#checkoutForm"))); delete form.website;
+    form.billSame = $("#f-billSame").checked ? "1" : "0";
     sessionStorage.setItem(SAVE_KEY, JSON.stringify({ draft: packSpec(snapshot()), items: state.items.map(packSpec), pos: state.pos, step: state.step, form }));
   } catch {}
 }
@@ -915,7 +948,11 @@ function restoreSession() {
   state.items = (raw.items || []).map(validSpec).filter(sp => sp && sp.zones.size && sp.months.size);
   state.pos = Number.isInteger(raw.pos) ? raw.pos : state.items.length;
   loadSpec(draft); $("#reqText").value = state.reqText;
-  Object.entries(raw.form || {}).forEach(([k, v]) => { const el = $("#checkoutForm").elements[k]; if (el && k !== "website") el.value = v; });
+  Object.entries(raw.form || {}).forEach(([k, v]) => {
+    const el = $("#checkoutForm").elements[k]; if (!el || k === "website") return;
+    if (el.type === "checkbox") el.checked = v === "1"; else el.value = v;
+  });
+  syncBillSame();
   state.step = raw.step === 2 && calcOrder().lines.length ? 2 : 1;
   return true;
 }
@@ -1136,8 +1173,12 @@ function render() {
    One page at a time, like a checkout, on phones and desktop alike.
    Package pages, then two details pages.
    =========================================================== */
-const PAGES = { 1: ["pub", "size", "zones", "months", "place", "art", "review"], 2: ["contact", "billing"] };
-const PAGE_FIELDS = { contact: ["business", "contact", "phone", "email", "category"], billing: ["street", "city", "zip", "billingEmail"] };
+const PAGES = { 1: ["pub", "size", "zones", "months", "place", "art", "review"], 2: ["business", "contact", "billing"] };
+const PAGE_FIELDS = {
+  business: ["business", "street", "city", "state", "zip", "category", "retail"],
+  contact: ["contact", "phone", "mobile", "email"],
+  billing: ["billStreet", "billCity", "billState", "billZip", "billingEmail"],
+};
 const paged = () => true;          // one page at a time on every screen size
 state.page = 0;
 function renderPaged(o) {
@@ -1172,10 +1213,10 @@ $("#pNext").onclick = () => {
   if (sending) return;
   const cur = PAGES[state.step][state.page];
   if (state.step === 1 && cur !== "review") { state.page++; render(); toTop(); return; }
-  if (cur === "contact") {
-    const bad = PAGE_FIELDS.contact.filter(name => !checkField(name));
+  if (state.step === 2 && cur !== "billing") {
+    const bad = PAGE_FIELDS[cur].filter(name => !checkField(name));
     if (bad.length) { form.elements[bad[0]].focus(); return; }
-    state.page = 1; render(); toTop(); return;
+    state.page++; render(); toTop(); return;
   }
   $("#nextBtn").click();          // review → details, or billing → send (same code path as desktop)
 };
@@ -1191,15 +1232,29 @@ $("#pBack").onclick = () => {
    Details form: inline validation next to each field
    =========================================================== */
 const form = $("#checkoutForm");
+const billSame = () => $("#f-billSame").checked;
+function syncBillSame() {
+  form.classList.toggle("bill-same", billSame());
+  if (billSame()) ["billStreet", "billCity", "billState", "billZip"].forEach(n => checkField(n));   // clear stale errors
+}
+$("#f-billSame").addEventListener("change", () => { syncBillSame(); saveSession(); if (!billSame()) $("#f-billStreet").focus(); });
+form.classList.toggle("bill-same", billSame());
 const RULES = {
   business: v => (v ? "" : "Enter your business name."),
   contact:  v => (v ? "" : "Enter a contact name."),
   phone:    v => (!v ? "Enter a phone number." : v.replace(/\D/g, "").length < 10 ? "Enter a 10-digit phone number." : ""),
   email:    v => (!v ? "Enter an email address." : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? "" : "Enter a valid email address, like name@business.com."),
   category: v => (v ? "" : "Choose a service category."),
-  street:   v => (v ? "" : "Enter the billing street address."),
-  city:     v => (v ? "" : "Enter the billing city."),
-  zip:      v => (!v ? "Enter the billing ZIP code." : /^\d{5}(-\d{4})?$/.test(v) ? "" : "Enter a 5-digit ZIP code."),
+  street:   v => (v ? "" : "Enter the business address."),
+  city:     v => (v ? "" : "Enter the city."),
+  state:    v => (/^[A-Za-z]{2}$/.test(v) ? "" : "Enter the 2-letter state, like FL."),
+  zip:      v => (!v ? "Enter the ZIP code." : /^\d{5}(-\d{4})?$/.test(v) ? "" : "Enter a 5-digit ZIP code."),
+  retail:   v => (v ? "" : "Choose yes or no."),
+  mobile:   v => (!v || v.replace(/\D/g, "").length >= 10 ? "" : "Enter a 10-digit number, or leave this empty."),
+  billStreet: v => (billSame() || v ? "" : "Enter the billing address."),
+  billCity:   v => (billSame() || v ? "" : "Enter the billing city."),
+  billState:  v => (billSame() || /^[A-Za-z]{2}$/.test(v) ? "" : "Enter the 2-letter state."),
+  billZip:    v => (billSame() || /^\d{5}(-\d{4})?$/.test(v) ? "" : "Enter a 5-digit billing ZIP code."),
   billingEmail: v => (!v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? "" : "Enter a valid email address, or leave this empty."),
 };
 function checkField(name) {
@@ -1212,7 +1267,7 @@ function checkField(name) {
 function checkAll() {
   const bad = Object.keys(RULES).filter(name => !checkField(name));
   if (bad.length) {
-    if (paged()) { state.page = PAGE_FIELDS.contact.includes(bad[0]) ? 0 : 1; renderPaged(calcOrder()); }   // show the page that holds it
+    if (paged()) { state.page = Math.max(0, PAGES[2].findIndex(pg => PAGE_FIELDS[pg].includes(bad[0]))); renderPaged(calcOrder()); }   // show the page that holds it
     form.elements[bad[0]].focus();
   }
   return bad;
@@ -1290,6 +1345,8 @@ function buildOrder() {
   const customer = Object.fromEntries(new FormData(form));
   delete customer.website;
   Object.keys(customer).forEach(k => { customer[k] = String(customer[k]).trim(); });
+  customer.billSame = billSame();
+  customer.state = (customer.state || "").toUpperCase();
   // One id per request, reused on retry so the receiving system can drop duplicates.
   state.requestId ||= (crypto.randomUUID ? crypto.randomUUID() : "r" + Date.now() + Math.random().toString(36).slice(2));
   return {
@@ -1321,8 +1378,107 @@ function buildOrder() {
         total: Math.round(o.total),
       },
       customer,
+      ...agreementData(o, customer),
     },
   };
+}
+
+/* ===========================================================
+   DocuSign + Smartsheet: the request laid out like the BDB / EHI Advertising Agreement.
+   agreementTabs  → one value per field on the agreement, keyed by the DocuSign tab label
+                    (see integration/docusign-tabs.csv). Checkboxes are true / false.
+   smartsheetRow  → one flat row, keyed by Smartsheet column name (integration/smartsheet-columns.csv).
+   Card number, expiry and signatures are left for the advertiser to enter in DocuSign.
+   =========================================================== */
+const AGREEMENT_ROWS = [      // the agreement's product rows and the zones each one can mail
+  { key: "BDB",   pub: "bdb", zones: [1, 2, 3, 5, 6, 7], label: "Best Deals Books (Zones 1, 2, 3, 5, 6, 7)" },
+  { key: "BDBZ4", pub: "bdb", zones: [4],                label: "Best Deals Books - Zone 4" },
+  { key: "EHI",   pub: "ehi", zones: [1, 2, 3, 5],       label: "Exclusively Home Improvements (Zones 1, 2, 3, 5)" },
+];
+const MON3 = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
+const zoneNo = (z) => parseInt(String(z.id).replace(/\D/g, ""), 10);
+const cents = (n) => Math.round(n * 100) / 100;
+function agreementData(o, c) {
+  const rows = AGREEMENT_ROWS.map(r => ({ ...r, sizes: [], zoneSet: new Set(), perMonth: 0 }));
+  o.lines.forEach(l => {
+    const each = l.zones.length ? l.oneMag / l.zones.length : 0;       // one magazine, per zone, per issue
+    l.pub.includes.forEach(pubId => {
+      rows.filter(r => r.pub === pubId).forEach(r => {
+        const zs = l.zones.filter(z => r.zones.includes(zoneNo(z))); if (!zs.length) return;
+        if (!r.sizes.includes(l.size.name)) r.sizes.push(l.size.name);
+        zs.forEach(z => r.zoneSet.add(zoneNo(z)));
+        r.perMonth += each * zs.length;
+      });
+    });
+  });
+  const monthKeys = MONTHS.filter(m => o.monthSet.has(m.key)).map(m => m.key);
+  const first = monthKeys[0] ? monthByKey[monthKeys[0]] : null;
+  const monthly = rows.reduce((a, r) => a + r.perMonth, 0);
+  const sched = monthSchedule(o), varies = new Set(sched.map(x => Math.round(x.amount))).size > 1;
+  const adText = (l) => `Ad ${l.no}: ${l.size.name}, ${l.pub.name}, ${l.zones.map(z => z.id).join(" ")}, ${monthList(l.sp.months)}`
+    + `, ${money(l.perIssue)}/issue` + (l.place.premium ? `, ${l.place.name} (fee TBD)` : "")
+    + (l.sp.req ? `, placement request: ${l.sp.reqText.trim() || "see request"} (fee TBD)` : "") + `, artwork: ${l.art.name}`;
+  const notes = [
+    ...o.lines.map(adText),
+    ...(varies ? ["Monthly amounts vary: " + sched.map(x => `${x.label} ${money(x.amount)}`).join("; ")] : []),
+    `Contract total ${money(o.total)} (${o.freq.name}). Request ${state.requestId}.`,
+    ...(c.notes ? ["Advertiser notes: " + c.notes] : []),
+  ].join("\n");
+  const bill = c.billSame
+    ? { street: c.street, city: c.city, state: c.state, zip: c.zip }
+    : { street: c.billStreet, city: c.billCity, state: c.billState, zip: c.billZip };
+  const upper = (v) => String(v || "").toUpperCase();
+
+  const t = {
+    Company: c.business, DBA: c.dba || "", LicenseNo: c.license || "",
+    Address: c.street, City: c.city, State: upper(c.state), Zip: c.zip,
+    Phone: c.phone, Mobile: c.mobile || "", Email: c.email,
+    MainContact: c.contact, SalesManager: c.salesManager || "", MarketingManager: c.marketingManager || "",
+  };
+  rows.forEach(r => {
+    const used = r.zoneSet.size > 0;
+    t[`${r.key}_RatePerZone`] = used ? cents(r.perMonth / r.zoneSet.size) : "";
+    t[`${r.key}_AdSize`] = r.sizes.join(" + ");
+    r.zones.forEach(n => { t[`${r.key}_Zone${n}`] = r.zoneSet.has(n); });
+    t[`${r.key}_TotalPerMonth`] = used ? cents(r.perMonth) : "";
+  });
+  Object.assign(t, {
+    NextLead360_Rate: "", NextLead360_AdSizeCPM: "", NextLead360_TotalPerMonth: "",
+    Notes: notes, MonthlyTotal: cents(monthly),
+    Term_3X: o.freq.id === "3x", Term_6X: o.freq.id === "6x", Term_12X: o.freq.id === "12x",
+    IssueStartMonth: first ? MON3[+first.key.slice(5) - 1] : "", IssueStartYear: first ? first.key.slice(0, 4) : "",
+    Retail: c.retail === "Yes", SelectAllMonths: monthKeys.length >= 12,
+    BillingSameAsAbove: !!c.billSame,
+    BillingAddress: c.billSame ? "" : bill.street, BillingCity: c.billSame ? "" : bill.city,
+    BillingState: c.billSame ? "" : upper(bill.state), BillingZip: c.billSame ? "" : bill.zip,
+    PrintName: c.contact, Date: new Date().toLocaleDateString("en-US"),
+  });
+  MON3.forEach((m, i) => { t[`Month_${m}`] = monthKeys.some(k => +k.slice(5) === i + 1); });
+
+  const smartsheetRow = {
+    "Request ID": state.requestId, "Submitted": new Date().toISOString(), "Status": "New request",
+    "Company": c.business, "DBA": c.dba || "", "License #": c.license || "",
+    "Address": c.street, "City": c.city, "State": upper(c.state), "ZIP": c.zip,
+    "Phone": c.phone, "Mobile": c.mobile || "", "Email": c.email,
+    "Main Contact": c.contact, "Sales Manager": c.salesManager || "", "Marketing Manager": c.marketingManager || "",
+    "Service Category": c.category, "Retail": c.retail,
+    "Magazines": [...new Set(o.lines.flatMap(l => l.pub.includes.map(p => pubShort[p])))].join(", "),
+    "Ad Sizes": [...new Set(o.lines.map(l => l.size.name))].join(", "),
+    "Zones": [...new Set(o.lines.flatMap(l => l.zones.map(z => z.id)))].sort().join(", "),
+    "Ads": o.lines.length,
+    "Term": o.freq.id.toUpperCase(),
+    "Issue Start": first ? first.long : "",
+    "Issue Months": monthKeys.map(k => monthByKey[k].short + " " + monthByKey[k].year).join(", "),
+    "Issues": monthKeys.length,
+    "Monthly Total": cents(monthly), "Contract Total": Math.round(o.total),
+    "Placement Upgrades": o.lines.flatMap(upgradesOf).join(", "), "Placement Fee TBD": o.tbd ? "Yes" : "No",
+    "Artwork": [...new Set(o.lines.map(l => l.art.name))].join(", "),
+    "Billing Same As Business": c.billSame ? "Yes" : "No",
+    "Billing Address": bill.street, "Billing City": bill.city, "Billing State": upper(bill.state), "Billing ZIP": bill.zip,
+    "Billing Email": c.billingEmail || "", "Notes": notes,
+    "DocuSign Envelope ID": "", "DocuSign Status": "",
+  };
+  return { agreementTabs: t, smartsheetRow };
 }
 
 // Sends the request. Resolves only when the endpoint answers with a success status.
@@ -1429,7 +1585,7 @@ $("#backBtn").onclick = () => { if (sending) return; state.step = 1; state.sendE
 $("#printOrder").onclick = () => window.print();
 $("#newOrder").onclick = () => {
   clearSession();
-  form.reset(); $("#reqText").value = "";
+  form.reset(); form.classList.add("bill-same"); $("#reqText").value = "";
   form.querySelectorAll(".bad").forEach(f => f.classList.remove("bad")); form.querySelectorAll(".ferr").forEach(f => { f.textContent = ""; });
   Object.assign(state, { page: 0, items: [], pos: 0, size: "fp", place: "std", req: false, reqText: "", months: new Set(), step: 1, notice: "", zoneNotice: "", upOpen: false, estOpen: false, sendError: "", requestId: null });
   pruneZones(); state.zoneNotice = "";
