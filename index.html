@@ -209,11 +209,15 @@
   footer a { color: var(--brand-deep); font-weight: 600; }
   noscript p { margin: 0; padding: 16px 0; font-weight: 600; }
 
-  /* ---------- Phones: a paged checkout that fills one screen ----------
+  /* ---------- A paged checkout that fills one screen (every screen size) ----------
      Column layout: head, the current page (scrolls if it is long), the action bar.
      html.flow = embedded in a frame the host resizes: natural height, bar at the end. */
   .pbar, .pprog { display: none; }
-  @media (max-width: 700px) {
+  html.paged .wrap { max-width: 760px; }
+  html.paged .grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  html.paged .est { position: static; padding: 20px; }
+  html.paged #jumpEst { display: inline; }
+  @media all {
     html.paged:not(.flow), html.paged:not(.flow) body { height: 100%; }
     html.paged:not(.flow) body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     html.paged:not(.flow) body > * { width: 100%; }          /* auto side margins would shrink-wrap flex items */
@@ -249,6 +253,21 @@
     .pnote { font-size: 14px; margin: 0 0 8px; }
     html.paged #sizeOpts .opt { padding: 11px 14px; }
   }
+  /* ---------- Splash: what's about to happen, shown once per visit ---------- */
+  .splash { display: none; }
+  html.show-splash .splash { display: block; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  html.show-splash .head, html.show-splash main, html.show-splash .pbar, html.show-splash footer { display: none !important; }
+  .splash-in { padding-top: clamp(28px, 6vw, 64px); padding-bottom: 40px; }
+  .splash h1 { font-size: clamp(30px, 5.2vw, 46px); line-height: 1.08; font-weight: 700; }
+  .splash h1:focus, .sec-h h2:focus { outline: none; }
+  .splash-lede { margin: 12px 0 0; color: var(--muted); font-size: 18px; max-width: 30em; }
+  .splash .next { margin: 28px 0 32px; gap: 18px; }
+  .splash .next b { font-size: 17px; }
+  .splash-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
+  .splash-facts li { background: var(--brand-wash); color: var(--brand-deep); font-weight: 600; font-size: 14px; border-radius: 999px; padding: 6px 14px; }
+  .splash .btn { max-width: 360px; }
+  .splash-note { color: var(--muted); font-size: 15px; margin: 16px 0 0; }
+  .splash-note a { color: var(--brand-deep); font-weight: 600; }
   @media (prefers-reduced-motion: reduce) { html.paged .pprog i { transition: none; } }
   @media (prefers-reduced-motion: reduce) { .opt:active:not(:disabled), .btn:active:not(:disabled) { transform: none; } }
   @media print {
@@ -265,6 +284,22 @@
     <a href="tel:8446008846">844-600-8846</a>
   </div>
 </div>
+
+<section class="splash" id="splash" aria-labelledby="splashTitle">
+  <div class="wrap splash-in">
+    <h1 id="splashTitle" tabindex="-1">Book your magazine ad in a few minutes</h1>
+    <p class="splash-lede">Here's what's about to happen.</p>
+    <ol class="next">
+      <li><div><b>Build your ad</b><span>Pick the magazine, ad size, markets and the months you want to run. Add as many ads as you like.</span></div></li>
+      <li><div><b>See your price as you go</b><span>Your estimate updates with every choice. Booking more months lowers the price per issue.</span></div></li>
+      <li><div><b>Send your details</b><span>Your business, contact and billing info. No payment is taken today.</span></div></li>
+      <li><div><b>We confirm and send your agreement</b><span>We check your placement, then send a DocuSign agreement and invoice.</span></div></li>
+    </ol>
+    <ul class="splash-facts"><li>About 3 minutes</li><li>No payment today</li><li>Nothing is booked until you sign</li></ul>
+    <button class="btn" id="startBtn" type="button">Get started</button>
+    <p class="splash-note">Questions? Call <a href="tel:8446008846">844-600-8846</a>.</p>
+  </div>
+</section>
 
 <header class="wrap head">
   <h1>Request ad space</h1>
@@ -1040,10 +1075,12 @@ function render() {
     onClick: () => { state.art = a.id; render(); },
   })));
 
-  // "Ad 2 of 2" strip when the package has more than one ad
+  // "Ad 1" strip, or "Ad 2 of 2" once the package has more than one ad
   const head = $("#adHead");
-  head.classList.toggle("hidden", !n);
-  if (n) head.innerHTML = `<b>Ad ${state.pos + 1} of ${n + 1}</b><span class="grow">${plural(n, "other ad")} saved in your estimate.</span><button type="button" class="linkbtn" id="jumpEst">View estimate</button>`;
+  head.classList.remove("hidden");
+  head.innerHTML = n
+    ? `<b>Ad ${state.pos + 1} of ${n + 1}</b><span class="grow">${plural(n, "other ad")} saved in your estimate.</span><button type="button" class="linkbtn" id="jumpEst">View estimate</button>`
+    : `<b>Ad 1</b><span class="grow">Build your first ad. You can add more before checkout.</span>`;
 
   // ---------- estimate (the one summary) ----------
   const many = o.lines.length > 1 || n > 0;
@@ -1096,13 +1133,12 @@ function render() {
 }
 
 /* ===========================================================
-   Phones: one page at a time, like a checkout.
-   Package pages, then two details pages. Desktop shows everything at once.
+   One page at a time, like a checkout, on phones and desktop alike.
+   Package pages, then two details pages.
    =========================================================== */
 const PAGES = { 1: ["pub", "size", "zones", "months", "place", "art", "review"], 2: ["contact", "billing"] };
 const PAGE_FIELDS = { contact: ["business", "contact", "phone", "email", "category"], billing: ["street", "city", "zip", "billingEmail"] };
-const phoneQuery = matchMedia("(max-width: 700px)");
-const paged = () => phoneQuery.matches;
+const paged = () => true;          // one page at a time on every screen size
 state.page = 0;
 function renderPaged(o) {
   const on = paged(), est = $("#estimate");
@@ -1150,7 +1186,6 @@ $("#pBack").onclick = () => {
   else if (state.step === 2) { state.step = 1; state.page = PAGES[1].length - 1; }
   render(); toTop();
 };
-phoneQuery.addEventListener("change", () => render());
 
 /* ===========================================================
    Details form: inline validation next to each field
@@ -1432,6 +1467,17 @@ if (embedded && !fitFrame) {
   // A parent that loads late can ask for the height again.
   addEventListener("message", (e) => { if (e.source === window.parent && e.data && e.data.type === "bda-ping") { last = 0; post(); } });
 }
+
+// Splash: shown once per visit, before the first page.
+const SPLASH_KEY = "bdaSplashSeen";
+const splashSeen = (() => { try { return sessionStorage.getItem(SPLASH_KEY) === "1"; } catch { return false; } })();
+if (!splashSeen) document.documentElement.classList.add("show-splash");
+$("#startBtn").onclick = () => {
+  try { sessionStorage.setItem(SPLASH_KEY, "1"); } catch {}
+  document.documentElement.classList.remove("show-splash");
+  toTop();
+  const h = document.querySelector(".sec:not(.off) h2"); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); }
+};
 
 fetchRates().then(() => {
   const restored = restoreSession();

@@ -40,14 +40,17 @@ The form was redesigned against the Hallmark skill's rule list (the stamp is the
 - A slim black bar with the wordmark and phone number; it's hidden when the form is embedded in a host page.
 - Not done: the skill's lint and render pass, because its scripts and reference files weren't available when this was built.
 
-## Phones: a paged checkout
-At 700px wide or less the form shows one page at a time and fills exactly one screen:
+## Splash screen
+The first time someone opens the form in a visit, a short intro explains what's about to happen: build your ad, see your price as you go, send your details, then we confirm and send the agreement and invoice. It also says "About 3 minutes", "No payment today" and "Nothing is booked until you sign". **Get started** opens the first page. It isn't shown again in the same browser tab (sessionStorage).
+
+## A paged checkout on every screen
+On phones, tablets and desktop the form shows one page at a time and fills exactly one screen. On wide screens the column is capped at 760px:
 - **Nine pages:** Magazine, Ad size, Markets, Issue months, Placement, Artwork, Estimate, then Business and contact, then Billing. Confirmation follows.
 - **Layout:** the head, the current page, and an action bar are stacked in a column the height of the screen. A long page scrolls between the head and the bar. The bar is part of the layout, not an overlay, so it never covers a field, an error or a choice.
 - **Action bar:** the running estimated total, "2 of 9", Back, and one primary button (Next, Continue to details, Send ad request). Next is disabled with a reason when a page needs a choice (a market, a month).
 - **Estimate page:** every ad with Edit and Remove, the monthly breakdown, the total, and "Add another ad". Adding an ad starts the next one at Ad size; Edit reopens that ad at page 1.
 - **Details:** each page validates its own fields before moving on. If sending fails, or a field on the other page is wrong, the form shows that page.
-- Desktop and tablets keep everything on one page with the estimate beside the form.
+- **Ad 1:** every package page starts with "Ad 1" (or "Ad 2 of 2" and so on once more ads are saved), so it's clear which ad is being built.
 
 **Embedded on a phone:** with the resizing embed (`godaddy-embed.html`) each page takes its natural height and the host frame follows it. With a fixed-height frame, add `?fit=frame` to the form's address (as `godaddy-embed-fixed.html` does) and the form fills the frame the same way it fills a screen.
 
