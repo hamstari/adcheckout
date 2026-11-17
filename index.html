@@ -272,6 +272,87 @@
   .splash .btn { max-width: 360px; }
   .splash-note { color: var(--muted); font-size: 15px; margin: 16px 0 0; }
   .splash-note a { color: var(--brand-deep); font-weight: 600; }
+  .head-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .hcall { display: none; color: var(--brand-deep); font-weight: 600; font-size: 14px; text-decoration: none; white-space: nowrap; }
+
+  /* ---------- Phones: compact, so each page fits one screen ----------
+     Chrome is one title row, the step line and a one-row action bar; cards go two across. */
+  @media (max-width: 700px) {
+    html.paged .bar { display: none; }
+    html.paged .hcall { display: inline; }
+    html.paged .head { padding-top: 10px; padding-bottom: 8px; }
+    html.paged .head h1 { font-size: 18px; line-height: 1.3; }
+    html.paged .steps { margin-top: 8px; gap: 6px; }
+    html.paged .steps li { border-top-width: 3px; padding-top: 4px; font-size: 12.5px; }
+    html.paged .steps .sn { display: none; }
+    html.paged .steps li.done .sn { display: inline-grid; }
+    html.paged .pprog { display: none; }
+    html.paged .grid { padding-bottom: 12px; }
+    html.paged .sec { padding-top: 6px; }
+    html.paged .sec-h { margin-bottom: 10px; }
+    html.paged .sec-h h2, html.paged .est h2 { font-size: 19px; }
+    html.paged .sub, html.paged .note { font-size: 14px; }
+    html.paged .sub { margin-bottom: 8px; }
+    html.paged .note { margin-top: 8px; }
+    html.paged .adhead { font-size: 14px; padding-bottom: 4px; }
+    html.paged .adhead .grow { display: none; }               /* keep the "Ad 1 of 2" label and the estimate link */
+    html.paged .adhead b { font-size: 15px; }
+
+    /* cards */
+    html.paged .opt { padding: 10px 12px; }
+    html.paged .opt b { font-size: 15px; }
+    html.paged .opt small { font-size: 13px; }
+    html.paged .opt .price { margin-top: 2px; font-size: 14px; }
+    html.paged .opts, html.paged #zoneOpts { gap: 8px; }
+    html.paged #sizeOpts, html.paged #zoneOpts, html.paged #placeOpts, html.paged #artOpts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    html.paged #sizeOpts .opt { display: flex; padding-top: 24px; }
+    html.paged #sizeOpts .opt svg { display: none; }
+    html.paged #sizeOpts .opt b { padding-right: 0; }
+    html.paged #sizeOpts .opt .spec { top: 8px; left: 12px; right: auto; font-size: 11.5px; }
+    html.paged #sizeOpts .grp-label { display: none; }      /* standard sizes first, then covers; the order says it */
+    html.paged #pubOpts .opt { padding: 12px 14px; }
+    html.paged .months { gap: 6px; }
+    html.paged .months .opt { padding: 9px 6px; text-align: center; align-items: center; }
+    html.paged .months .opt b { font-size: 14px; }
+    html.paged .quick { gap: 6px; margin-bottom: 8px; }
+    html.paged .chip { padding: 5px 11px; font-size: 13px; }
+
+    /* forms: two across where the fields are short */
+    html.paged .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    html.paged .fields .full { grid-column: 1 / -1; }
+    html.paged .field label { font-size: 13.5px; line-height: 1.3; }
+    html.paged .field label span { font-size: 12px; }
+    html.paged .field input, html.paged .field select, html.paged .field textarea { margin-top: 4px; padding: 10px 12px; }
+    html.paged .field textarea { min-height: 0; height: 64px; }
+    html.paged .ferr { font-size: 13px; }
+
+    /* estimate */
+    html.paged .est { padding: 16px; }
+    html.paged .est-total strong { font-size: 40px; }
+    html.paged .eline { font-size: 14px; padding-bottom: 10px; margin-bottom: 10px; }
+    html.paged .addrow { padding-top: 12px; }
+
+    /* action bar: one row, the total and step count on the left, the buttons on the right */
+    html.paged .pbar { padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); }
+    html.paged .pbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+    html.paged .pbar .alert, html.paged .pnote { flex: 1 0 100%; margin: 0; font-size: 13px; }
+    html.paged .pmeta { flex: 1 1 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 0; margin: 0; font-size: 12.5px; line-height: 1.3; min-width: 0; }
+    html.paged .pmeta b { font-size: 17px; }
+    html.paged .prow { flex: 0 1 auto; display: flex; gap: 8px; }
+    html.paged .prow .btn { width: auto; padding: 11px 16px; font-size: 15px; white-space: nowrap; }
+    html.paged .prow .btn.ghost { padding: 11px 12px; }
+
+    /* splash */
+    html.show-splash .splash-in { padding-top: 18px; padding-bottom: 16px; }
+    html.show-splash .splash h1 { font-size: 24px; }
+    html.show-splash .splash-lede { font-size: 15px; margin-top: 8px; }
+    html.show-splash .splash .next { margin: 14px 0 14px; gap: 8px; }
+    html.show-splash .splash .next b { font-size: 15px; }
+    html.show-splash .splash .next span { font-size: 13.5px; }
+    html.show-splash .splash-facts { margin-bottom: 14px; gap: 6px; }
+    html.show-splash .splash-facts li { font-size: 12.5px; padding: 4px 10px; }
+    html.show-splash .splash-note { font-size: 14px; margin-top: 12px; }
+  }
   @media (prefers-reduced-motion: reduce) { html.paged .pprog i { transition: none; } }
   @media (prefers-reduced-motion: reduce) { .opt:active:not(:disabled), .btn:active:not(:disabled) { transform: none; } }
   @media print {
@@ -306,7 +387,7 @@
 </section>
 
 <header class="wrap head">
-  <h1>Request ad space</h1>
+  <div class="head-row"><h1>Request ad space</h1><a class="hcall" href="tel:8446008846">844-600-8846</a></div>
   <p class="lede">Build your package and send it. No payment today.</p>
   <ol class="steps" id="steps" aria-label="Progress">
     <li><span class="sn">1</span>Package</li>
@@ -1012,7 +1093,7 @@ function render() {
   CONFIG.zones.forEach(z => {
     const blocked = zoneBlock(z.id);
     const named = zoneLabel(z) !== z.name;      // a real market name: show the zone code beside it
-    const title = `<b>${esc(z.name)}${named ? `<span class="code">${esc(z.id)}</span>` : ""}</b>`;
+    const title = `<b>${esc(z.name).replace(/\//g, "/<wbr>")}${named ? `<span class="code">${esc(z.id)}</span>` : ""}</b>`;
     const b = optButton({
       pressed: state.zones.has(z.id),
       label: `${z.name}${named ? ", " + z.id : ""}${blocked ? ", unavailable: " + blocked : ""}`,
@@ -1035,7 +1116,7 @@ function render() {
   const quick = $("#quickPicks"); quick.innerHTML = "";
   [3, 6, 12].filter(k => k <= MONTHS.length).forEach(k => {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "chip"; b.textContent = `Next ${k} available`;
+    b.type = "button"; b.className = "chip"; b.textContent = `Next ${k}`; b.setAttribute("aria-label", `Next ${k} available months`);
     b.onclick = () => {
       state.months.clear();
       MONTHS.filter(m => !monthBlocked(m.key)).slice(0, k).forEach(m => state.months.add(m.key));
@@ -1197,7 +1278,7 @@ function renderPaged(o) {
   $("#pFill").style.transform = `scaleX(${state.step === 3 ? 1 : at / all})`;
   $("#pCount").textContent = `${at} of ${all}`;
   $("#pTotal").textContent = money(o.total);
-  $("#pTotalRow").style.visibility = cur === "review" ? "hidden" : "visible";
+  $("#pTotalRow").style.display = cur === "review" ? "none" : "";
   const noZone = cur === "zones" && !state.zones.size, noMonth = cur === "months" && !state.months.size, noAd = cur === "review" && !o.lines.length;
   const next = $("#pNext");
   next.textContent = cur === "review" ? "Continue to details" : cur === "billing" ? (sending ? "Sending…" : "Send ad request") : "Next";
